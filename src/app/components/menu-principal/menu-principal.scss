@@ -1,0 +1,42 @@
+.sidebar-collapsed .nav-link span {
+  display: none;
+}
+
+.nav-link {
+  margin-left: 0;
+  padding-left: 0.2rem;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+}
+
+.nav-link[aria-expanded="true"] .fa-chevron-down {
+  transform: rotate(180deg);
+  transition: transform 0.5s ease;
+}
+
+/* Efeito ao passar o mouse */
+.sidebar .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* leve destaque */
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5); /* sombra interna */
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+/* Item ativo/selecionado */
+.sidebar .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
+  border-radius: 4px;
+}
+
+.btn-dark{
+  padding: 0;
+}
+
+.side-icon {
+  font-size: 1.5rem;
+}
+
+li{
+  margin-top: 0.6rem;
+}

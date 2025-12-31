@@ -1,1 +1,95 @@
 /* You can add global styles to this file, and also import other style files */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  z-index: 1030;
+}
+
+.sidebar {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  height: calc(100vh - 56px);
+  background-color: #212529;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+  z-index: 1020;
+}
+
+.sidebar-expanded {
+  width: 250px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  z-index: 1000;
+  background: #222;
+}
+
+.sidebar-collapsed {
+  width: 70px;
+}
+
+.content {
+  margin-top: 56px;
+  margin-left: 250px;
+  transition: margin-left 0.3s ease;
+}
+
+.content.collapsed {
+  margin-left: 70px;
+}
+
+.group-novo {
+  display: grid;
+  justify-content: end;
+  .novo {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+input,
+select .fomControl {
+  border: none; /* remove todas as bordas */
+  border-bottom: 1px solid #333; /* adiciona apenas linha inferior */
+  background: transparent; /* remove fundo padrão */
+  outline: none; /* remove destaque ao focar */
+  padding: 5px; /* espaço interno */
+  width: 100%; /* ocupa toda a largura */
+  font-size: 14px; /* tamanho da fonte */
+}
+
+/* efeito ao focar */
+input:focus,
+select:focus .fomControl:focus {
+  border-bottom: 2px solid #007bff; /* muda cor da linha ao focar */
+}
+
+input,
+select .fomControl {
+  transition: border-bottom-color 0.3s ease;
+}
+
+@media (min-width: 800px) {
+  .sidebar-expanded {
+    width: 250px;
+  }
+}
+
+@media (max-width: 799px) {
+  .sidebar-collapsed {
+    width: 70px;
+  }
+  .content {
+    margin-left: 70px;
+  }
+}

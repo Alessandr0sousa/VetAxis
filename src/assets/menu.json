@@ -1,0 +1,129 @@
+{
+  "items": [
+    {
+      "label": "Dashboard",
+      "icon": "fa-solid fa-chart-line",
+      "routerLink": ["/dashboard"]
+    },
+    {
+      "label": "Clientes",
+      "icon": "fa-solid fa-user",
+      "routerLink": ["/clientes"]
+    },
+    {
+      "label": "Pets",
+      "icon": "fa-solid fa-paw",
+      "routerLink": ["/pets"]
+    },
+    {
+      "label": "Consultas",
+      "icon": "fa-solid fa-stethoscope",
+      "routerLink": ["/consultas"]
+    },
+    {
+      "label": "Internação",
+      "icon": "fa-solid fa-procedures",
+      "routerLink": ["/internacao"]
+    },
+    {
+      "label": "Cadastro",
+      "icon": "fa-solid fa-user-plus",
+      "children": [
+        {
+          "label": "Clientes",
+          "icon": "fa-solid fa-user",
+          "routerLink": ["/cadastro/cliente-form"]
+        },
+        {
+          "label": "Pets",
+          "icon": "fa-solid fa-paw",
+          "routerLink": ["/cadastro/pet-form"]
+        },
+        {
+          "label": "Veterinários",
+          "icon": "fa-solid fa-user-md",
+          "routerLink": ["/cadastro/veterinarios"]
+        },
+        {
+          "label": "Funcionários",
+          "icon": "fa-solid fa-users",
+          "routerLink": ["/cadastro/funcionarios"]
+        }
+      ]
+    },
+    {
+      "label": "Agenda",
+      "icon": "fa-solid fa-calendar-days",
+      "children": [
+        {
+          "label": "Cirurgias",
+          "icon": "fa-solid fa-syringe",
+          "routerLink": ["/agenda/cirurgias"]
+        },
+        {
+          "label": "Exames",
+          "icon": "fa-solid fa-vials",
+          "routerLink": ["/agenda/exames"]
+        }
+      ]
+    },
+    {
+      "label": "Financeiro",
+      "icon": "fa-solid fa-money-bill-wave",
+      "children": [
+        {
+          "label": "Faturamento",
+          "icon": "fa-solid fa-file-invoice-dollar",
+          "routerLink": ["/financeiro/faturamento"]
+        },
+        {
+          "label": "Despesas",
+          "icon": "fa-solid fa-credit-card",
+          "routerLink": ["/financeiro/despesas"]
+        },
+        {
+          "label": "Comissões",
+          "icon": "fa-solid fa-hand-holding-dollar",
+          "routerLink": ["/financeiro/comissoes"]
+        },
+        {
+          "label": "Relatórios",
+          "icon": "fa-solid fa-chart-pie",
+          "routerLink": ["/financeiro/relatorios"]
+        }
+      ]
+    },
+    {
+      "label": "Estoque",
+      "icon": "fa-solid fa-boxes-stacked",
+      "children": [
+        {
+          "label": "Medicamentos",
+          "icon": "fa-solid fa-pills",
+          "routerLink": ["/estoque/medicamentos"]
+        },
+        {
+          "label": "Produtos",
+          "icon": "fa-solid fa-box",
+          "routerLink": ["/estoque/produtos"]
+        }
+      ]
+    },
+    {
+      "label": "Configurações",
+      "icon": "fa-solid fa-cogs",
+      "children": [
+        {
+          "label": "Usuários",
+          "icon": "fa-solid fa-user-shield",
+          "routerLink": ["/configuracoes/usuarios"]
+        },
+        {
+          "label": "Perfis de Acesso",
+          "icon": "fa-solid fa-lock",
+          "routerLink": ["/configuracoes/perfis"]
+        }
+      ]
+    }
+  ]
+}

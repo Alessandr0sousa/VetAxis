@@ -1,0 +1,70 @@
+<div
+  class="sidebar bg-dark text-white p-3"
+  [ngClass]="{ 'sidebar-collapsed': isCollapsed, 'sidebar-expanded': !isCollapsed }"
+>
+  <div class="d-flex justify-content-center align-items-center mb-3 overlay">
+    @if (!isCollapsed) {
+    <app-card-cliente (click)="toggle.emit()"></app-card-cliente>
+    } @else {
+    <button class="btn btn-sm btn-dark side-icon" (click)="toggle.emit()">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+    }
+  </div>
+
+  <ul class="nav flex-column">
+    @for (iten of itens; track iten) {
+    <li class="nav-item">
+      @if (iten.children) {
+      <a
+        class="nav-link text-white d-flex align-items-center"
+        data-bs-toggle="collapse"
+        [attr.data-bs-target]="'#collapse-' + iten.label"
+        role="button"
+        aria-expanded="false"
+        [attr.aria-controls]="'collapse-' + iten.label"
+        [title]="iten.label"
+      >
+        <i [class]="iten.icon + ' side-icon'"></i>
+        @if (!isCollapsed) {
+        <span class="ms-2">{{ iten.label }}</span>
+        <i class="fa-solid fa-chevron-down ms-auto"></i>
+        }
+      </a>
+
+      <div class="collapse" [attr.id]="'collapse-' + iten.label">
+        @if (iten.children && !isCollapsed) {
+        <ul class="nav flex-column ms-3">
+          @for (child of iten.children; track child) {
+          <li class="nav-item">
+            <a
+              class="nav-link text-white d-flex align-items-center"
+              [routerLink]="child.routerLink"
+              [title]="child.label"
+            >
+              <i [class]="child.icon + ' side-icon'"></i>
+              <span class="ms-2">{{ child.label }}</span>
+            </a>
+          </li>
+          }
+        </ul>
+        }
+      </div>
+      } @else {
+      <a
+        class="nav-link text-white d-flex align-items-center"
+        [routerLink]="iten.routerLink"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        [title]="iten.label"
+      >
+        <i [class]="iten.icon + ' side-icon'"></i>
+        @if (!isCollapsed) {
+        <span class="ms-2">{{ iten.label }}</span>
+        }
+      </a>
+      }
+    </li>
+    }
+  </ul>
+</div>

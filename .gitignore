@@ -40,3 +40,8 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+src/app/components/clientes/cliente-form/cliente-form.html
+angular.json
+package-lock.json
+package.json
+tsconfig.json

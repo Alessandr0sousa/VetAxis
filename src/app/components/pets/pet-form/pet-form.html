@@ -1,0 +1,172 @@
+<div class="mt-3">
+  <div class="card-header mb-3">
+    <h5 class="mb-0">{{ petId ? 'Editar' : 'Cadastrar' }} Pet</h5>
+  </div>
+  <div class="card-body">
+    <form [formGroup]="petForm" (ngSubmit)="salvarPet()">
+      <div class="container g-2 row">
+        <!-- Nome -->
+        <div class="mb-3 col-4">
+          <label class="form-label">Nome do Animal</label>
+          <input
+            type="text"
+            class="fomControl"
+            formControlName="nome"
+            placeholder="Digite o nome"
+          />
+        </div>
+
+        <!-- Sexo -->
+        <div class="mb-3 col-2">
+          <label class="form-label">Sexo</label>
+          <input
+            class="fomControl"
+            list="sexoOptions"
+            formControlName="sexo"
+            placeholder="Digite ou selecione o sexo"
+          />
+          <datalist id="sexoOptions">
+            <option value="Macho"></option>
+            <option value="Fêmea"></option>
+          </datalist>
+        </div>
+
+        <!-- Esterilização -->
+        <div class="form-check form-switch mb-3 col-2 check">
+          <label class="form-label" for="esterilizacao">Esterilizado</label>
+          <input
+            class="form-check-input formControl"
+            type="checkbox"
+            role="switch"
+            id="esterilizacao"
+            formControlName="esterilizacao"
+          />
+        </div>
+
+        <!-- Nascimento -->
+        <div class="mb-3 col-4">
+          <label class="form-label">Nascimento</label>
+          <input type="date" class="fomControl" formControlName="nascimento" />
+        </div>
+
+        <!-- Espécie -->
+        <div class="mb-3 col-2">
+          <label class="form-label">Espécie</label>
+          <input
+            class="fomControl"
+            list="especiesOptions"
+            formControlName="especie"
+            placeholder="Digite ou selecione a espécie"
+          />
+          <datalist id="especiesOptions">
+            <option value="Cão"></option>
+            <option value="Gato"></option>
+            <option value="Ave"></option>
+            <option value="Réptil"></option>
+            <option value="Roedor"></option>
+            <option value="Peixe"></option>
+          </datalist>
+        </div>
+
+        <!-- Raça -->
+        <div class="mb-3 col-3">
+          <label class="form-label">Raça</label>
+          <input
+            class="fomControl"
+            list="racasOptions"
+            formControlName="raca"
+            placeholder="Digite ou selecione a raça"
+          />
+          <datalist id="racasOptions">
+            <option value="Labrador"></option>
+            <option value="Poodle"></option>
+            <option value="Bulldog"></option>
+            <option value="Persa"></option>
+            <option value="Siamês"></option>
+            <option value="Pastor Alemão"></option>
+            <option value="Golden Retriever"></option>
+          </datalist>
+        </div>
+
+        <!-- Pelagem -->
+        <div class="mb-3 col-2">
+          <label class="form-label">Pelagem (Cor)</label>
+          <input
+            class="fomControl"
+            list="corPelagemOptions"
+            formControlName="pelagem"
+            placeholder="Digite ou selecione a cor da pelagem"
+          />
+          <datalist id="corPelagemOptions">
+            <option value="Preta"></option>
+            <option value="Branca"></option>
+            <option value="Marrom"></option>
+            <option value="Cinza"></option>
+            <option value="Amarela"></option>
+            <option value="Caramelo"></option>
+            <option value="Tigrada"></option>
+            <option value="Malhada"></option>
+            <option value="Mesclada"></option>
+          </datalist>
+        </div>
+
+        <!-- Temperamento -->
+        <div class="mb-3 col-2">
+          <label class="form-label">Temperamento</label>
+          <input
+            class="fomControl"
+            list="temperamentoOptions"
+            formControlName="temperamento"
+            placeholder="Digite ou selecione o temperamento"
+          />
+          <datalist id="temperamentoOptions">
+            <option value="Calmo"></option>
+            <option value="Agitado"></option>
+            <option value="Brincalhão"></option>
+            <option value="Sociável"></option>
+            <option value="Agressivo"></option>
+            <option value="Medroso"></option>
+            <option value="Protetor"></option>
+            <option value="Independente"></option>
+            <option value="Carinhoso"></option>
+          </datalist>
+        </div>
+
+        <!-- Microchip -->
+        <div class="form-check mb-3 col-2 checkbox">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            formControlName="microchip"
+            id="microchip"
+          />
+          <label class="form-check-label" for="microchip">Possui microchip</label>
+        </div>
+
+        <!-- Status -->
+        <div class="form-check mb-3 col-1 checkbox">
+          <input type="checkbox" class="form-check-input" formControlName="status" id="status" />
+          <label class="form-check-label" for="status">Ativo</label>
+        </div>
+        <!-- <div class="mb-3">
+          <label class="form-label">Cliente</label>
+          <select class="form-select" formControlName="clienteId">
+            <option value="">Selecione o cliente</option>
+            @for (cliente of clientes; track cliente.id) {}
+            <option [value]="cliente.id">
+              {{ cliente.nome }}
+            </option>
+          </select>
+        </div> -->
+
+        <!-- Botões -->
+        <div class="d-flex justify-content-end">
+          <button type="submit" class="btn btn-success me-2" [disabled]="petForm.invalid">
+            {{ petId ? 'Atualizar' : 'Salvar' }}
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="cancelarPet()">Cancelar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
