@@ -21,10 +21,22 @@ O backend é responsável por fornecer os dados e autenticação da aplicação.
 ---
 
 ## 📂 Estrutura do Projeto
-src/ ├── app/ │    ├── components/ │    │    ├── card-cliente/ │    │    └── menu-principal/ │    ├── pages/ │    │    ├── dashboard/ │    │    ├── pets/ │    │    ├── agenda/ │    │    ├── internacoes/ │    │    ├── estoque/ │    │    └── financeiro/ │    └── app.component.ts ├── assets/ │    └── menu.json
-
----
-
+src/
+ ├── app/
+ │    ├── components/
+ │    │    ├── card-cliente/
+ │    │    └── menu-principal/
+ │    ├── pages/
+ │    │    ├── dashboard/
+ │    │    ├── pets/
+ │    │    ├── agenda/
+ │    │    ├── internacoes/
+ │    │    ├── estoque/
+ │    │    └── financeiro/
+ │    └── app.component.ts
+ ├── assets/
+ │    └── menu.json
+ 
 ## ⚙️ Funcionalidades
 - **Menu lateral responsivo** com suporte a submenus.  
 - **Dashboard** com visão geral da clínica.  
