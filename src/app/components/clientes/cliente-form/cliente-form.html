@@ -1,0 +1,178 @@
+<div class="mt-3">
+  <div class="card-header row">
+    <div class="mb-3 col-9">
+      <h5 class="mb-0">{{ cliente ? 'Editar' : 'Cadastrar' }} Cliente</h5>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <form [formGroup]="clienteForm" (ngSubmit)="salvarCliente()">
+      <div class="container-fluid">
+        <div class="row g-1">
+          <!-- Nome -->
+          <div class="mb-3 col-6 col-sm-6">
+            <label for="nome" class="form-label">Nome</label>
+            <input
+              id="nome"
+              type="text"
+              class="fomControl"
+              formControlName="nome"
+              placeholder="Digite o nome"
+            />
+            @if (clienteForm.get('nome')?.invalid && clienteForm.get('nome')?.touched) {
+            <div class="text-danger">Nome é obrigatório.</div>
+            }
+          </div>
+
+          <!-- CPF -->
+          <div class="mb-3 col-3">
+            <label for="cpf" class="form-label">CPF</label>
+            <input
+              id="cpf"
+              type="text"
+              class="fomControl"
+              formControlName="cpf"
+              placeholder="Digite o CPF"
+              (keyup)="formatarCampo($event)"
+              maxlength="14"
+            />
+            @if (clienteForm.get('cpf')?.invalid && clienteForm.get('cpf')?.touched) {
+            <div class="text-danger">CPF é obrigatório.</div>
+            }
+          </div>
+
+          <!-- Telefone -->
+          <div class="mb-3 col-3">
+            <label for="telefone" class="form-label">Telefone</label>
+            <input
+              id="telefone"
+              type="tel"
+              class="fomControl"
+              formControlName="telefone"
+              placeholder="Digite o telefone"
+              (keyup)="formatarCampo($event)"
+              maxlength="15"
+            />
+            @if (clienteForm.get('telefone')?.invalid && clienteForm.get('telefone')?.touched) {
+            <div class="text-danger">Telefone é obrigatório.</div>
+            }
+          </div>
+
+          <!-- Email -->
+          <div class="mb-3 col-6">
+            <label for="email" class="form-label">Email</label>
+            <input
+              id="email"
+              type="email"
+              class="fomControl"
+              formControlName="email"
+              placeholder="Digite o email"
+            />
+            @if (clienteForm.get('email')?.invalid && clienteForm.get('email')?.touched) {
+            <div class="text-danger">Email inválido.</div>
+            }
+          </div>
+
+          <!-- Endereço -->
+          <div class="mb-3 col-2" formGroupName="endereco">
+            <label for="cep" class="form-label">CEP</label>
+            <input
+              id="cep"
+              type="text"
+              class="fomControl"
+              formControlName="cep"
+              placeholder="Digite o cep"
+              (keyup)="formatarCampo($event)"
+              (blur)="buscarEnderecoPorCep()"
+              maxlength="9"
+            />
+            @if (clienteForm.get('endereco.cep')?.invalid &&
+            clienteForm.get('endereco.cep')?.touched) {
+            <div class="text-danger">CEP inválido.</div>
+            }
+          </div>
+
+          <div class="mb-3 col-1" formGroupName="endereco">
+            <label for="uf" class="form-label">UF</label>
+            <input
+              formControlName="uf"
+              id="uf"
+              list="listaEstados"
+              class="fomControl"
+              placeholder="UF"
+              (change)="buscarMunicipiosPorEstado($event.target.value)"
+            />
+
+            <datalist id="listaEstados">
+              @for (estado of estados; track estado.id) {
+              <option [value]="estado.sigla">{{ estado.nome }}</option>
+              }
+            </datalist>
+          </div>
+
+          <div class="mb-3 col-3" formGroupName="endereco">
+            <label for="cidade" class="form-label">Município</label>
+            <input
+              formControlName="cidade"
+              id="cidade"
+              list="listaMunicipios"
+              class="fomControl"
+              placeholder="Digite a cidade"
+            />
+            <datalist id="listaMunicipios">
+              @for (municipio of municipios; track municipio.id) {
+              <option [value]="municipio.nome">{{ municipio.nome }}</option>
+              }
+            </datalist>
+          </div>
+
+          <div class="mb-3 col-6" formGroupName="endereco">
+            <label for="logradouro" class="form-label">Logradouro</label>
+            <input
+              id="logradouro"
+              type="text"
+              class="fomControl"
+              formControlName="logradouro"
+              placeholder="Digite o logradouro"
+            />
+          </div>
+
+          <div class="mb-3 col-4" formGroupName="endereco">
+            <label for="bairro" class="form-label">Bairro</label>
+            <input
+              id="bairro"
+              type="text"
+              class="fomControl"
+              formControlName="bairro"
+              placeholder="Digite o bairro"
+            />
+          </div>
+
+          <div class="mb-3 col-2" formGroupName="endereco">
+            <label for="numero" class="form-label">Nº</label>
+            <input
+              id="numero"
+              type="text"
+              class="fomControl"
+              formControlName="numero"
+              placeholder="Digite o numero"
+            />
+            @if (clienteForm.get('numero')?.touched) {
+            <div class="text-danger">Número é obrigatório.</div>
+            }
+          </div>
+
+          <!-- Botões -->
+          <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-success me-2" [disabled]="clienteForm.invalid">
+              {{ cliente ? 'Atualizar' : 'Salvar' }}
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="cancelarCliente()">
+              Descartar
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
