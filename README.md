@@ -1,6 +1,3 @@
-# Gerando arquivo README.md com conteúdo completo da documentação VetAxis
-content = """# 📖 README – VetAxis
-
 ## 🚀 Visão Geral
 O **VetAxis** é uma aplicação desenvolvida em **Angular 20** com foco em gestão veterinária.  
 Ela oferece um **menu lateral responsivo** que se adapta ao tamanho da tela e integra diferentes módulos da clínica, como **dashboard, agenda, internações, estoque e financeiro**.
