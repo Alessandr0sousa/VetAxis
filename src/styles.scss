@@ -58,7 +58,7 @@
 }
 
 input,
-select .fomControl {
+select .formControl {
   border: none; /* remove todas as bordas */
   border-bottom: 1px solid #333; /* adiciona apenas linha inferior */
   background: transparent; /* remove fundo padrão */
@@ -70,12 +70,12 @@ select .fomControl {
 
 /* efeito ao focar */
 input:focus,
-select:focus .fomControl:focus {
+select:focus .formControl:focus {
   border-bottom: 2px solid #007bff; /* muda cor da linha ao focar */
 }
 
 input,
-select .fomControl {
+select .formControl {
   transition: border-bottom-color 0.3s ease;
 }
 
@@ -92,4 +92,39 @@ select .fomControl {
   .content {
     margin-left: 70px;
   }
+}
+
+.check{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding-left: 1rem;
+}
+
+.checkbox{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.form-switch .form-check-input{
+    margin-left: 0;
+}
+
+.form-check-input:checked {
+    background-color: #00c442;
+    border-color: #bec0c3;
+}
+
+.text-muted {
+  opacity: 0.4;
+}
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50px;
 }

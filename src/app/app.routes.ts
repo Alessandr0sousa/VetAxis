@@ -5,7 +5,7 @@ import { Exames } from './components/agenda/exames/exames';
 import { ClienteForm } from './components/clientes/cliente-form/cliente-form';
 import { Funcionarios } from './components/cadastro/funcionarios/funcionarios';
 import { Pets } from './components/pets/pets';
-import { Veterinarios } from './components/cadastro/veterinarios/veterinarios';
+import { Veterinarios } from './components/veterinarios/veterinarios';
 import { Clientes } from './components/clientes/clientes';
 import { Perfis } from './components/configuracoes/perfis/perfis';
 import { Usuarios } from './components/configuracoes/usuarios/usuarios';
@@ -19,6 +19,7 @@ import { Faturamento } from './components/financeiro/faturamento/faturamento';
 import { Relatorios } from './components/financeiro/relatorios/relatorios';
 import { Internacao } from './components/internacao/internacao';
 import { PetForm } from './components/pets/pet-form/pet-form';
+import { VeterinariosForm } from './components/veterinarios/veterinarios-form/veterinarios-form';
 
 export const routes: Routes = [
   { path: '', component: Dashboard, title: 'Dashboard' },
@@ -32,7 +33,7 @@ export const routes: Routes = [
     path: 'cadastro',
     children: [
       { path: 'cliente-form', component: ClienteForm, title: 'Cliente Form' },
-      { path: 'pet-form', component: PetForm, title: 'PetForm' },
+      { path: 'pet-form', component: PetForm, title: 'Pet Form' },
       { path: 'veterinarios', component: Veterinarios, title: 'Veterinários' },
       { path: 'funcionarios', component: Funcionarios, title: 'Funcionários' }
     ]

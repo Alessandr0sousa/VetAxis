@@ -1,3 +1,4 @@
+import { Cliente } from './cliente';
 export interface Pet {
   id?: number;
   nome: string;
@@ -10,5 +11,6 @@ export interface Pet {
   status: boolean;
   temperamento?: string;
   microchip?: boolean;
-  clienteId: number;
+  chip?: string;
+  cliente: Cliente;
 }

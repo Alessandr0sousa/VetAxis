@@ -1,8 +1,9 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Cliente } from './../models/cliente';
 
-import { Cliente } from '../models/cliente';
+import { Page } from '../models/page';
 import { ClientesService } from '../services/clientes-service';
 import { ClienteForm } from './cliente-form/cliente-form';
 
@@ -17,7 +18,7 @@ export class Clientes implements OnInit {
   clientes: Cliente[] = [];
   clientesFiltrados: Cliente[] = [];
   clientFormVisible = false;
-  clienteSelecionado?: number;
+  clienteSelecionado?: Cliente;
   totalPages: number = 0;
   currentPage: number = 0;
 
@@ -28,17 +29,13 @@ export class Clientes implements OnInit {
   }
 
   listarClientes(page: number = 0, size: number = 10) {
-    this.clientesService.listar(page, size).subscribe((dados: any) => {
+    this.clientesService.listar(page, size).subscribe((dados: Page<Cliente>) => {
       this.clientes = dados.content ?? [];
       this.clientesFiltrados = [...this.clientes];
       this.totalPages = dados.totalPages;
       this.currentPage = dados.number;
       this.cdr.detectChanges();
     });
-  }
-
-  get clienteSelecionadoObj(): Cliente | undefined {
-    return this.clientes.find((c) => c.id === this.clienteSelecionado);
   }
 
   filtrarClientes(event: string) {
@@ -65,10 +62,11 @@ export class Clientes implements OnInit {
   editarCliente(id: number) {
     this.clientesService.buscarPorId(id).subscribe({
       next: (clienteCompleto) => {
-        this.clienteSelecionado = clienteCompleto.id;
+        this.clienteSelecionado = clienteCompleto;
         this.clientes = this.clientes.map((c) => (c.id === id ? clienteCompleto : c));
         this.clientesFiltrados = [...this.clientes];
         this.clientFormVisible = true;
+        console.log("Cliente: ",this.clienteSelecionado);
       },
       error: () => {
         alert('Erro ao buscar dados completos do cliente.');
@@ -82,6 +80,7 @@ export class Clientes implements OnInit {
         next: () => {
           this.listarClientes();
           this.fecharForm();
+          alert('Cliente atualizado com sucesso.');
         },
         error: (err) => {
           alert('Erro ao atualizar cliente.');
@@ -92,6 +91,7 @@ export class Clientes implements OnInit {
         next: () => {
           this.listarClientes();
           this.fecharForm();
+          alert('Cliente salvo com sucesso.');
         },
         error: (err) => {
           if (err.status === 409 || err.error?.message?.includes('CPF já cadastrado')) {

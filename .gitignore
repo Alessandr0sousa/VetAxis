@@ -45,3 +45,4 @@ angular.json
 package-lock.json
 package.json
 tsconfig.json
+.vscode/settings.json

@@ -1,15 +1,13 @@
-@if (clientFormVisible) {
-<app-cliente-form
-  [cliente]="clienteSelecionado"
+@if (vetFormVisible) {
+<app-veterinarios-form
+  [vetDto]="vetSelecionado"
   (cancelar)="fecharForm()"
-  (salvar)="salvarCliente($event)"
->
-</app-cliente-form>
+  (salvar)="salvarVet($event)"
+></app-veterinarios-form>
 }
-
 <div class="mt-3">
   <div class="card-header mb-3">
-    <h5 class="mb-0">Listar Cliente</h5>
+    <h5 class="mb-0">Listar Veterinários</h5>
   </div>
 
   <div class="card-body">
@@ -19,8 +17,8 @@
         <input
           type="text"
           class="fomControl ps-2"
-          placeholder="Digite o nome, telefone, e-mail ou CPF do cliente"
-          (input)="filtrarClientes($event.target.value)"
+          placeholder="Digite o nome, telefone, especialidade ou CRMV do Veterinário"
+          (input)="filtrarVets($event.target.value)"
         />
         <i
           class="fa-solid fa-search position-absolute top-50 end-0 translate-middle-y me-3 text-muted"
@@ -33,31 +31,31 @@
           title="Adicionar Cliente"
           (click)="abrirForm()"
         >
-          <i class="fa-solid fa-user-plus fa-lg"></i>
+          <i class="fa-solid fa-user-md fa-2xl"></i>
         </button>
       </div>
     </div>
 
-    <!-- Lista de clientes -->
+    <!-- Lista de Veterinários -->
     <table class="table table-striped">
       <thead>
         <tr>
           <th>Nome</th>
-          <th>CPF</th>
+          <th>CRMV</th>
           <th>Telefone</th>
-          <th>Email</th>
+          <th>Especialidade</th>
           <th class="text-center">Ações</th>
         </tr>
       </thead>
       <tbody>
-        @for (cliente of clientesFiltrados; track cliente.id) {
+        @for (vet of vetsFiltrados; track vet.id) {
         <tr>
-          <td class="truncate">{{ cliente.nome }}</td>
-          <td class="truncate">{{ cliente.cpf }}</td>
-          <td class="truncate">{{ cliente.telefone }}</td>
-          <td class="truncate">{{ cliente.email }}</td>
+          <td class="truncate">{{ vet.nome }}</td>
+          <td class="truncate">{{ vet.crmv }}</td>
+          <td class="truncate">{{ vet.telefone }}</td>
+          <td class="truncate">{{ vet.especialidade }}</td>
           <td class="text-center">
-            <button class="btn btn-sm btn-warning" (click)="editarCliente(cliente.id)">
+            <button class="btn btn-sm btn-warning" (click)="editarVet(vet.id)">
               <i class="fa-regular fa-pen-to-square"></i>
             </button>
           </td>

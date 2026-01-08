@@ -10,8 +10,7 @@ import { Page } from '../models/page'; // novo modelo
 export class ClientesService {
   constructor(private api: ApiService) {}
 
-  // ✅ Agora retorna objeto paginado
-  listar(page: number = 0, size: number = 10): Observable<Page<Cliente>> {
+  listar(page: number, size: number): Observable<Page<Cliente>> {
     return this.api.get<Page<Cliente>>(`clientes?page=${page}&size=${size}`);
   }
 

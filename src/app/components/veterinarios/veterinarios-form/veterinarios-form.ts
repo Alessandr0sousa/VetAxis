@@ -1,70 +1,55 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Cliente } from '../../models/cliente';
+import { EspecialidadeVeterinaria } from '../../models/veterinario-model';
 import { Customservice } from '../../services/customservice';
-import { Estado, IbgeService } from '../../services/ibgeservice';
 import { ViaCepService } from '../../services/viacepservice';
+import { VeterinarioModel } from './../../models/veterinario-model';
 
 @Component({
-  selector: 'app-cliente-form',
-  standalone: true,
+  selector: 'app-veterinarios-form',
   imports: [ReactiveFormsModule],
-  templateUrl: './cliente-form.html',
-  styleUrls: ['./cliente-form.scss'],
+  templateUrl: './veterinarios-form.html',
+  styleUrl: './veterinarios-form.scss',
 })
-export class ClienteForm {
-  @Input() cliente?: Cliente;
+export class VeterinariosForm {
+  @Input() vetDto?: VeterinarioModel;
   @Output() cancelar = new EventEmitter<void>();
-  @Output() salvar = new EventEmitter<Cliente>();
+  @Output() salvar = new EventEmitter<VeterinarioModel>();
 
-  clienteForm: FormGroup;
-  petFormVisible = false;
-  estados: Estado[] = [];
-  municipios: any[] = [];
+  vetForm!: FormGroup;
+  especialidades = Object.values(EspecialidadeVeterinaria);
 
   constructor(
     private fb: FormBuilder,
     private viaCep: ViaCepService,
-    private ibgeService: IbgeService,
     private customService: Customservice,
     private cdr: ChangeDetectorRef
   ) {
-    this.clienteForm = this.fb.group({
-      nome: ['', Validators.required],
-      cpf: ['', [Validators.required, Validators.minLength(14), Validators.maxLength(14)]],
-      telefone: ['', [Validators.required, Validators.maxLength(15)]],
+    this.vetForm = this.fb.group({
+      nome: ['', [Validators.required, Validators.minLength(3)]],
+      cpf: ['', [Validators.required]],
+      telefone: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
+      crmv: ['', [Validators.required]],
+      especialidade: ['', [Validators.required]],
+      status: [true],
       endereco: this.fb.group({
         logradouro: ['', Validators.required],
         numero: ['', Validators.required],
         bairro: ['', Validators.required],
         cidade: ['', Validators.required],
-        uf: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(2)]],
-        cep: ['', [Validators.minLength(9), Validators.maxLength(9)]],
+        uf: ['', [Validators.required, Validators.maxLength(2)]],
+        cep: ['', Validators.required],
       }),
-    });
-
-    this.ibgeService.listarEstados().subscribe((dados) => {
-      this.estados = dados.sort((a, b) => a.nome.localeCompare(b.nome));
     });
   }
 
   ngOnChanges(): void {
-    if (this.cliente) {
-      this.clienteForm.patchValue(this.cliente);
+    if (this.vetDto) {
+      this.vetForm.patchValue(this.vetDto);
       this.cdr.detectChanges();
     } else {
-      this.clienteForm.reset();
-    }
-  }
-
-  buscarMunicipiosPorEstado(sigla: string) {
-    console.log('Buscando municípios para o estado:', sigla);
-    const estado = this.estados.find((e) => e.sigla === sigla);
-    if (estado) {
-      this.ibgeService.listarMunicipiosPorEstado(estado.id).subscribe((dados) => {
-        this.municipios = dados.sort((a, b) => a.nome.localeCompare(b.nome));
-      });
+      this.vetForm.reset();
     }
   }
 
@@ -73,12 +58,12 @@ export class ClienteForm {
   }
 
   buscarEnderecoPorCep() {
-    let cep = this.clienteForm.get('endereco.cep')?.value;
+    let cep = this.vetForm.get('endereco.cep')?.value;
     cep = this.limparCampo(cep);
     if (cep && cep.length === 8) {
       this.viaCep.buscarCep(cep).subscribe((dados) => {
         if (!dados.erro) {
-          this.clienteForm.patchValue({
+          this.vetForm.patchValue({
             endereco: {
               logradouro: dados.logradouro,
               bairro: dados.bairro,
@@ -91,35 +76,35 @@ export class ClienteForm {
     }
   }
 
-  salvarCliente() {
+  salvarVet() {
     // pega os valores crus do form
-    let cep = this.clienteForm.get('endereco.cep')?.value;
-    let cpf = this.clienteForm.get('cpf')?.value;
-    let tel = this.clienteForm.get('telefone')?.value;
+    let cep = this.vetForm.get('endereco.cep')?.value;
+    let cpf = this.vetForm.get('cpf')?.value;
+    let tel = this.vetForm.get('telefone')?.value;
 
     // aplica limpeza
     cep = this.limparCampo(cep);
     cpf = this.limparCampo(cpf);
     tel = this.limparCampo(tel);
 
-    if (this.clienteForm.valid) {
-      const clienteAtualizado: Cliente = {
-        ...(this.cliente ?? {}),
-        ...this.clienteForm.value,
+    if (this.vetForm.valid) {
+      const vetAtualizado: VeterinarioModel = {
+        ...(this.vetDto ?? {}),
+        ...this.vetForm.value,
         endereco: {
-          ...this.clienteForm.value.endereco,
+          ...this.vetForm.value.endereco,
           cep: cep,
         },
         cpf: cpf,
         telefone: tel,
       };
 
-      this.salvar.emit(clienteAtualizado);
+      this.salvar.emit(vetAtualizado);
     }
   }
 
-  cancelarCliente() {
-    this.clienteForm.reset();
+  cancelaVet() {
+    this.vetForm.reset();
     this.cancelar.emit();
   }
 
@@ -140,6 +125,6 @@ export class ClienteForm {
     const formatador = formatadores[tipo];
     const formatado = formatador ? formatador(valor) : valor;
 
-    this.clienteForm.get(caminho)?.setValue(formatado, { emitEvent: false });
+    this.vetForm.get(caminho)?.setValue(formatado, { emitEvent: false });
   }
 }

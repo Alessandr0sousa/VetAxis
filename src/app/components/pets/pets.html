@@ -1,1 +1,74 @@
-<p>pets works!</p>
+@if (petsFormVisible) {
+  <app-pet-form
+    [pet]="petSelecionado"
+    (cancelar)="fecharForm()"
+    (salvar)="salvarPet($event)"
+  ></app-pet-form>
+}
+
+<div class="mt-3">
+  <div class="card-header mb-3">
+    <h5 class="mb-0">Listar Pets</h5>
+  </div>
+
+  <div class="card-body">
+    <div class="row">
+      <div class="position-relative mb-3 col-9">
+        <input
+          type="text"
+          class="formControl ps-2"
+          placeholder="Digite o nome, espécie ou nome do cliente"
+          (input)="filtrarPets($event.target.value)"
+        />
+        <i
+          class="fa-solid fa-search position-absolute top-50 end-0 translate-middle-y me-3 text-muted"
+        ></i>
+      </div>
+
+      <div class="col-3 pe-5 group-novo">
+        <button
+          class="btn btn-outline-secondary novo"
+          title="Adicionar Pets"
+          (click)="abrirForm()"
+        >
+          <i class="fa-solid fa-paw fa-2xl"></i>
+        </button>
+      </div>
+    </div>
+
+    @if (pets.length > 0) {
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Espécie</th>
+            <th>Status</th>
+            <th>Responsável</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (pet of petsFiltrados; track pet.id) {
+            <tr>
+              <td>{{ pet.nome }}</td>
+              <td>{{ pet.especie }}</td>
+              <td>
+                <span [class.text-success]="pet.status" [class.text-danger]="!pet.status">
+                  {{ pet.status ? 'Ativo' : 'Inativo' }}
+                </span>
+              </td>
+              <td>{{ pet.cliente.nome }}</td>
+              <td class="text-center">
+                <button class="btn btn-sm btn-warning me-2" (click)="editarPet(pet.id!)">
+                  <i class="fa-regular fa-pen-to-square"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <div class="alert alert-warning">Nenhum pet cadastrado.</div>
+    }
+  </div>
+</div>
