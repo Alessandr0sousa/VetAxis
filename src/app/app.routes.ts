@@ -2,10 +2,8 @@ import { Routes } from '@angular/router';
 
 import { Cirurgias } from './components/agenda/cirurgias/cirurgias';
 import { Exames } from './components/agenda/exames/exames';
-import { ClienteForm } from './components/clientes/cliente-form/cliente-form';
 import { Funcionarios } from './components/cadastro/funcionarios/funcionarios';
-import { Pets } from './components/pets/pets';
-import { Veterinarios } from './components/veterinarios/veterinarios';
+import { ClienteForm } from './components/clientes/cliente-form/cliente-form';
 import { Clientes } from './components/clientes/clientes';
 import { Perfis } from './components/configuracoes/perfis/perfis';
 import { Usuarios } from './components/configuracoes/usuarios/usuarios';
@@ -19,7 +17,8 @@ import { Faturamento } from './components/financeiro/faturamento/faturamento';
 import { Relatorios } from './components/financeiro/relatorios/relatorios';
 import { Internacao } from './components/internacao/internacao';
 import { PetForm } from './components/pets/pet-form/pet-form';
-import { VeterinariosForm } from './components/veterinarios/veterinarios-form/veterinarios-form';
+import { Pets } from './components/pets/pets';
+import { Veterinarios } from './components/veterinarios/veterinarios';
 
 export const routes: Routes = [
   { path: '', component: Dashboard, title: 'Dashboard' },

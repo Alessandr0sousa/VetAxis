@@ -8,9 +8,9 @@ import { BaseEntity } from '../models/base-entity';
   standalone: true, // Angular 20
   imports: [CommonModule],
   templateUrl: './generic-list.html',
-  styleUrls: ['./generic-list.scss'] // ✅ precisa ser plural
+  styleUrls: ['./generic-list.scss']
 })
-export class GenericListComponent<T extends BaseEntity> implements OnInit { // ✅ generics só aqui
+export class GenericList<T extends BaseEntity> implements OnInit {
   @Input() service!: {
     listar: (page: number, size: number) => any;
     buscarPorId: (id: number) => any;
