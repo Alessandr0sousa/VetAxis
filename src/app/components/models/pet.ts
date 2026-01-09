@@ -1,7 +1,6 @@
+import { BaseEntity } from './base-entity';
 import { Cliente } from './cliente';
-export interface Pet {
-  id?: number;
-  nome: string;
+export interface Pet extends BaseEntity{
   sexo: String;
   esterilizacao: boolean;
   nascimento: string;

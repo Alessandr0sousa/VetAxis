@@ -1,67 +1,9 @@
-@if (vetFormVisible) {
-<app-veterinarios-form
-  [vetDto]="vetSelecionado"
-  (cancelar)="fecharForm()"
-  (salvar)="salvarVet($event)"
-></app-veterinarios-form>
-}
-<div class="mt-3">
-  <div class="card-header mb-3">
-    <h5 class="mb-0">Listar Veterinários</h5>
-  </div>
-
-  <div class="card-body">
-    <!-- Campo de busca -->
-    <div class="row">
-      <div class="position-relative mb-3 col-9">
-        <input
-          type="text"
-          class="fomControl ps-2"
-          placeholder="Digite o nome, telefone, especialidade ou CRMV do Veterinário"
-          (input)="filtrarVets($event.target.value)"
-        />
-        <i
-          class="fa-solid fa-search position-absolute top-50 end-0 translate-middle-y me-3 text-muted"
-        ></i>
-      </div>
-
-      <div class="col-3 pe-5 group-novo">
-        <button
-          class="btn btn-outline-secondary novo"
-          title="Adicionar Cliente"
-          (click)="abrirForm()"
-        >
-          <i class="fa-solid fa-user-md fa-2xl"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Lista de Veterinários -->
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>CRMV</th>
-          <th>Telefone</th>
-          <th>Especialidade</th>
-          <th class="text-center">Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (vet of vetsFiltrados; track vet.id) {
-        <tr>
-          <td class="truncate">{{ vet.nome }}</td>
-          <td class="truncate">{{ vet.crmv }}</td>
-          <td class="truncate">{{ vet.telefone }}</td>
-          <td class="truncate">{{ vet.especialidade }}</td>
-          <td class="text-center">
-            <button class="btn btn-sm btn-warning" (click)="editarVet(vet.id)">
-              <i class="fa-regular fa-pen-to-square"></i>
-            </button>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-</div>
+<app-generic-list
+  [service]="vetService"
+  [formComponent]="vetForm"
+  [filtroFn]="filtrarVets"
+  [columns]="vetColumns"
+  [inconAdd]="icone"
+  formInputName="vetDto"
+>
+</app-generic-list>

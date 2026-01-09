@@ -1,9 +1,10 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { EspecialidadeVeterinaria } from '../../models/veterinario-model';
 import { Customservice } from '../../services/customservice';
 import { ViaCepService } from '../../services/viacepservice';
 import { VeterinarioModel } from './../../models/veterinario-model';
+import { BaseForm } from '../../models/base-form';
 
 @Component({
   selector: 'app-veterinarios-form',
@@ -11,10 +12,11 @@ import { VeterinarioModel } from './../../models/veterinario-model';
   templateUrl: './veterinarios-form.html',
   styleUrl: './veterinarios-form.scss',
 })
-export class VeterinariosForm {
+export class VeterinariosForm implements BaseForm<VeterinarioModel> {
   @Input() vetDto?: VeterinarioModel;
-  @Output() cancelar = new EventEmitter<void>();
+
   @Output() salvar = new EventEmitter<VeterinarioModel>();
+  @Output() cancelar = new EventEmitter<void>();
 
   vetForm!: FormGroup;
   especialidades = Object.values(EspecialidadeVeterinaria);
@@ -27,7 +29,6 @@ export class VeterinariosForm {
   ) {
     this.vetForm = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3)]],
-      cpf: ['', [Validators.required]],
       telefone: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       crmv: ['', [Validators.required]],
@@ -98,7 +99,6 @@ export class VeterinariosForm {
         cpf: cpf,
         telefone: tel,
       };
-
       this.salvar.emit(vetAtualizado);
     }
   }

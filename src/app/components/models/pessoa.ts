@@ -1,7 +1,6 @@
 import { BaseEntity } from "./base-entity";
 
 export interface Pessoa extends BaseEntity{
-  cpf: string;
   telefone: string;
   email: string;
   endereco: {

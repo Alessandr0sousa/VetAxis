@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 
 import { Cirurgias } from './components/agenda/cirurgias/cirurgias';
 import { Exames } from './components/agenda/exames/exames';
-import { Funcionarios } from './components/cadastro/funcionarios/funcionarios';
+import { Funcionarios } from './components/funcionarios/funcionarios';
 import { ClienteForm } from './components/clientes/cliente-form/cliente-form';
 import { Clientes } from './components/clientes/clientes';
 import { Perfis } from './components/configuracoes/perfis/perfis';
