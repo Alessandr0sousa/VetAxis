@@ -7,9 +7,10 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [RouterOutlet, MenuPrincipal, Navbar, CommonModule, FormsModule],
   templateUrl: './app.html',
-  styleUrl: './app.scss',
+  styleUrls: ['./app.scss'], // ✅ corrigido
 })
 export class App {
   protected readonly title = signal('VetAxis');
@@ -18,5 +19,4 @@ export class App {
   toggleSidebar() {
     this.isCollapsed = !this.isCollapsed;
   }
-
 }

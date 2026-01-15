@@ -6,9 +6,7 @@ import { ApiService } from '../../api-services/api-sevice';
 import { VeterinarioModel } from '../models/veterinario-model';
 import { Page } from '../models/page';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class VeterinarioService extends ApiService {
 
   private readonly endpoint = 'veterinarios';

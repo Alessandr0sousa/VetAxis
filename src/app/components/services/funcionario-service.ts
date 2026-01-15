@@ -5,9 +5,7 @@ import { Observable } from 'rxjs';
 import { FuncionarioModel } from '../models/funcionario-model';
 import { Page } from '../models/page';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class FuncionarioService extends ApiService {
   private readonly endpoint = 'funcionarios';
 

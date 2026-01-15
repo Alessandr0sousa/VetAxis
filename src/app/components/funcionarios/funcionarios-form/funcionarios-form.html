@@ -3,6 +3,11 @@
     <div class="mb-3 col-9">
       <h5 class="mb-0">{{ dto ? 'Editar' : 'Cadastrar' }} Funcionário</h5>
     </div>
+    <div class="col-3">
+      <button type="button" class="btn btn-secondary mb-3" (click)="voltar()">
+        <i class="fa fa-arrow-left"></i> Voltar
+      </button>
+    </div>
   </div>
 
   <div class="card-body">
@@ -102,21 +107,14 @@
               (blur)="buscarEnderecoPorCep()"
               maxlength="9"
             />
-            @if (form.get('endereco.cep')?.invalid &&
-            form.get('endereco.cep')?.touched) {
+            @if (form.get('endereco.cep')?.invalid && form.get('endereco.cep')?.touched) {
             <div class="text-danger">CEP inválido.</div>
             }
           </div>
 
           <div class="mb-3 col-1" formGroupName="endereco">
             <label for="uf" class="form-label">UF</label>
-            <input
-              formControlName="uf"
-              id="uf"
-              type="text"
-              class="fomControl"
-              placeholder="UF"
-            />
+            <input formControlName="uf" id="uf" type="text" class="fomControl" placeholder="UF" />
           </div>
 
           <div class="mb-3 col-3" formGroupName="endereco">

@@ -1,89 +1,55 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { Pet } from '../models/pet';
+import { Component, inject } from '@angular/core';
+import { Columns } from '../models/columns';
 import { PetService } from '../services/pet-service';
+import { Pet } from './../models/pet';
+import { GenericList } from './../shared/generic-list/generic-list';
 import { PetForm } from './pet-form/pet-form';
-import { Page } from '../models/page';
-import { Cliente } from '../models/cliente';
 
 @Component({
   selector: 'app-pets',
   standalone: true,
-  imports: [PetForm],
+  imports: [GenericList],
   templateUrl: './pets.html',
   styleUrls: ['./pets.scss'],
 })
-export class Pets implements OnInit {
-  pets: Pet[] = [];
-  petsFiltrados: Pet[] = [];
-  petsFormVisible = false;
-  petSelecionado?: Pet;
-  totalPages: number = 0;
-  currentPage: number = 0;
+export class Pets {
+  petService = inject(PetService);
+  petForm = PetForm;
+  icone = 'fa-solid fa-paw fa-2xl';
 
-  constructor(private petService: PetService, private cdr: ChangeDetectorRef) {}
+  petColumns: Columns<Pet>[] = [
+    { header: 'Nome', field: 'nome' },
+    { header: 'Espécie', field: 'especie' },
+    { header: 'Status', field: (p: Pet) => (p.status ? 'Ativo' : 'Inativo') },
+    { header: 'Responsável', field: 'cliente.nome' },
+    {
+      header: 'Ações',
+      actions: [
+        {
+          type: 'edit',
+          class: 'btn btn-sm',
+          icon: 'fa-regular fa-pen-to-square warning',
+          title: 'Editar',
+          callback: '',
+        },
+        {
+          type: 'consultar',
+          class: 'btn btn-sm',
+          icon: 'fa-solid fa-stethoscope info',
+          title: 'Consultar',
+          callback: '',
+        },
+      ],
+    },
+  ];
 
-  ngOnInit(): void {
-    this.carregarPets();
-  }
-
-  carregarPets(page: number = 0, size: number = 10): void {
-    this.petService.listar(page, size).subscribe({
-      next: (data: Page<Pet>) => {
-        this.pets = data?.content ?? []; // garante array
-        this.petsFiltrados = [...this.pets];
-        this.totalPages = data?.totalPages ?? 0;
-        this.currentPage = data?.number ?? 0;
-        this.cdr.detectChanges();
-        console.info(this.pets);
-      },
-      error: (err) => {
-        console.error('Erro ao carregar pets', err);
-        this.pets = []; // evita erro no *ngFor/@for
-      },
-    });
-  }
-
-  filtrarPets(event: string) {
-    const filtro = event.toLowerCase();
-    this.petsFiltrados = this.pets.filter(
-      (pet) =>
-        pet.nome.toLowerCase().includes(filtro) ||
-        pet.especie.toLowerCase().includes(filtro) ||
-        (pet.cliente?.nome?.toLowerCase().includes(filtro) ?? false)
+  filtrarPets(pet: Pet, filtro: string): boolean {
+    const f = filtro.toLowerCase();
+    return (
+      pet.nome.toLowerCase().includes(f) ||
+      pet.especie.toLowerCase().includes(f) ||
+      (pet.cliente?.nome?.toLowerCase().includes(f) ?? false)
     );
-    console.info(this.petsFiltrados);
-  }
-
-  excluirPet(id: number): void {
-    if (confirm('Deseja realmente excluir este pet?')) {
-      this.petService.deletePet(id).subscribe(() => {
-        this.pets = this.pets.filter((p) => p.id !== id);
-      });
-    }
-  }
-
-  abrirForm() {
-    this.petSelecionado = undefined;
-    this.petsFormVisible = true;
-  }
-
-  fecharForm() {
-    this.petsFormVisible = false;
-    this.petSelecionado = undefined;
-  }
-
-  editarPet(id: number): void {
-    this.petService.getPetById(id).subscribe({
-      next: (petCompleto) => {
-        this.petSelecionado = petCompleto;
-        this.pets = this.pets.map((p) => (p.id === id ? petCompleto : p));
-        this.petsFiltrados = [...this.pets];
-        this.petsFormVisible = true;
-      },
-      error: () => {
-        alert('Erro ao buscar os dados completos do Pet.');
-      },
-    });
   }
 
   calcularIdade(dataNascimento: string): string {
@@ -98,39 +64,6 @@ export class Pets implements OnInit {
       anos--;
       meses += 12;
     }
-
     return anos > 0 ? `${anos} ano(s) e ${meses} mês(es)` : `${meses} mês(es)`;
-  }
-
-  salvarPet(pet: Pet) {
-    if (pet.id) {
-      this.petService.atualizar(pet).subscribe({
-        next: () => {
-          this.carregarPets();
-          this.fecharForm();
-          alert('Pet atualizado com sucesso!');
-        },
-        error: () => {
-          alert('Erro ao atualizar pet.');
-        },
-      });
-    } else {
-      this.petService.salvar(pet).subscribe({
-        next: () => {
-          this.carregarPets();
-          this.fecharForm();
-          alert('Pet salvo com sucesso!');
-        },
-        error: (err) => {
-          if (err.status === 409 || err.error?.message?.includes('Pet já cadastrado')) {
-            alert('Este pet já está cadastrado!');
-          } else {
-            alert('Erro ao salvar pet.');
-          }
-          this.carregarPets();
-          this.fecharForm();
-        },
-      });
-    }
   }
 }

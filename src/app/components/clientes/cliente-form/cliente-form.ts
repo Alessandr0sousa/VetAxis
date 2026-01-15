@@ -1,9 +1,12 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { Cliente } from '../../models/cliente';
 import { Customservice } from '../../services/customservice';
 import { Estado, IbgeService } from '../../services/ibgeservice';
 import { ViaCepService } from '../../services/viacepservice';
+import { BaseForm } from '../../shared/base-form/base-form';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-cliente-form',
@@ -12,24 +15,27 @@ import { ViaCepService } from '../../services/viacepservice';
   templateUrl: './cliente-form.html',
   styleUrls: ['./cliente-form.scss'],
 })
-export class ClienteForm {
-  @Input() cliente?: Cliente;
-  @Output() cancelar = new EventEmitter<void>();
-  @Output() salvar = new EventEmitter<Cliente>();
-
-  clienteForm: FormGroup;
-  petFormVisible = false;
+export class ClienteForm extends BaseForm<Cliente> {
   estados: Estado[] = [];
   municipios: any[] = [];
 
   constructor(
-    private fb: FormBuilder,
-    private viaCep: ViaCepService,
     private ibgeService: IbgeService,
-    private customService: Customservice,
-    private cdr: ChangeDetectorRef
+    fb: FormBuilder,
+    viaCep: ViaCepService,
+    customService: Customservice,
+    cdr: ChangeDetectorRef,
+    location: Location
   ) {
-    this.clienteForm = this.fb.group({
+    super(fb, viaCep, customService, cdr, location);
+
+    this.ibgeService.listarEstados().subscribe((dados) => {
+      this.estados = dados.sort((a, b) => a.nome.localeCompare(b.nome));
+    });
+  }
+
+  protected buildForm(): void {
+    this.form = this.fb.group({
       nome: ['', Validators.required],
       cpf: ['', [Validators.required, Validators.minLength(14), Validators.maxLength(14)]],
       telefone: ['', [Validators.required, Validators.maxLength(15)]],
@@ -43,103 +49,14 @@ export class ClienteForm {
         cep: ['', [Validators.minLength(9), Validators.maxLength(9)]],
       }),
     });
-
-    this.ibgeService.listarEstados().subscribe((dados) => {
-      this.estados = dados.sort((a, b) => a.nome.localeCompare(b.nome));
-    });
-  }
-
-  ngOnChanges(): void {
-    if (this.cliente) {
-      this.clienteForm.patchValue(this.cliente);
-      this.cdr.detectChanges();
-    } else {
-      this.clienteForm.reset();
-    }
   }
 
   buscarMunicipiosPorEstado(sigla: string) {
-    console.log('Buscando municípios para o estado:', sigla);
     const estado = this.estados.find((e) => e.sigla === sigla);
     if (estado) {
       this.ibgeService.listarMunicipiosPorEstado(estado.id).subscribe((dados) => {
         this.municipios = dados.sort((a, b) => a.nome.localeCompare(b.nome));
       });
     }
-  }
-
-  private limparCampo(valor: string): string {
-    return valor ? valor.replace(/\D/g, '') : '';
-  }
-
-  buscarEnderecoPorCep() {
-    let cep = this.clienteForm.get('endereco.cep')?.value;
-    cep = this.limparCampo(cep);
-    if (cep && cep.length === 8) {
-      this.viaCep.buscarCep(cep).subscribe((dados) => {
-        if (!dados.erro) {
-          this.clienteForm.patchValue({
-            endereco: {
-              logradouro: dados.logradouro,
-              bairro: dados.bairro,
-              cidade: dados.localidade,
-              uf: dados.uf,
-            },
-          });
-        }
-      });
-    }
-  }
-
-  salvarCliente() {
-    // pega os valores crus do form
-    let cep = this.clienteForm.get('endereco.cep')?.value;
-    let cpf = this.clienteForm.get('cpf')?.value;
-    let tel = this.clienteForm.get('telefone')?.value;
-
-    // aplica limpeza
-    cep = this.limparCampo(cep);
-    cpf = this.limparCampo(cpf);
-    tel = this.limparCampo(tel);
-
-    if (this.clienteForm.valid) {
-      const clienteAtualizado: Cliente = {
-        ...(this.cliente ?? {}),
-        ...this.clienteForm.value,
-        endereco: {
-          ...this.clienteForm.value.endereco,
-          cep: cep,
-        },
-        cpf: cpf,
-        telefone: tel,
-      };
-
-      this.salvar.emit(clienteAtualizado);
-    }
-  }
-
-  cancelarCliente() {
-    this.clienteForm.reset();
-    this.cancelar.emit();
-  }
-
-  formatarCampo(event: any) {
-    let valor = event.target.value;
-    valor = valor.replace(/\D/g, '');
-
-    const tipo = event.target.getAttribute('formControlName');
-    const grupo = event.target.closest('[formGroupName]')?.getAttribute('formGroupName');
-    const caminho = grupo ? `${grupo}.${tipo}` : tipo;
-
-    const formatadores: Record<string, (v: string) => string> = {
-      telefone: this.customService.formatarTelefone.bind(this.customService),
-      cpf: this.customService.formatarCPF.bind(this.customService),
-      cep: this.customService.formatarCEP.bind(this.customService),
-    };
-
-    const formatador = formatadores[tipo];
-    const formatado = formatador ? formatador(valor) : valor;
-
-    this.clienteForm.get(caminho)?.setValue(formatado, { emitEvent: false });
   }
 }

@@ -1,106 +1,48 @@
-import { HttpClientModule } from '@angular/common/http';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import { GenericList } from '../shared/generic-list/generic-list';
 import { Cliente } from './../models/cliente';
-
-import { Page } from '../models/page';
 import { ClientesService } from '../services/clientes-service';
 import { ClienteForm } from './cliente-form/cliente-form';
+import { Columns } from '../models/columns';
 
 @Component({
   selector: 'app-clientes',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, HttpClientModule, ClienteForm],
+  imports: [GenericList],
   templateUrl: './clientes.html',
   styleUrls: ['./clientes.scss'],
 })
-export class Clientes implements OnInit {
-  clientes: Cliente[] = [];
-  clientesFiltrados: Cliente[] = [];
-  clientFormVisible = false;
-  clienteSelecionado?: Cliente;
-  totalPages: number = 0;
-  currentPage: number = 0;
+export class Clientes {
+  clienteService = inject(ClientesService);
+  clienteForm = ClienteForm;
+  icone = "fa-solid fa-user-plus fa-2xl";
 
-  constructor(private clientesService: ClientesService, private cdr: ChangeDetectorRef) {}
-
-  ngOnInit(): void {
-    this.listarClientes();
-  }
-
-  listarClientes(page: number = 0, size: number = 10) {
-    this.clientesService.listar(page, size).subscribe((dados: Page<Cliente>) => {
-      this.clientes = dados.content ?? [];
-      this.clientesFiltrados = [...this.clientes];
-      this.totalPages = dados.totalPages;
-      this.currentPage = dados.number;
-      this.cdr.detectChanges();
-    });
-  }
-
-  filtrarClientes(event: string) {
-    const filtro = event.toLowerCase();
-    this.clientesFiltrados = this.clientes.filter(
-      (cli) =>
-        cli.nome.toLowerCase().includes(filtro) ||
-        cli.telefone.includes(filtro) ||
-        cli.email.toLowerCase().includes(filtro) ||
-        cli.cpf.includes(filtro)
-    );
-  }
-
-  abrirForm() {
-    this.clienteSelecionado = undefined;
-    this.clientFormVisible = true;
-  }
-
-  fecharForm() {
-    this.clientFormVisible = false;
-    this.clienteSelecionado = undefined;
-  }
-
-  editarCliente(id: number) {
-    this.clientesService.buscarPorId(id).subscribe({
-      next: (clienteCompleto) => {
-        this.clienteSelecionado = clienteCompleto;
-        this.clientes = this.clientes.map((c) => (c.id === id ? clienteCompleto : c));
-        this.clientesFiltrados = [...this.clientes];
-        this.clientFormVisible = true;
-        console.log("Cliente: ",this.clienteSelecionado);
-      },
-      error: () => {
-        alert('Erro ao buscar dados completos do cliente.');
-      },
-    });
-  }
-
-  salvarCliente(cliente: Cliente) {
-    if (cliente.id) {
-      this.clientesService.atualizar(cliente).subscribe({
-        next: () => {
-          this.listarClientes();
-          this.fecharForm();
-          alert('Cliente atualizado com sucesso.');
+  clienteColumns: Columns<Cliente>[] = [
+    { header: 'Nome', field: 'nome' },
+    { header: 'CPF', field: 'cpf' },
+    { header: 'Telefone', field: 'telefone' },
+    { header: 'E-mail', field: 'email' },
+    {
+      header: 'Ações',
+      actions: [
+        {
+          type: 'edit',
+          class: 'btn btn-sm',
+          icon: 'fa-regular fa-pen-to-square warning',
+          title: 'Editar',
+          callback: '',
         },
-        error: (err) => {
-          alert('Erro ao atualizar cliente.');
-        },
-      });
-    } else {
-      this.clientesService.salvar(cliente).subscribe({
-        next: () => {
-          this.listarClientes();
-          this.fecharForm();
-          alert('Cliente salvo com sucesso.');
-        },
-        error: (err) => {
-          if (err.status === 409 || err.error?.message?.includes('CPF já cadastrado')) {
-            alert('Este CPF já está cadastrado!');
-          } else {
-            alert('Erro ao salvar cliente.');
-          }
-        },
-      });
+      ]
     }
+  ];
+
+  filtrarClientes(cli: Cliente, filtro: string): boolean {
+    const f = filtro.toLowerCase();
+    return (
+      cli.nome.toLowerCase().includes(f) ||
+      cli.telefone.includes(f) ||
+      cli.email.toLowerCase().includes(f) ||
+      cli.cpf.includes(f)
+    );
   }
 }

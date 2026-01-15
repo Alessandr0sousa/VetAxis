@@ -4,6 +4,8 @@ import { FuncionarioModel } from '../../models/funcionario-model';
 import { ViaCepService } from '../../services/viacepservice';
 import { Customservice } from '../../services/customservice';
 import { BaseForm } from '../../shared/base-form/base-form';
+import { Location } from '@angular/common';
+
 
 @Component({
   selector: 'app-funcionarios-form',
@@ -17,9 +19,10 @@ export class FuncionariosForm extends BaseForm<FuncionarioModel> {
     fb: FormBuilder,
     viaCep: ViaCepService,
     customService: Customservice,
-    cdr: ChangeDetectorRef
+    cdr: ChangeDetectorRef,
+    location: Location
   ) {
-    super(fb, viaCep, customService, cdr);
+    super(fb, viaCep, customService, cdr, location);
   }
 
   protected override buildForm(): void {

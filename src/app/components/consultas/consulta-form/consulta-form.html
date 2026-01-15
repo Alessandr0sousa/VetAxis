@@ -1,0 +1,76 @@
+<div class="card-body">
+  <form [formGroup]="form" (ngSubmit)="salvarForm()" class="container mt-4">
+    <div class="row">
+      <div class="mb-3 col-md-3">
+        <label for="agendamento" class="form-label">Agendamento</label>
+        <input type="datetime-local" id="agendamento" formControlName="agendamento" class="formControl" />
+      </div>
+      <div class="mb-3 col-md-3">
+        <label for="peso" class="form-label">Peso (kg)</label>
+        <input type="number" id="peso" formControlName="peso" class="formControl" />
+      </div>
+
+      <div class="mb-3 col-md-6">
+        <label for="anamnese" class="form-label">Anamnese</label>
+        <textarea
+          id="anamnese"
+          formControlName="anamnese"
+          class="formControl"
+          resize="none"
+        ></textarea>
+      </div>
+
+      <div class="mb-3 col-md-6">
+        <label for="exameFisico" class="form-label">Exame Físico</label>
+        <textarea id="exameFisico" formControlName="exameFisico" class="formControl"></textarea>
+      </div>
+
+      <div class="mb-3 col-md-6">
+        <label for="tratamento" class="form-label">Tratamento</label>
+        <textarea id="tratamento" formControlName="tratamento" class="formControl"></textarea>
+      </div>
+
+      <div class="mb-3 col-md-6">
+        <label for="prescricao" class="form-label">Prescrição</label>
+        <textarea id="prescricao" formControlName="prescricao" class="formControl"></textarea>
+      </div>
+
+      <div class="mb-3 col-md-3">
+        <label for="diagnostico" class="form-label">Diagnóstico</label>
+        <input id="diagnostico" formControlName="diagnostico" class="formControl">
+      </div>
+
+      <div class="mb-3 col-6 col-md-3">
+        <label class="form-label" for="pet">Pets</label>
+        <input
+          id="pet"
+          class="formControl"
+          type="text"
+          list="petOptions"
+          formControlName="pet"
+          placeholder="Selecione o Pet"
+        />
+        <datalist id="petOptions">
+          @for (p of pets; track p.id) {
+          <option [value]="p.nome"></option>
+          }
+        </datalist>
+      </div>
+
+      <div class="form-check mb-3 col-md-2">
+        <input
+          type="checkbox"
+          id="internamento"
+          formControlName="internamento"
+          class="form-check-input"
+        />
+        <label for="internamento" class="form-check-label">Internamento</label>
+      </div>
+
+      <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary me-2">Salvar</button>
+        <button type="button" (click)="cancelarForm()" class="btn btn-secondary">Cancelar</button>
+      </div>
+    </div>
+  </form>
+</div>

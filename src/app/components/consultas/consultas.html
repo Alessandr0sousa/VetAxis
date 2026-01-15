@@ -1,1 +1,47 @@
-<p>consultas works!</p>
+<div class="mt-3">
+  @if (pet) {
+  <div class="row">
+    <h2>Consulta {{ pet.sexo === 'Fêmea' ? 'da' : 'do' }} {{ pet.nome }}({{ pet.especie }})</h2>
+    <p class="col-auto dadospet"><strong>Status: </strong>{{ pet.status ? 'Ativo' : 'Inativo' }}</p>
+    <p class="col-auto dadospet"><strong>Raça: </strong>{{ pet.raca }}</p>
+    <p class="col-auto dadospet">
+      <strong>Esterilização: </strong>{{ pet.esterilizacao ? 'Sim' : 'Não' }}
+    </p>
+    <p class="col-auto dadospet"><strong>Pelagem: </strong>{{ pet.pelagem }}</p>
+    <p class="col-auto dadospet"><strong>Temperamento: </strong>{{ pet.temperamento }}</p>
+    <p class="col-auto dadospet"><strong>Sexo: </strong>{{ pet.sexo }}</p>
+    @if(pet.microchip){
+    <p class="col-auto dadospet"><strong>Chip: </strong>{{ pet.chip }}</p>
+    }
+    <p class="col-auto dadospet"><strong>Repsonsável: </strong>{{ pet.cliente.nome }}</p>
+    <p class="col-auto dadospet"><strong>Cpf: </strong>{{ pet.cliente.cpf }}</p>
+    <p class="col-auto dadospet">
+      <strong>Endereço: </strong>{{ pet.cliente.endereco.logradouro }},
+      {{ pet.cliente.endereco.bairro }}, {{ pet.cliente.endereco.numero }},
+      {{ pet.cliente.endereco.cidade }} - {{ pet.cliente.endereco.uf }}
+    </p>
+  </div>
+  }@else{
+  <div class="mt-3 row">
+    <h2 class="col-10">{{ nome }} Consulta</h2>
+    <div class="col-2 text-end group-novo">
+      <button class="btn btn-outline-secondary novo" title="Nova Consulta" (click)="novaConsulta()">
+        <i class="fa-solid fa-stethoscope fa-2xl"></i>
+      </button>
+    </div>
+  </div>
+  }
+  <hr />
+  @if (pet) {
+  <app-consulta-form></app-consulta-form>
+  } @if(!isAgedamento) {
+  <div class="alert alert-warning row" role="alert">
+    <p class="col-10 aviso">
+      Você precisa selecionar um Pet para poder realizar uma consulta ou agendar uma.
+    </p>
+    <div class="text-end col-2">
+      <button class="btn btn-sm btn-primary" (click)="onClickEmitter()">Agendar</button>
+    </div>
+  </div>
+  }
+</div>

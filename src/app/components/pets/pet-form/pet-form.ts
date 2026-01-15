@@ -13,7 +13,7 @@ import { Especie, Pelagem, Temperamento, getRacasPorEspecie } from '../../models
   styleUrls: ['./pet-form.scss'],
 })
 export class PetForm implements OnInit {
-  @Input() pet?: Pet;
+  @Input() dto?: Pet;
   @Output() cancelar = new EventEmitter<void>();
   @Output() salvar = new EventEmitter<Pet>();
 
@@ -51,10 +51,10 @@ export class PetForm implements OnInit {
   }
 
   ngOnChanges(): void {
-    if (this.pet) {
+    if (this.dto) {
       this.petForm.patchValue({
-        ...this.pet,
-        clienteNome: this.pet.cliente?.nome ?? '',
+        ...this.dto,
+        clienteNome: this.dto.cliente?.nome ?? '',
       });
     } else {
       this.petForm.reset();
@@ -62,10 +62,24 @@ export class PetForm implements OnInit {
   }
 
   onEspecieChange(valor: string) {
-  const especie = valor as Especie;
-  this.racasSelecionadas = getRacasPorEspecie(especie);
-}
+    const especie = valor as Especie;
+    this.racasSelecionadas = getRacasPorEspecie(especie);
+  }
 
+  onClienteSelecionado(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const nomeSelecionado = input.value;
+
+    // procura o cliente pelo nome
+    const cliente = this.clientes.find((c) => c.nome === nomeSelecionado);
+
+    if (cliente) {
+      // atualiza o form com o objeto completo
+      this.petForm.patchValue({
+        cliente: cliente,
+      });
+    }
+  }
 
   listarClientes() {
     return this.clienteService.listar(0, 10).subscribe({
@@ -78,9 +92,9 @@ export class PetForm implements OnInit {
     if (this.petForm.valid) {
       const formValue = this.petForm.value;
       const pet: Pet = {
-        ...(this.pet ?? {}),
+        ...(this.dto ?? {}),
         ...formValue,
-        cliente: formValue.cliente, // objeto completo
+        cliente: formValue.cliente,
       };
       delete (pet as any).clienteNome;
       this.salvar.emit(pet);

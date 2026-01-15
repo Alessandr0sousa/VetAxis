@@ -1,4 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
 .navbar {
   position: fixed;
   top: 0;
@@ -79,6 +83,22 @@ select .formControl {
   transition: border-bottom-color 0.3s ease;
 }
 
+textarea.formControl {
+  border: none;                /* remove todas as bordas */
+  border-bottom: 1px solid #333; /* adiciona apenas linha inferior */
+  background: transparent;     /* remove fundo padrão */
+  outline: none;               /* remove destaque ao focar */
+  padding: 5px;                /* espaço interno */
+  width: 100%;                 /* ocupa toda a largura */
+  font-size: 14px;             /* tamanho da fonte */
+  transition: border-bottom-color 0.3s ease;
+  // resize: none;                /* impede redimensionamento do textarea */
+}
+
+textarea.formControl:focus {
+  border-bottom: 2px solid #007bff; /* muda cor da linha ao focar */
+}
+
 @media (min-width: 800px) {
   .sidebar-expanded {
     width: 250px;
@@ -131,4 +151,14 @@ select .formControl {
 
 .warning{
   color: #ffc107;
+  :active{
+    border: none;
+  }
+}
+
+.info{
+  color: #0dcaf0;
+  :active{
+    border: none;
+  }
 }

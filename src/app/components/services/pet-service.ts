@@ -17,7 +17,7 @@ export class PetService extends ApiService {
     return this.get<Page<Pet>>(`${this.endpoint}?page=${page}&size=${size}`);
   }
 
-  getPetById(id: number): Observable<Pet> {
+  buscarPorId(id: number): Observable<Pet> {
     return this.get<Pet>(`${this.endpoint}/${id}`);
   }
 

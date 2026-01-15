@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Directive, EventEmitter, Input, Output } from '@angu
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ViaCepService } from '../../services/viacepservice';
 import { Customservice } from '../../services/customservice';
+import { Location } from '@angular/common';
 
 @Directive()
 export abstract class BaseForm<T> {
@@ -15,7 +16,8 @@ export abstract class BaseForm<T> {
     protected fb: FormBuilder,
     protected viaCep: ViaCepService,
     protected customService: Customservice,
-    protected cdr: ChangeDetectorRef
+    protected cdr: ChangeDetectorRef,
+    private location: Location
   ) {}
 
   /** Cada componente filho deve implementar a construção do formulário */
@@ -91,6 +93,10 @@ export abstract class BaseForm<T> {
   cancelarForm(): void {
     this.form.reset();
     this.cancelar.emit();
+  }
+
+  voltar() {
+    this.location.back();
   }
 
   formatarCampo(event: any): void {

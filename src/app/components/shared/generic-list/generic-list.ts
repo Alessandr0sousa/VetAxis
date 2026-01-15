@@ -4,16 +4,20 @@ import {
   ChangeDetectorRef,
   Component,
   ComponentRef,
+  EventEmitter,
   Input,
   OnInit,
+  Output,
   signal,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { BaseEntity } from '../../models/base-entity';
+import { Columns } from '../../models/columns';
 import { Page } from '../../models/page';
-import { BaseForm } from '../../models/base-form';
-import { FormsModule } from "@angular/forms";
+import { BaseForm } from '../../shared/base-form/base-form';
 
 @Component({
   selector: 'app-generic-list',
@@ -26,10 +30,11 @@ export class GenericList<T extends BaseEntity> implements OnInit, AfterViewInit 
   @Input() service!: any;
   @Input() formComponent!: any;
   @Input() filtroFn!: (item: T, filtro: string) => boolean;
-  @Input() columns!: { header: string; field: keyof T }[];
-  @Input() inconAdd!: String;
-
+  @Input() columns: Columns<T>[] = [];
+  @Input() iconAdd!: String;
   @Input() formInputName: string = 'dto';
+
+  @Output() onEdit = new EventEmitter<any>();
 
   data = signal<T[]>([]);
   filtrados = signal<T[]>([]);
@@ -42,7 +47,7 @@ export class GenericList<T extends BaseEntity> implements OnInit, AfterViewInit 
 
   @ViewChild('formContainer', { read: ViewContainerRef }) formContainer!: ViewContainerRef;
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef, private router: Router) {}
 
   ngAfterViewInit() {
     if (this.formContainer) {
@@ -61,6 +66,12 @@ export class GenericList<T extends BaseEntity> implements OnInit, AfterViewInit 
       BaseForm<T>
     >;
     compRef.setInput(this.formInputName, this.selecionado());
+
+    setTimeout(() => {
+      if (this.selecionado() && compRef.instance.form) {
+        compRef.instance.form.patchValue(this.selecionado()!);
+      }
+    });
 
     compRef.instance.salvar.subscribe((item: T) => this.salvar(item));
     compRef.instance.cancelar.subscribe(() => this.fecharForm());
@@ -83,7 +94,7 @@ export class GenericList<T extends BaseEntity> implements OnInit, AfterViewInit 
   }
 
   limparFiltro() {
-    this.filtro = "";
+    this.filtro = '';
     this.filtrados.set(this.data()); // recarrega lista sem filtro
   }
 
@@ -98,7 +109,19 @@ export class GenericList<T extends BaseEntity> implements OnInit, AfterViewInit 
       next: (item: T) => {
         this.selecionado.set(item);
         this.limparFiltro();
-        this.abrirForm(); // 🔑 cria o formulário dinamicamente
+        this.abrirForm();
+      },
+      error: () => alert('Erro ao buscar dados.'),
+    });
+  }
+
+  consultarPet(row: any): void {
+    this.service.buscarPorId(row).subscribe({
+      next: (item: T) => {
+        this.selecionado.set(item);
+        this.router.navigate(['/consultas'], {
+          state: { pet: item },
+        });
       },
       error: () => alert('Erro ao buscar dados.'),
     });
@@ -125,5 +148,13 @@ export class GenericList<T extends BaseEntity> implements OnInit, AfterViewInit 
       });
     }
     this.limparFiltro();
+  }
+
+  getValue(obj: any, path: string | keyof T | undefined): any {
+    if (!path) return '';
+    if (typeof path === 'string') {
+      return path.split('.').reduce((acc, part) => acc?.[part], obj);
+    }
+    return obj[path];
   }
 }

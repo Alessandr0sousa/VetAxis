@@ -3,6 +3,7 @@ import { FuncionarioService } from './../services/funcionario-service';
 import { Component, inject } from '@angular/core';
 import { GenericList } from '../shared/generic-list/generic-list';
 import { FuncionariosForm } from './funcionarios-form/funcionarios-form';
+import { Columns } from '../models/columns';
 
 @Component({
   selector: 'app-funcionarios',
@@ -16,12 +17,24 @@ export class Funcionarios {
   funcionariosForm = FuncionariosForm;
   icone = "fa-solid fa-users fa-2xl";
 
-  funcionarioColumns: { header: string; field: keyof FuncionarioModel }[] = [
+  funcionarioColumns: Columns<FuncionarioModel>[] = [
     { header: 'Nome', field: 'nome' },
     { header: 'CPF', field: 'cpf' },
     { header: 'Telefone', field: 'telefone' },
     { header: 'E-mail', field: 'email' },
-    { header: 'Cargo', field: 'cargo' }
+    { header: 'Cargo', field: 'cargo' },
+    {
+      header: 'Ações',
+      actions: [
+        {
+          type: 'edit',
+          class: 'btn btn-sm',
+          icon: 'fa-regular fa-pen-to-square warning',
+          title: 'Editar',
+          callback: '',
+        },
+      ]
+    }
   ];
 
   filtrarFuncionarios(func: FuncionarioModel, filtro: string): boolean {
