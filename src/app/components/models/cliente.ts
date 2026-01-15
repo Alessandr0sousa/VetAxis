@@ -1,15 +1,4 @@
-export interface Cliente {
-  id: number;
-  nome: string;
+import { Pessoa } from "./pessoa";
+export interface Cliente extends Pessoa {
   cpf: string;
-  telefone: string;
-  email: string;
-  endereco: {
-    logradouro: string;
-    numero: string;
-    bairro: string;
-    cidade: string;
-    uf: string;
-    cep: string;
-  };
 }

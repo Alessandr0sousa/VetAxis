@@ -2,32 +2,34 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Cliente } from '../models/cliente';
 import { ApiService } from '../../api-services/api-sevice';
-import { Page } from '../models/page'; // novo modelo
+import { Page } from '../models/page';
+import { HttpClient } from '@angular/common/http';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ClientesService {
-  constructor(private api: ApiService) {}
+@Injectable({ providedIn: 'root' })
+export class ClientesService extends ApiService {
+  private endpoint = 'clientes';
 
-  // ✅ Agora retorna objeto paginado
-  listar(page: number = 0, size: number = 10): Observable<Page<Cliente>> {
-    return this.api.get<Page<Cliente>>(`clientes?page=${page}&size=${size}`);
+  constructor(http: HttpClient) {
+    super(http);
+  }
+
+  listar(page: number, size: number): Observable<Page<Cliente>> {
+    return this.get<Page<Cliente>>(`${this.endpoint}?page=${page}&size=${size}`);
   }
 
   buscarPorId(id: number): Observable<Cliente> {
-    return this.api.get<Cliente>(`clientes/${id}`);
+    return this.get<Cliente>(`${this.endpoint}/${id}`);
   }
 
   salvar(cliente: Cliente): Observable<Cliente> {
-    return this.api.post<Cliente>('clientes', cliente);
+    return this.post<Cliente>(this.endpoint, cliente);
   }
 
   atualizar(cliente: Cliente): Observable<Cliente> {
-    return this.api.put<Cliente>(`clientes/${cliente.id}`, cliente);
+    return this.put<Cliente>(`${this.endpoint}/${cliente.id}`, cliente);
   }
 
   excluir(id: number): Observable<void> {
-    return this.api.delete<void>(`clientes/${id}`);
+    return this.delete<void>(`${this.endpoint}/${id}`);
   }
 }

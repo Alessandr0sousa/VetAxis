@@ -1,1 +1,48 @@
-<router-outlet></router-outlet>
+<div class="cadastro-container">
+  <h2>Cadastros</h2>
+  <div class="row">
+    <div class="col-sm-9">
+      <ul class="nav row">
+        @for (menu of menus; track menu.label) {
+        <div class="col-6 mt-3 mb-2">
+          <div class="div-menu">
+            <li class="nav-itemn">
+              <button class="btn btn-secondary">
+                <a class="nav-link" [routerLink]="menu.routerLink">
+                  <i [class]="menu.icon" class="h2 m-1 mt-2 text-white"> </i>
+                </a>
+              </button>
+            </li>
+            <span class="m-2 h6">{{ menu.label }}</span>
+          </div>
+        </div>
+        }
+      </ul>
+    </div>
+
+    <div class="col-sm-3">
+      <div class="row">
+        @for (menu of menus; track menu.label) {
+        <div class="card border-3 mb-1">
+          <div class="card-body d-flex flex-column">
+            <h6 class="card-title text-center">{{ menu.label }} Cadastrados</h6>
+
+            <div class="d-flex flex-grow-1 align-items-center justify-content-center">
+              <!-- aqui você troca getQtd(menu.label) pelo store -->
+              <h3 class="fw-bold qtd text-danger">
+                {{ qtds()['t' + slugify(menu.label)] }}
+              </h3>
+            </div>
+
+            <div class="text-end">
+              <a [routerLink]="slugifyLink(menu.label)" class="card-link">
+                {{ menu.label }}
+              </a>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,1 +1,9 @@
-<p>pets works!</p>
+<app-generic-list
+  [service]="petService"
+  [formComponent]="petForm"
+  [filtroFn]="filtrarPets"
+  [columns]="petColumns"
+  [iconAdd]="icone"
+  formInputName="dto"
+>
+</app-generic-list>

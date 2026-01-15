@@ -1,23 +1,34 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Pet } from '../../models/pet';
+import { ClientesService } from '../../services/clientes-service';
+import { Cliente } from '../../models/cliente';
+import { Especie, Pelagem, Temperamento, getRacasPorEspecie } from '../../models/enum-model';
 
 @Component({
   selector: 'app-pet-form',
+  standalone: true, // importante para standalone
   imports: [ReactiveFormsModule],
   templateUrl: './pet-form.html',
-  styleUrl: './pet-form.scss',
+  styleUrls: ['./pet-form.scss'],
 })
 export class PetForm implements OnInit {
-  @Input() petId?: number;
+  @Input() dto?: Pet;
   @Output() cancelar = new EventEmitter<void>();
-  @Output() salvar = new EventEmitter<void>();
+  @Output() salvar = new EventEmitter<Pet>();
 
   petForm!: FormGroup;
 
-  constructor(private fb: FormBuilder) {}
+  clientes: Cliente[] = [];
+  clienteId?: number;
 
-  ngOnInit(): void {
+  especies = Object.values(Especie);
+  pelagens = Object.values(Pelagem);
+  temperamentos = Object.values(Temperamento);
+
+  racasSelecionadas: string[] = [];
+
+  constructor(private fb: FormBuilder, private clienteService: ClientesService) {
     this.petForm = this.fb.group({
       nome: ['', Validators.required],
       sexo: ['', Validators.required],
@@ -28,33 +39,65 @@ export class PetForm implements OnInit {
       pelagem: [''],
       temperamento: [''],
       microchip: [false],
+      chip: [],
       status: [false],
-      clienteId: [null, Validators.required]
+      cliente: [null, Validators.required],
+      clienteNome: ['', Validators.required],
     });
+  }
 
-    if (this.petId) {
-      const pet: Pet = {
-        id: this.petId,
-        nome: 'Rex',
-        sexo: 'Macho',
-        esterilizacao: true,
-        nascimento: '2020-05-10',
-        especie: 'Cão',
-        raca: 'Labrador',
-        pelagem: 'Amarela',
-        status: true,
-        temperamento: 'Amigável',
-        microchip: true,
-        clienteId: 1
-      };
-      this.petForm.patchValue(pet);
+  ngOnInit(): void {
+    this.listarClientes();
+  }
+
+  ngOnChanges(): void {
+    if (this.dto) {
+      this.petForm.patchValue({
+        ...this.dto,
+        clienteNome: this.dto.cliente?.nome ?? '',
+      });
+    } else {
+      this.petForm.reset();
     }
+  }
+
+  onEspecieChange(valor: string) {
+    const especie = valor as Especie;
+    this.racasSelecionadas = getRacasPorEspecie(especie);
+  }
+
+  onClienteSelecionado(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const nomeSelecionado = input.value;
+
+    // procura o cliente pelo nome
+    const cliente = this.clientes.find((c) => c.nome === nomeSelecionado);
+
+    if (cliente) {
+      // atualiza o form com o objeto completo
+      this.petForm.patchValue({
+        cliente: cliente,
+      });
+    }
+  }
+
+  listarClientes() {
+    return this.clienteService.listar(0, 10).subscribe({
+      next: (data) => (this.clientes = data.content ?? []),
+      error: (err) => console.error('Erro ao carregar clientes', err),
+    });
   }
 
   salvarPet() {
     if (this.petForm.valid) {
-      console.log('Pet salvo:', this.petForm.value);
-      this.salvar.emit();
+      const formValue = this.petForm.value;
+      const pet: Pet = {
+        ...(this.dto ?? {}),
+        ...formValue,
+        cliente: formValue.cliente,
+      };
+      delete (pet as any).clienteNome;
+      this.salvar.emit(pet);
     }
   }
 

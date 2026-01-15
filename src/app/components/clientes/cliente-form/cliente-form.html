@@ -1,16 +1,16 @@
 <div class="mt-3">
   <div class="card-header row">
     <div class="mb-3 col-9">
-      <h5 class="mb-0">{{ cliente ? 'Editar' : 'Cadastrar' }} Cliente</h5>
+      <h5 class="mb-0">{{ dto ? 'Editar' : 'Cadastrar' }} Cliente</h5>
     </div>
   </div>
 
   <div class="card-body">
-    <form [formGroup]="clienteForm" (ngSubmit)="salvarCliente()">
+    <form [formGroup]="form" (ngSubmit)="salvarForm()">
       <div class="container-fluid">
         <div class="row g-1">
           <!-- Nome -->
-          <div class="mb-3 col-6 col-sm-6">
+          <div class="mb-3 col-6">
             <label for="nome" class="form-label">Nome</label>
             <input
               id="nome"
@@ -19,7 +19,7 @@
               formControlName="nome"
               placeholder="Digite o nome"
             />
-            @if (clienteForm.get('nome')?.invalid && clienteForm.get('nome')?.touched) {
+            @if (form.get('nome')?.invalid && form.get('nome')?.touched) {
             <div class="text-danger">Nome é obrigatório.</div>
             }
           </div>
@@ -36,7 +36,7 @@
               (keyup)="formatarCampo($event)"
               maxlength="14"
             />
-            @if (clienteForm.get('cpf')?.invalid && clienteForm.get('cpf')?.touched) {
+            @if (form.get('cpf')?.invalid && form.get('cpf')?.touched) {
             <div class="text-danger">CPF é obrigatório.</div>
             }
           </div>
@@ -53,7 +53,7 @@
               (keyup)="formatarCampo($event)"
               maxlength="15"
             />
-            @if (clienteForm.get('telefone')?.invalid && clienteForm.get('telefone')?.touched) {
+            @if (form.get('telefone')?.invalid && form.get('telefone')?.touched) {
             <div class="text-danger">Telefone é obrigatório.</div>
             }
           </div>
@@ -68,7 +68,7 @@
               formControlName="email"
               placeholder="Digite o email"
             />
-            @if (clienteForm.get('email')?.invalid && clienteForm.get('email')?.touched) {
+            @if (form.get('email')?.invalid && form.get('email')?.touched) {
             <div class="text-danger">Email inválido.</div>
             }
           </div>
@@ -86,8 +86,8 @@
               (blur)="buscarEnderecoPorCep()"
               maxlength="9"
             />
-            @if (clienteForm.get('endereco.cep')?.invalid &&
-            clienteForm.get('endereco.cep')?.touched) {
+            @if (form.get('endereco.cep')?.invalid &&
+            form.get('endereco.cep')?.touched) {
             <div class="text-danger">CEP inválido.</div>
             }
           </div>
@@ -157,17 +157,17 @@
               formControlName="numero"
               placeholder="Digite o numero"
             />
-            @if (clienteForm.get('numero')?.touched) {
+            @if (form.get('numero')?.touched) {
             <div class="text-danger">Número é obrigatório.</div>
             }
           </div>
 
           <!-- Botões -->
           <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-success me-2" [disabled]="clienteForm.invalid">
-              {{ cliente ? 'Atualizar' : 'Salvar' }}
+            <button type="submit" class="btn btn-success me-2" [disabled]="form.invalid">
+              {{ dto ? 'Atualizar' : 'Salvar' }}
             </button>
-            <button type="button" class="btn btn-secondary" (click)="cancelarCliente()">
+            <button type="button" class="btn btn-secondary" (click)="cancelarForm()">
               Descartar
             </button>
           </div>

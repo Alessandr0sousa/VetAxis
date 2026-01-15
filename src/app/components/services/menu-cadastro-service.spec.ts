@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ApiSevice } from './api-sevice';
+import { MenuCadastroService } from './menu-cadastro-service';
 
-describe('ApiSevice', () => {
-  let service: ApiSevice;
+describe('MenuCadastroService', () => {
+  let service: MenuCadastroService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(ApiSevice);
+    service = TestBed.inject(MenuCadastroService);
   });
 
   it('should be created', () => {

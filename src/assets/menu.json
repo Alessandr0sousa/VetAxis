@@ -28,28 +28,7 @@
     {
       "label": "Cadastro",
       "icon": "fa-solid fa-user-plus",
-      "children": [
-        {
-          "label": "Clientes",
-          "icon": "fa-solid fa-user",
-          "routerLink": ["/cadastro/cliente-form"]
-        },
-        {
-          "label": "Pets",
-          "icon": "fa-solid fa-paw",
-          "routerLink": ["/cadastro/pet-form"]
-        },
-        {
-          "label": "Veterinários",
-          "icon": "fa-solid fa-user-md",
-          "routerLink": ["/cadastro/veterinarios"]
-        },
-        {
-          "label": "Funcionários",
-          "icon": "fa-solid fa-users",
-          "routerLink": ["/cadastro/funcionarios"]
-        }
-      ]
+      "routerLink": ["/cadastro"]
     },
     {
       "label": "Agenda",

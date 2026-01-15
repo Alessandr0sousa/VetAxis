@@ -14,6 +14,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
     provideHttpClient(),
-    { provide: RouteReuseStrategy, useClass: NoReuseStrategy } // 🔑 registra a estratégia
+    { provide: RouteReuseStrategy, useClass: NoReuseStrategy }
   ]
 };

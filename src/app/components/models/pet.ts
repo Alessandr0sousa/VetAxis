@@ -1,6 +1,6 @@
-export interface Pet {
-  id?: number;
-  nome: string;
+import { BaseEntity } from './base-entity';
+import { Cliente } from './cliente';
+export interface Pet extends BaseEntity{
   sexo: String;
   esterilizacao: boolean;
   nascimento: string;
@@ -10,5 +10,6 @@ export interface Pet {
   status: boolean;
   temperamento?: string;
   microchip?: boolean;
-  clienteId: number;
+  chip?: string;
+  cliente: Cliente;
 }
