@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApiService {
   private baseUrl = 'http://localhost:8080';
@@ -14,6 +14,18 @@ export class ApiService {
   get<T>(endpoint: string, params?: any): Observable<T> {
     return this.http.get<T>(`${this.baseUrl}/${endpoint}`, { params });
   }
+
+  getWithHeaders<T>(
+  endpoint: string,
+  params: {
+    campo: string;
+    valor: string;
+    page?: number;
+    size?: number;
+  }
+): Observable<T> {
+  return this.http.get<T>(`${this.baseUrl}/${endpoint}/buscar`, { params });
+}
 
   // POST
   post<T>(endpoint: string, body: any, headers?: HttpHeaders): Observable<T> {

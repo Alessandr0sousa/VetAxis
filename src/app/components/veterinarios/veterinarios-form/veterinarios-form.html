@@ -168,11 +168,11 @@
             />
           </div>
           <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-success me-2" [disabled]="form.invalid">
-              {{ dto ? 'Atualizar' : 'Salvar' }}
-            </button>
-            <button type="button" class="btn btn-secondary" (click)="cancelarForm()">
+            <button type="button" class="btn btn-secondary me-2" (click)="cancelarForm()">
               Descartar
+            </button>
+            <button type="submit" class="btn btn-success" [disabled]="form.invalid">
+              {{ dto ? 'Atualizar' : 'Salvar' }}
             </button>
           </div>
         </div>

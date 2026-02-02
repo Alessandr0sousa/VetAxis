@@ -1,0 +1,39 @@
+.readonly {
+  border: none;
+}
+.option {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.cancel{
+  margin-right: 0.2rem;
+}
+
+.horario-selector label {
+    display: inline-block;
+    padding: 0.2rem;
+    margin: 0.3rem;
+    cursor: pointer;
+    // background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.horario-selector input[type="radio"] {
+    display: none;
+}
+
+/* Estilo para o label quando o rádio input está marcado */
+.horario-selector input[type="radio"]:checked + label {
+    background-color: #007bff; /* Cor de destaque para seleção */
+    color: white;
+    border-color: #007bff;
+}
+
+/* Estilo de hover para melhor UX */
+.horario-selector label:hover {
+    background-color: #f0f0f0e0;
+}
+

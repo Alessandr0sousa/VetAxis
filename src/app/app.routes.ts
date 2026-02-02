@@ -22,6 +22,7 @@ import { Medicamentos } from './components/estoque/medicamentos/medicamentos';
 import { Produtos } from './components/estoque/produtos/produtos';
 import { Usuarios } from './components/configuracoes/usuarios/usuarios';
 import { Perfis } from './components/configuracoes/perfis/perfis';
+import { Agenda } from './components/agenda/agenda';
 
 export const routes: Routes = [
   { path: '', component: Dashboard, title: 'Dashboard' },
@@ -44,6 +45,7 @@ export const routes: Routes = [
 
   { path: 'cadastro', component: Cadastro, title: 'Cadastro' },
 
+  { path: 'agenda', component: Agenda, title: 'Agenda' },
   { path: 'agenda/cirurgias', component: Cirurgias, title: 'Cirurgias' },
   { path: 'agenda/exames', component: Exames, title: 'Exames' },
 

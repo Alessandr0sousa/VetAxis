@@ -1,13 +1,16 @@
-import { PetService } from './../../services/pet-service';
-import { Component, ChangeDetectorRef, OnInit, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
-import { BaseForm } from '../../shared/base-form/base-form';
-import { ConsultaModel } from '../../models/consulta-model';
-import { ViaCepService } from '../../services/viacepservice';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  ConsultaModel,
+  StatusAgendamento,
+  StatusAgendamentoLabels,
+} from '../../models/consulta-model';
+import { ConsultasFormAgendamentosModel } from '../../models/consultas-form-agendametos-model';
 import { Customservice } from '../../services/customservice';
-import { Pet } from '../../models/pet';
-import { Page } from '../../models/page';
+import { ViaCepService } from '../../services/viacepservice';
+import { BaseForm } from '../../shared/base-form/base-form';
+import { Pet } from './../../models/pet';
 
 @Component({
   selector: 'app-consulta-form',
@@ -17,6 +20,14 @@ import { Page } from '../../models/page';
   styleUrls: ['./consulta-form.scss'],
 })
 export class ConsultaForm extends BaseForm<ConsultaModel> {
+  @Input() agendamento?: ConsultasFormAgendamentosModel;
+  @Output() consultaConcluida = new EventEmitter<ConsultasFormAgendamentosModel>();
+
+  statusOptions = Object.values(StatusAgendamento).map((status) => ({
+    value: status,
+    label: StatusAgendamentoLabels[status],
+  }));
+
   pets: Pet[] = [];
 
   constructor(
@@ -25,39 +36,37 @@ export class ConsultaForm extends BaseForm<ConsultaModel> {
     customService: Customservice,
     cdr: ChangeDetectorRef,
     location: Location,
-    private petService: PetService
   ) {
     super(fb, viaCep, customService, cdr, location);
   }
 
   override ngOnInit(): void {
     super.ngOnInit();
-    this.listarPets();
   }
 
   protected buildForm(): void {
     this.form = this.fb.group({
       id: [null],
-      agendamento: [null, Validators.required],
       peso: [null, [Validators.required, Validators.min(0)]],
-      anamnese: ['', Validators.required],
-      exameFisico: ['', Validators.required],
-      tratamento: ['', Validators.required],
-      prescricao: ['', Validators.required],
-      diagnostico: ['', Validators.required],
-      internamento: [false],
       pet: [null, Validators.required],
+      consultaOrigem: [null],
+      veterinarioNome: [null],
+      petNome: [null],
+      consulta: this.fb.group({
+        anamnese: ['', Validators.required],
+        exameFisico: ['', Validators.required],
+        tratamento: ['', Validators.required],
+        prescricao: ['', Validators.required],
+        diagnostico: ['', Validators.required],
+        internamento: [false],
+        status: [null],
+      }),
     });
   }
 
-  listarPets(): void {
-    this.petService.listar(0, 10).subscribe({
-      next: (dados: Page<Pet>) => {
-        this.pets = dados.content ?? [];
-      },
-      error: (err) => {
-        console.error('Erro ao carregar pets', err);
-      },
-    });
+  salvarConsulta() {
+    this.agendamento = this.agendamento || ({} as ConsultasFormAgendamentosModel);
+    this.agendamento.consulta.status = 'REALIZADO' as any;
+    this.consultaConcluida.emit(this.agendamento);
   }
 }

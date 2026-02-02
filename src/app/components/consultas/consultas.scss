@@ -1,8 +1,17 @@
-.dadospet{
-  margin-bottom: .1rem;
+.dadospet {
+  margin-bottom: 0.1rem;
   opacity: 75%;
 }
 
-.aviso{
-  margin-bottom: .2rem;
+.aviso {
+  margin-bottom: 0.2rem;
+}
+
+.alert {
+  display: flex;
+  justify-content: space-between;
+}
+
+.row{
+  margin: 0.5rem 0;
 }

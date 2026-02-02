@@ -1,0 +1,13 @@
+<div class="agenda-calendario">
+  <div class="agenda-calendario">
+    <p-datepicker
+      [(ngModel)]="date"
+      [inline]="true"
+      [showWeek]="false"
+      [minDate]="now"
+      [disabledDates]="diasIndisponiveis"
+      class="custom-datepicker"
+      (onSelect)="selecionarDia()"
+    ></p-datepicker>
+  </div>
+</div>

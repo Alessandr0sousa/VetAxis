@@ -163,11 +163,11 @@
           </div>
           <!-- Botões -->
           <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-success me-2" [disabled]="petForm.invalid">
-              {{ dto ? 'Atualizar' : 'Salvar' }}
+            <button type="button" class="btn btn-secondary me-2" (click)="cancelarPet()">
+              Descartar
             </button>
-            <button type="button" class="btn btn-secondary" (click)="cancelarPet()">
-              Cancelar
+            <button type="submit" class="btn btn-success" [disabled]="petForm.invalid">
+              {{ dto ? 'Atualizar' : 'Salvar' }}
             </button>
           </div>
         </div>

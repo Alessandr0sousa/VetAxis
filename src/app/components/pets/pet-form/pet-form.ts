@@ -95,6 +95,9 @@ export class PetForm implements OnInit {
         ...(this.dto ?? {}),
         ...formValue,
         cliente: formValue.cliente,
+        esterilizacao: formValue.esterilizacao ?? false,
+        microchip: formValue.microchip ?? false,
+        status: formValue.status ?? false,
       };
       delete (pet as any).clienteNome;
       this.salvar.emit(pet);

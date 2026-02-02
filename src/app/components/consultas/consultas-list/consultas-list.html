@@ -1,0 +1,34 @@
+<div class="mt-4">
+  <div class="card">
+    <ul class="list-group list-group-flush">
+      @for (item of agendamentosFiltrados; track item.id) {
+        <li
+          class="list-group-item inline-flex"
+          [title]="
+            'Consulta agendada para ' +
+            item.dia +
+            ' às ' +
+            item.horario +
+            ' com ' +
+            item.veterinario.nome +
+            ' - ' +
+            labelStatus[item.consulta.status]
+          "
+        >
+          <strong>{{ item.pet.nome }}</strong>
+          <div>
+            <span>{{ item.dia }}</span>
+            &nbsp;
+            <span>{{ item.horario }}</span>
+            &nbsp;
+            <i
+              [class]="
+                iconesStatus[item.consulta.status] + ' ' + fonteColorStatus[item.consulta.status]
+              "
+            ></i>
+          </div>
+        </li>
+      }
+    </ul>
+  </div>
+</div>

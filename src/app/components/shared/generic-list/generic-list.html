@@ -4,7 +4,7 @@
 
 <div class="mt-3">
   <div class="card-header mb-3">
-    <h5 class="mb-0">Listar Registros</h5>
+    <h5 class="mb-0">Listar {{title}}</h5>
   </div>
 
   <div class="card-body">
@@ -48,7 +48,7 @@
             <button
               [class]="i.class"
               [title]="i.title"
-              (click)="i.type == 'edit' ? editar(row.id) : consultarPet(row)"
+              (click)="i.type == 'edit' ? editar(row.id) : consultarPet(row.id)"
             >
               <i [class]="i.icon"></i>
             </button>

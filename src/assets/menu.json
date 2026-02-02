@@ -33,6 +33,7 @@
     {
       "label": "Agenda",
       "icon": "fa-solid fa-calendar-days",
+      "routerLink": ["/agenda"],
       "children": [
         {
           "label": "Cirurgias",

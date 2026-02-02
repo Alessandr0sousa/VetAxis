@@ -1,1 +1,74 @@
+<div class="mt-3">
+  <div class="row mb-3">
+    <!-- Coluna principal -->
+    <div [class]="isvisible ? 'col-sm-12' : 'col-sm-9'">
+      <h2>Agendamentos</h2>
 
+      <div [class]="isvisible ? 'col-sm-9' : 'col-sm-12'">
+        <hr />
+      </div>
+
+      <!-- Seleção de tipo de agendamento -->
+      @if (!isvisible) {
+        <strong>Selecione o tipo de agendamento que deseja.</strong>
+        <div class="mt-3 col-4">
+          <input
+            [(ngModel)]="selectedAgendamento"
+            id="agendamentos"
+            list="listaEstados"
+            class="formControl"
+            placeholder="Agendamentos"
+            (change)="changeComponentSelected($event)"
+          />
+          <datalist id="listaEstados">
+            @for (a of agendamentos; track a) {
+              <option [value]="a"></option>
+            }
+          </datalist>
+        </div>
+      }
+
+      <!-- Renderização condicional dos componentes -->
+      @if (isvisible) {
+        @switch (selectedAgendamento) {
+          @case ('Consultas') {
+            <app-consultas-form-agendamentos  (cancelar)="onCancelar()"></app-consultas-form-agendamentos>
+          }
+          @case ('Exames') {
+            <app-exames></app-exames>
+          }
+          @case ('Cirurgias') {
+            <app-cirurgias></app-cirurgias>
+          }
+        }
+      }
+    </div>
+
+    <!-- Coluna lateral com cards -->
+    @if (!isvisible && agendamentosList.length > 0) {
+      <aside class="col-sm-3 ms-auto left-line">
+        @for (item of agendamentosList; track item.id) {
+          <div class="card mb-2">
+            <div
+              class="card-header p-0 ps-2"
+              [class]="STATUS_BADGE_CLASS[item.consulta.status || 'AGENDADO']"
+            >
+              {{ item.pet.nome }}
+            </div>
+            <div class="card-body p-2">
+              <h6 class="card-title mb-1">{{ item.veterinario.nome }}</h6>
+              <p class="card-text mb-1">{{ item.dia }} - {{ item.horario }}</p>
+              @if (item.consulta.status === 'AGENDADO') {
+                <div class="text-end">
+                  <button class="btn btn-sm btn-secondary" (click)="confirmarConsulta(item)">
+                    Confirmar
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </aside>
+    }
+  </div>
+</div>

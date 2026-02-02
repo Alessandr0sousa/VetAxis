@@ -33,6 +33,7 @@ export class GenericList<T extends BaseEntity> implements OnInit, AfterViewInit 
   @Input() columns: Columns<T>[] = [];
   @Input() iconAdd!: String;
   @Input() formInputName: string = 'dto';
+  @Input() title: string = 'Registros';
 
   @Output() onEdit = new EventEmitter<any>();
 
@@ -115,11 +116,11 @@ export class GenericList<T extends BaseEntity> implements OnInit, AfterViewInit 
     });
   }
 
-  consultarPet(row: any): void {
-    this.service.buscarPorId(row).subscribe({
+  consultarPet(id: number): void {
+    this.service.buscarPorId(id).subscribe({
       next: (item: T) => {
         this.selecionado.set(item);
-        this.router.navigate(['/consultas'], {
+        this.router.navigate(['/agenda'], {
           state: { pet: item },
         });
       },

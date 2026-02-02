@@ -92,7 +92,7 @@ textarea.formControl {
   width: 100%;                 /* ocupa toda a largura */
   font-size: 14px;             /* tamanho da fonte */
   transition: border-bottom-color 0.3s ease;
-  // resize: none;                /* impede redimensionamento do textarea */
+  resize: none;                /* impede redimensionamento do textarea */
 }
 
 textarea.formControl:focus {
