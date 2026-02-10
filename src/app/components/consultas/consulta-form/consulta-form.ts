@@ -42,6 +42,7 @@ export class ConsultaForm extends BaseForm<ConsultaModel> {
 
   override ngOnInit(): void {
     super.ngOnInit();
+    this.carregarDados();
   }
 
   protected buildForm(): void {
@@ -64,9 +65,38 @@ export class ConsultaForm extends BaseForm<ConsultaModel> {
     });
   }
 
+  carregarDados() {
+    if (this.agendamento) {
+      this.form.patchValue({
+        id: this.agendamento.id,
+        peso: this.agendamento.peso,
+        pet: this.agendamento.pet.id,
+        veterinarioNome: this.agendamento.veterinario.nome,
+        petNome: this.agendamento.pet.nome,
+        consultaOrigem: this.agendamento.consultaOrigem,
+      });
+
+      if (this.agendamento.consulta) {
+        this.form.get('consulta')?.patchValue(this.agendamento.consulta);
+      }
+    }
+  }
+
+
   salvarConsulta() {
-    this.agendamento = this.agendamento || ({} as ConsultasFormAgendamentosModel);
-    this.agendamento.consulta.status = 'REALIZADO' as any;
+    this.agendamento!.consulta.anamnese = this.form.get('consulta.anamnese')?.value;
+    this.agendamento!.consulta.exameFisico = this.form.get('consulta.exameFisico')?.value;
+    this.agendamento!.consulta.tratamento = this.form.get('consulta.tratamento')?.value;
+    this.agendamento!.consulta.prescricao = this.form.get('consulta.prescricao')?.value;
+    this.agendamento!.consulta.diagnostico = this.form.get('consulta.diagnostico')?.value;
+    this.agendamento!.consulta.internamento = this.form.get('consulta.internamento')?.value ?? false;
+    this.agendamento!.peso = this.form.get('peso')?.value;
+
+    this.agendamento!.consulta.status = 'REALIZADO' as any;
+
+    delete (this.agendamento as any).veterinarioNome;
+    delete (this.agendamento as any).petNome;
+
     this.consultaConcluida.emit(this.agendamento);
   }
 }

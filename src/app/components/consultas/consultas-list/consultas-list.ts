@@ -31,7 +31,10 @@ export class ConsultasList implements OnInit, OnChanges {
   labelStatus = StatusAgendamentoLabels;
   badgeStatus = STATUS_BADGE_CLASS;
 
-  constructor(private agendamentoService: AgendamentosService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private agendamentoService: AgendamentosService,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
     this.agendamentoService.agendamentos$.subscribe((lista) => {
@@ -45,18 +48,29 @@ export class ConsultasList implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['diaSelected']) {
-      this.listarAgendamentos()
+      this.listarAgendamentos();
       this.filtrarAgendamentos();
       this.cdr.detectChanges();
     }
   }
 
   listarAgendamentos() {
-    this.agendamentoService.buscarPorCampo({ campo: 'dia', valor: this.diaSelected, page: 0, size: 20 }).subscribe({
-      error: (error) => {
-        console.error('Erro ao listar agendamentos:', error);
-      },
-    });
+    this.agendamentoService
+      .buscarPorCampo({
+        campo: 'dia',
+        valor: this.diaSelected,
+        page: 0,
+        size: 20,
+        sort: [
+          { field: 'dia', direction: 'asc' },
+          { field: 'horario', direction: 'asc' },
+        ],
+      })
+      .subscribe({
+        error: (error) => {
+          console.error('Erro ao listar agendamentos:', error);
+        },
+      });
   }
 
   private filtrarAgendamentos(): void {

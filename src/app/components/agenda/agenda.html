@@ -32,7 +32,10 @@
       @if (isvisible) {
         @switch (selectedAgendamento) {
           @case ('Consultas') {
-            <app-consultas-form-agendamentos  (cancelar)="onCancelar()"></app-consultas-form-agendamentos>
+            <app-consultas-form-agendamentos
+              (cancelar)="onCancelar()"
+              [dto]="selectedAgendamentoDto"
+            ></app-consultas-form-agendamentos>
           }
           @case ('Exames') {
             <app-exames></app-exames>
@@ -45,28 +48,48 @@
     </div>
 
     <!-- Coluna lateral com cards -->
-    @if (!isvisible && agendamentosList.length > 0) {
+    @if (!isvisible) {
       <aside class="col-sm-3 ms-auto left-line">
-        @for (item of agendamentosList; track item.id) {
-          <div class="card mb-2">
-            <div
-              class="card-header p-0 ps-2"
-              [class]="STATUS_BADGE_CLASS[item.consulta.status || 'AGENDADO']"
-            >
-              {{ item.pet.nome }}
-            </div>
-            <div class="card-body p-2">
-              <h6 class="card-title mb-1">{{ item.veterinario.nome }}</h6>
-              <p class="card-text mb-1">{{ item.dia }} - {{ item.horario }}</p>
-              @if (item.consulta.status === 'AGENDADO') {
-                <div class="text-end">
-                  <button class="btn btn-sm btn-secondary" (click)="confirmarConsulta(item)">
-                    Confirmar
+        <div class="d-flex align-items-center mb-3">
+          <button class="btn btn-secondary me-2" (click)="decrementarDia()">
+            <i class="fa-solid fa-angle-left"></i>
+          </button>
+          <strong>{{ diaFormatado() }}</strong>
+          <button class="btn btn-secondary ms-2" (click)="incrementarDia()">
+            <i class="fa-solid fa-angle-right"></i>
+          </button>
+        </div>
+        @if (agendamentosList().length > 0) {
+          <!-- Lista de agendamentos -->
+          @for (item of agendamentosList(); track $index) {
+            <div class="card mb-2">
+              <div
+                class="card-header p-0 ps-2"
+                [class]="STATUS_BADGE_CLASS[item.consulta.status || 'AGENDADO']"
+              >
+                {{ item.pet.nome }}
+              </div>
+              <div class="card-body p-2">
+                <h6 class="card-title mb-1">{{ item.veterinario.nome }}</h6>
+                <p class="card-text mb-1">{{ item.dia }} - {{ item.horario }}</p>
+
+                @if (item.consulta.status === 'AGENDADO') {
+                  <div class="d-flex justify-content-between">
+                    <button class="btn btn-sm btn-primary" (click)="confirmarConsulta(item, true)">
+                      Confirmar
+                    </button>
+                    <button class="btn btn-sm btn-danger" (click)="confirmarConsulta(item, false)">
+                      Cancelar
+                    </button>
+                  </div>
+                } @else if (item.consulta.status == 'CANCELADO') {
+                  <button class="btn btn-sm btn-secondary" (click)="reagendarConsulta(item)">
+                    Reagendar
                   </button>
-                </div>
-              }
+                }
+              </div>
             </div>
-          </div>
+          }
         }
       </aside>
     }

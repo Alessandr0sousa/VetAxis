@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, SimpleChanges, computed, effect, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ConsultasFormAgendamentos } from '../consultas/consultas-form-agendamentos/consultas-form-agendamentos';
-import { STATUS_BADGE_CLASS } from '../models/consulta-model';
+import { STATUS_BADGE_CLASS, StatusAgendamento } from '../models/consulta-model';
 import { ConsultasFormAgendamentosModel } from '../models/consultas-form-agendametos-model';
 import { AgendamentosService } from '../services/agendamentos-service';
+import { AlertService } from '../services/alert-service';
 import { Cirurgias } from './cirurgias/cirurgias';
 import { Exames } from './exames/exames';
 
@@ -22,26 +23,30 @@ export class Agenda implements OnInit {
   STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
   isFormVisible: boolean = false;
   selectedAgendamentoDto?: ConsultasFormAgendamentosModel;
-  diaSelected: string = new Date().toLocaleDateString('pt-BR');
+  diaSelected = signal<Date>(new Date());
+  refreshCards = false;
+  diaFormatado = computed(() =>
+    this.diaSelected().toLocaleDateString('pt-BR')
+  );
 
-  agendamentosList: ConsultasFormAgendamentosModel[] = [];
+  agendamentosList = signal<ConsultasFormAgendamentosModel[]>([]);
 
   constructor(
     private cdr: ChangeDetectorRef,
     private service: AgendamentosService,
     private router: Router,
-  ) {}
+    private swa: AlertService,
+  ) {
+    effect(() => {
+      const data = this.diaSelected();
+      setTimeout(() => {
+        this.listarAgendamentos();
+      }, 50);
+    });
+  }
+
   ngOnInit(): void {
     this.listarAgendamentos();
-  }
-
-  get _agendamentosList(): ConsultasFormAgendamentosModel[] {
-    return this.agendamentosList;
-  }
-
-  set _agendamentosList(value: ConsultasFormAgendamentosModel[]) {
-    this.agendamentosList = value;
-    this.cdr.detectChanges();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -56,67 +61,42 @@ export class Agenda implements OnInit {
     this.isvisible = !!this.selectedAgendamento;
   }
 
+  private formatDataISO(data: Date): string {
+    const ano = data.getFullYear();
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const dia = String(data.getDate()).padStart(2, '0');
+    return `${dia}/${mes}/${ano}`;
+  }
+
   listarAgendamentos() {
+    const dataEnviada = this.formatDataISO(this.diaSelected());
     this.service
-      .buscarPorCampo({ campo: 'dia', valor: this.diaSelected, page: 0, size: 20 })
+      .buscarPorCampo({
+        campo: 'dia',
+        valor: dataEnviada,
+        page: 0,
+        size: 20,
+        sort: [
+          { field: 'dia', direction: 'asc' },
+          { field: 'horario', direction: 'asc' },
+        ],
+      })
       .subscribe({
         next: (data) => {
-          this.agendamentosList = data.content ?? [];
-          this.cdr.detectChanges();
+          this.agendamentosList.set([...(data.content ?? [])]);
         },
         error: (err) => console.error('Erro ao carregar os agendamentos', err),
       });
   }
 
-  editar(id: number) {
-    this.service.buscarPorId(id).subscribe({
-      next: (item: ConsultasFormAgendamentosModel) => {
-        this.consultarPet(item.id);
-      },
-      error: () => alert('Erro ao buscar dados.'),
-    });
-  }
-
   iniciarConsulta(item: ConsultasFormAgendamentosModel) {
-    const agendaDto: ConsultasFormAgendamentosModel = {
-      ...(item ?? {}),
-      consulta: {
-        ...item.consulta,
-        status: 'INICIADO' as any,
-      },
-    };
-
-    delete (agendaDto as any).veterinarioNome;
-    delete (agendaDto as any).petNome;
-    this.service.atualizar(agendaDto).subscribe({
-      next: () => {
-        this.service.buscarPorId(item.id).subscribe({
-          next: (agendamento: ConsultasFormAgendamentosModel) => {
-            this.consultarPet(agendamento.id);
-          },
-          error: () => alert('Erro ao buscar dados.'),
-        });
-      },
-      error: (err) => {
-        console.error('Erro ao iniciar consulta', err);
-        alert('Erro ao iniciar consulta');
-      },
-    });
+    this.atualizarConsultaStatus(item, 'INICIADO' as any);
   }
 
-  finalizarConsulta($event: ConsultasFormAgendamentosModel) {
-    this.service.atualizar($event).subscribe({
-      next: () => {
-        console.log('Consulta finalizada com sucesso!');
-        this.listarAgendamentos();
-        this.isFormVisible = false;
-        this.selectedAgendamentoDto = undefined;
-      },
-      error: (err) => {
-        console.error('Erro ao finalizar consulta', err);
-        alert('Erro ao finalizar consulta');
-      },
-    });
+  finalizarConsulta(item: ConsultasFormAgendamentosModel) {
+    this.atualizarConsultaStatus(item, item.consulta.status);
+    this.isFormVisible = false;
+    this.selectedAgendamentoDto = undefined;
   }
 
   consultarPet(id: number): void {
@@ -131,31 +111,67 @@ export class Agenda implements OnInit {
     });
   }
 
-  confirmarConsulta(dto: ConsultasFormAgendamentosModel) {
-    const agendaDto: ConsultasFormAgendamentosModel = {
-      ...(dto ?? {}),
-      consulta: {
-        ...dto.consulta,
-        status: 'CONFIRMADO' as any,
-      },
+  confirmarConsulta(dto: ConsultasFormAgendamentosModel, confirmar: boolean) {
+    const novoStatus = confirmar ? StatusAgendamento.CONFIRMADO : StatusAgendamento.CANCELADO;
+    const msg = confirmar ? 'Consulta confirmada!' : 'Consulta cancelada!';
+    this.atualizarConsultaStatus(dto, novoStatus as any, msg, confirmar);
+  }
+
+  private atualizarConsultaStatus(
+    item: ConsultasFormAgendamentosModel,
+    status: any,
+    mensagem?: string,
+    sucesso?: boolean
+  ) {
+    const dto: ConsultasFormAgendamentosModel = {
+      ...item,
+      consulta: { ...item.consulta, status },
     };
-    delete (agendaDto as any).veterinarioNome;
-    delete (agendaDto as any).petNome;
-    this.service.atualizar(agendaDto).subscribe({
+
+    this.limparCampos(dto);
+
+    this.service.atualizar(dto).subscribe({
       next: () => {
-        alert('Consulta confirmada com sucesso!');
+        if (mensagem) {
+          sucesso ? this.swa.success(mensagem) : this.swa.warning(mensagem);
+        }
         this.listarAgendamentos();
       },
-      error: (err) => {
-        console.error('Erro ao confirmar consulta', err);
-        alert('Erro ao confirmar consulta');
-      },
+      error: () => alert(`Erro ao atualizar consulta: ${mensagem || 'operação'}`),
     });
+  }
+
+  private limparCampos(dto: ConsultasFormAgendamentosModel): ConsultasFormAgendamentosModel {
+    const copia = { ...dto };
+    delete (copia as any).veterinarioNome;
+    delete (copia as any).petNome;
+    return copia;
   }
 
   onCancelar() {
     this.isvisible = false;
     this.selectedAgendamento = '';
+    this.selectedAgendamentoDto = undefined; // limpa dto
+    this.listarAgendamentos();
   }
 
+  reagendarConsulta(item: ConsultasFormAgendamentosModel) {
+    this.selectedAgendamento = 'Consultas';
+    this.isvisible = !!this.selectedAgendamento;
+    this.selectedAgendamentoDto = item;
+  }
+
+  private alterarDia(dias: number) {
+    const data = new Date(this.diaSelected());
+    data.setDate(data.getDate() + dias);
+    this.diaSelected.set(data);
+  }
+
+  incrementarDia() {
+    this.alterarDia(1);
+  }
+
+  decrementarDia() {
+    this.alterarDia(-1);
+  }
 }

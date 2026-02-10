@@ -35,14 +35,18 @@ export class AgendamentosService extends ApiService {
     valor: string;
     page?: number;
     size?: number;
+    sort?: { field: string; direction: 'asc' | 'desc' }[];
   }): Observable<Page<ConsultasFormAgendamentosModel>> {
-    const httpParams = new HttpParams()
+    let httpParams = new HttpParams()
       .set('campo', params.campo)
       .set('valor', params.valor)
       .set('page', params.page ?? 0)
-      .set('size', params.size ?? 10)
-      .append('sort', 'dia,asc')
-      .append('sort', 'horario,asc');
+      .set('size', params.size ?? 10);
+
+    params.sort?.forEach((s) => {
+      httpParams = httpParams.append('sort', `${s.field},${s.direction}`);
+    });
+
     return this.get<Page<ConsultasFormAgendamentosModel>>(
       `${this.endpoint}/buscar`,
       httpParams,

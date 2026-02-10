@@ -1,8 +1,9 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import Swal from 'sweetalert2';
+import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { STATUS_BADGE_CLASS } from '../models/consulta-model';
 import { ConsultasFormAgendamentosModel } from '../models/consultas-form-agendametos-model';
 import { AgendamentosService } from '../services/agendamentos-service';
+import { AlertService } from '../services/alert-service';
 import { ConsultaForm } from './consulta-form/consulta-form';
 import { ConsultasFormAgendamentos } from './consultas-form-agendamentos/consultas-form-agendamentos';
 
@@ -20,19 +21,38 @@ export class Consultas implements OnInit {
   badgeStatus = STATUS_BADGE_CLASS;
   agendamentosFiltrados: ConsultasFormAgendamentosModel[] = [];
   diaSelected: string = new Date().toLocaleDateString('pt-BR');
+  retorno?: ConsultasFormAgendamentosModel;
 
   constructor(
     private cdr: ChangeDetectorRef,
     private agendamentoService: AgendamentosService,
+    private alertService: AlertService,
   ) {}
 
   ngOnInit(): void {
     this.listarAgendamentos();
   }
 
+  get _isAgendamento(): boolean {
+    return this.isAgedamento;
+  }
+
+  set _isAgendamento(value: boolean) {
+    this.isAgedamento = value;
+  }
+
   listarAgendamentos() {
     this.agendamentoService
-      .buscarPorCampo({ campo: 'dia', valor: this.diaSelected, page: 0, size: 20 })
+      .buscarPorCampo({
+        campo: 'dia',
+        valor: this.diaSelected,
+        page: 0,
+        size: 20,
+        sort: [
+          { field: 'dia', direction: 'asc' },
+          { field: 'horario', direction: 'asc' },
+        ],
+      })
       .subscribe({
         next: (data) => {
           this.agendamentosFiltrados = data.content ?? [];
@@ -43,8 +63,10 @@ export class Consultas implements OnInit {
   }
 
   onCancelar() {
+    this.agendamentoConsulta = undefined;
     this.isAgedamento = false;
     this.nome = '';
+    this.listarAgendamentos();
   }
 
   onClickEmitter() {
@@ -52,56 +74,62 @@ export class Consultas implements OnInit {
     this.nome = 'Agendar';
   }
 
-  iniciarConsulta(item: ConsultasFormAgendamentosModel) {
-    const agendaDto: ConsultasFormAgendamentosModel = {
-      ...(item ?? {}),
-      consulta: {
-        ...item.consulta,
-        status: 'INICIADO' as any,
-      },
-    };
-    delete (agendaDto as any).veterinarioNome;
-    delete (agendaDto as any).petNome;
-    this.agendamentoService.atualizar(agendaDto).subscribe({
-      next: () => {
-        this.agendamentoService.buscarPorId(item.id).subscribe({
-          next: (agendamento: ConsultasFormAgendamentosModel) => {
-            this.listarAgendamentos();
-            this.isAgedamento = false;
-            this.consultarPet(agendamento.id);
-          },
-          error: () => alert('Erro ao buscar dados.'),
-        });
-      },
-      error: (err) => {
-        console.error('Erro ao iniciar consulta', err);
-        alert('Erro ao iniciar consulta');
-      },
-    });
-    this.cdr.detectChanges();
+  async iniciarConsulta(item: ConsultasFormAgendamentosModel) {
+    try {
+      const agendaDto: ConsultasFormAgendamentosModel = {
+        ...(item ?? {}),
+        consulta: {
+          ...item.consulta,
+          status: 'INICIADO' as any,
+        },
+      };
+
+      delete (agendaDto as any).veterinarioNome;
+      delete (agendaDto as any).petNome;
+
+      await firstValueFrom(this.agendamentoService.atualizar(agendaDto));
+
+      const agendamento = await firstValueFrom(this.agendamentoService.buscarPorId(item.id));
+      this.listarAgendamentos();
+      this.isAgedamento = false;
+      this.consultarPet(agendamento.id);
+      this.cdr.markForCheck();
+    } catch (err) {
+      this.alertService.error('Erro ao buscar dados');
+    }
   }
 
   consultarPet(id: number): void {
-    this.agendamentoConsulta = this.agendamentosFiltrados.find((agendamento) => agendamento.id === id);
-    console.log('Agendamento para consulta:', this.agendamentoConsulta);
+    this.agendamentoConsulta = this.agendamentosFiltrados.find(
+      (agendamento) => agendamento.id === id,
+    );
     this.cdr.detectChanges();
   }
 
-  // 🔑 quando uma consulta é concluída, atualiza o BehaviorSubject
   onConsultaConcluida(event: ConsultasFormAgendamentosModel) {
-    console.log('Consulta concluída:', event);
-
-    // salva no backend e atualiza automaticamente o BehaviorSubject
-    this.agendamentoService.salvar(event).subscribe({
+    this.agendamentoService.atualizar(event).subscribe({
       next: () => {
-        Swal.fire('Consulta salva com sucesso!', '', 'success');
+        this.listarAgendamentos();
+        this.marcarRetorno(event);
       },
       error: (err) => {
-        console.error('Erro ao salvar consulta:', err);
-        Swal.fire('Erro ao salvar consulta', '', 'error');
+        this.alertService.error('Erro ao salvar consulta');
       },
     });
 
-    this.cdr.detectChanges(); // força atualização visual imediata
+    this.cdr.detectChanges();
+  }
+
+  marcarRetorno(item: ConsultasFormAgendamentosModel) {
+    this.alertService.confirm('Deseja agendar retorno dessa consulta?').then((resposta) => {
+      if (resposta) {
+        item.isRetorno = true;
+        this.retorno = item;
+        this.onCancelar();
+        this.onClickEmitter();
+      } else {
+        this.alertService.success('Consulta conclída com sucesso!');
+      }
+    });
   }
 }
