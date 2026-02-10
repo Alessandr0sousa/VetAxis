@@ -1,9 +1,9 @@
 <nav class="navbar sticky-top bg-dark border-body">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">
-      <img src="/src/assets/imgs/Logo2.png" alt="" width="30" height="24" class="d-inline-block align-text-top">
+      <img [src]="user.logo" alt="Logo da empresa" width="30" height="24" class="d-inline-block align-text-top">
       <span class="h4 ms-2 text-white">
-        VetAxis
+        {{ user.company }}
       </span>
     </a>
     <div class="d-flex">

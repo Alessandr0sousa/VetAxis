@@ -1,15 +1,17 @@
 import { Component } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
-  imports: [],
+  imports: [NgOptimizedImage],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
 })
 export class Navbar {
   user = {
     name: 'Alessandro Sousa',
-    company: 'VetAxis Inc.'
+    company: 'VetAxis Inc.',
+    logo: '/assets/img/logo-mini.png'
   };
 
 }
