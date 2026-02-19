@@ -3,7 +3,7 @@ import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
-  imports: [NgOptimizedImage],
+  imports: [],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
 })

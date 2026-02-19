@@ -23,8 +23,10 @@ import { Produtos } from './components/estoque/produtos/produtos';
 import { Usuarios } from './components/configuracoes/usuarios/usuarios';
 import { Perfis } from './components/configuracoes/perfis/perfis';
 import { Agenda } from './components/agenda/agenda';
+import { LoginPage } from './components/login/login-page';
 
 export const routes: Routes = [
+  { path: 'login', component: LoginPage, title: 'Login' },
   { path: '', component: Dashboard, title: 'Dashboard' },
   { path: 'dashboard', component: Dashboard, title: 'Dashboard' },
 
