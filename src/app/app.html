@@ -1,13 +1,18 @@
-<app-navbar></app-navbar>
+@if (ready()) {
+  @if (showLayout()) {
+    <app-navbar></app-navbar>
 
-<div class="d-flex">
-  <!-- Passa o estado e escuta o evento -->
-  <app-menu-principal
-    [isCollapsed]="isCollapsed"
-    (toggle)="toggleSidebar()">
-  </app-menu-principal>
+    <div class="d-flex">
+      <app-menu-principal
+        [isCollapsed]="isCollapsed"
+        (toggle)="toggleSidebar()">
+      </app-menu-principal>
 
-  <div class="content flex-grow-1 p-2" [ngClass]="{ 'collapsed': isCollapsed }">
+      <div class="content flex-grow-1 p-2" [class.collapsed]="isCollapsed">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  } @else {
     <router-outlet></router-outlet>
-  </div>
-</div>
+  }
+}
