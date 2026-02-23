@@ -1,16 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+import { UserProfileService } from '../services/user-profile-service';
 
 @Component({
-  selector: 'app-card-cliente',
+  selector: 'app-card-company',
   imports: [],
   templateUrl: './card-cliente.html',
   styleUrl: './card-cliente.scss',
 })
-export class CardCliente {
-  cliente = {
-    nome: 'Cliente Exemplo',
-    telefone: '(11) 98765-4321',
-    email: 'cliente@exemplo.com',
-    logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSP2g4LipcXcIbDnRL-xf2JU3GFUm6ynk6IpQ&s'
-  };
+export class CardCompany {
+  private readonly userProfileService = inject(UserProfileService);
+
+  cliente = computed(() => {
+    const profile = this.userProfileService.getUserProfile();
+    return {
+      nome: profile?.clinicaNome || 'Cliente Exemplo',
+      telefone: '(11) 98765-4321',
+      email: profile?.login || 'cliente@exemplo.com',
+      logo: profile?.clinicaLogo
+    };
+  });
 }

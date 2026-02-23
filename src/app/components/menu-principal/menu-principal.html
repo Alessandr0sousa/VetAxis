@@ -4,7 +4,7 @@
 >
   <div class="d-flex justify-content-center align-items-center mb-3 overlay">
     @if (!isCollapsed) {
-    <app-card-cliente (click)="toggle.emit()"></app-card-cliente>
+    <app-card-company (click)="toggle.emit()"></app-card-company>
     } @else {
     <button class="btn btn-sm btn-dark side-icon" (click)="toggle.emit()">
       <i class="fa-solid fa-bars"></i>

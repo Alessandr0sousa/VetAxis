@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import menuData from '../../../assets/menu.json';
-import { CardCliente } from '../card-cliente/card-cliente';
+import { CardCompany } from '../card-cliente/card-cliente';
 
 interface MenuItem {
   label: string;
@@ -28,7 +28,7 @@ interface MenuData {
 @Component({
   selector: 'app-menu-principal',
   standalone: true,
-  imports: [RouterModule, CommonModule, CardCliente],
+  imports: [RouterModule, CommonModule, CardCompany],
   templateUrl: './menu-principal.html',
   styleUrls: ['./menu-principal.scss'],
 })

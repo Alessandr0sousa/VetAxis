@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { NgOptimizedImage } from '@angular/common';
+import { Component, computed, inject } from '@angular/core';
+import { UserProfileService } from '../services/user-profile-service';
 
 @Component({
   selector: 'app-navbar',
@@ -8,10 +8,14 @@ import { NgOptimizedImage } from '@angular/common';
   styleUrl: './navbar.scss',
 })
 export class Navbar {
-  user = {
-    name: 'Alessandro Sousa',
-    company: 'VetAxis Inc.',
-    logo: '/assets/img/logo-mini.png'
-  };
+  private readonly userProfileService = inject(UserProfileService);
 
+  user = computed(() => {
+    const profile = this.userProfileService.getUserProfile();
+    return {
+      name: profile?.nome || 'Usuário',
+      company: profile?.clinicaNome || 'VetAxis Inc.',
+      logo: profile?.clinicaLogo || '/assets/img/logo-mini.png',
+    };
+  });
 }

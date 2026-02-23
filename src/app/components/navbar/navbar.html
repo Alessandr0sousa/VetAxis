@@ -1,14 +1,14 @@
 <nav class="navbar sticky-top bg-dark border-body">
   <div class="container-fluid d-flex justify-content-between align-items-center flex-nowrap gap-2">
     <a class="navbar-brand m-0" href="#">
-      <img [src]="user.logo" alt="Logo da empresa" width="30" height="24" class="d-inline-block align-text-top">
+      <img [src]="user().logo" alt="Logo da clínica" width="30" height="24" class="d-inline-block align-text-top">
       <span class="h4 ms-2 text-white d-none d-sm-inline">
-        {{ user.company }}
+        {{ user().company }}
       </span>
     </a>
     <div class="d-flex align-items-center flex-nowrap gap-2">
-      <span class="ms-2 text-white d-md-inline">{{ user.name }} |</span>
-      <span class="text-white">{{ user.company }}</span>
+      <span class="ms-2 text-white d-md-inline">{{ user().name }} |</span>
+      <span class="text-white">{{ user().company }}</span>
     </div>
   </div>
 </nav>
