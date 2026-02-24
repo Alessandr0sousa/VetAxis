@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { StatusAgendamento } from '../../models/consulta-model';
 import { ConsultasFormAgendamentosModel } from '../../models/consultas-form-agendametos-model';
@@ -11,11 +11,12 @@ import { VeterinarioModel } from './../../models/veterinario-model';
 import { VeterinarioService } from './../../services/veterinario-service';
 import { ConsultasList } from '../consultas-list/consultas-list';
 import { AlertService } from '../../services/alert-service';
+import { AnexosUpload } from '../../shared/anexos-upload/anexos-upload';
 
 @Component({
   selector: 'app-consultas-form-agendamentos',
   standalone: true,
-  imports: [AgendaCalendario, CommonModule, ReactiveFormsModule, ConsultasList],
+  imports: [AgendaCalendario, CommonModule, ReactiveFormsModule, ConsultasList, AnexosUpload],
   templateUrl: './consultas-form-agendamentos.html',
   styleUrls: ['./consultas-form-agendamentos.scss'],
 })
@@ -23,6 +24,7 @@ export class ConsultasFormAgendamentos implements OnInit {
   @Input() dto?: ConsultasFormAgendamentosModel;
   @Output() cancelar = new EventEmitter<void>();
   @Output() salvar = new EventEmitter<ConsultasFormAgendamentosModel>();
+  @ViewChild(AnexosUpload) anexosUpload?: AnexosUpload;
 
   pets: Pet[] = [];
   vets: VeterinarioModel[] = [];
@@ -41,10 +43,10 @@ export class ConsultasFormAgendamentos implements OnInit {
   ngOnInit(): void {
     this.form = this.criarForm();
     this.listarPets();
+    this.listarVeterinarios();
     this.diaSelected = new Date().toLocaleDateString('pt-BR');
 
     if (this.dto) {
-      this.listarVeterinarios();
       this.carregarDados();
     }
 
@@ -71,6 +73,7 @@ export class ConsultasFormAgendamentos implements OnInit {
         anamnese: ['', [Validators.required, Validators.minLength(10)]],
         status: [StatusAgendamento.AGENDADO],
       }),
+      anexos: [[]],
     });
   }
 
@@ -131,9 +134,11 @@ export class ConsultasFormAgendamentos implements OnInit {
   salvarAgendamento() {
     if (this.form.valid) {
       const formValue = this.form.value;
+      const { anexos, ...outrosValores } = formValue;
+
       let agendaDto: ConsultasFormAgendamentosModel = {
         ...(this.dto ?? {}),
-        ...formValue,
+        ...outrosValores,
         veterinario: formValue.veterinario,
         pet: formValue.pet,
         isRetorno: formValue.isRetorno ?? false,
@@ -141,9 +146,22 @@ export class ConsultasFormAgendamentos implements OnInit {
 
       agendaDto = this.limparCampos(agendaDto);
 
-      this.agendamentoService.salvar(agendaDto).subscribe({
-        next: () => {
-          this.swa.success('Agendamento salvo com sucesso!');
+      const request$ = agendaDto.id
+        ? this.agendamentoService.atualizar(agendaDto)
+        : this.agendamentoService.salvar(agendaDto);
+
+      request$.subscribe({
+        next: (agendamentoSalvo) => {
+          const mensagem = agendaDto.id
+            ? 'Agendamento atualizado com sucesso!'
+            : 'Agendamento salvo com sucesso!';
+          this.swa.success(mensagem);
+
+          // Salva anexos temporários após criação do agendamento
+          if (agendamentoSalvo?.id && this.anexosUpload) {
+            this.anexosUpload.salvarAnexosTemporarios(agendamentoSalvo.id);
+          }
+
           this.cancelarAgendamento();
         },
         error: () => this.swa.error('Erro ao salvar agendamento'),
@@ -156,12 +174,19 @@ export class ConsultasFormAgendamentos implements OnInit {
   carregarDados() {
     if (!this.dto) return;
 
+    // Usa a string do banco diretamente
+    const dia = this.dto?.dia ?? new Date().toLocaleDateString('pt-BR');
+
+    this.diaSelected = dia;
+
     this.form.patchValue({
       veterinarioNome: this.dto?.veterinario?.nome ?? '',
       petNome: this.dto?.pet?.nome ?? '',
       pet: this.dto?.pet ?? null,
       veterinario: this.dto?.veterinario ?? null,
       peso: this.dto?.peso ?? 0,
+      dia: dia,
+      horario: this.dto?.horario ?? '', // ✅ Preenchendo o horário diretamente
       consultaOrigem: this.dto,
       isRetorno: this.dto?.isRetorno ?? false,
       consulta: {

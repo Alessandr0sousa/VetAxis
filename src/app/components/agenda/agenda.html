@@ -71,7 +71,17 @@
               </div>
               <div class="card-body p-2">
                 <h6 class="card-title mb-1">{{ item.veterinario.nome }}</h6>
-                <p class="card-text mb-1">{{ item.dia }} - {{ item.horario }}</p>
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <span class="card-text">{{ item.dia }} - {{ item.horario }}</span>
+                  <button
+                    class="btn btn-sm p-0"
+                    type="button"
+                    title="Editar"
+                    (click)="editarAgendamento(item)"
+                  >
+                    <i class="fa-solid fa-pen text-warning"></i>
+                  </button>
+                </div>
 
                 @if (item.consulta.status === 'AGENDADO') {
                   <div class="d-flex justify-content-between">

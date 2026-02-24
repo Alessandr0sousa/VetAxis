@@ -51,6 +51,11 @@
         <label for="internamento" class="form-check-label">Internamento</label>
       </div>
 
+      <!-- Anexos -->
+      <div class="col-12">
+        <app-anexos-upload [agendamentoId]="agendamento?.id" formControlName="anexos"></app-anexos-upload>
+      </div>
+
       <div class="d-flex justify-content-end">
         <button type="button" (click)="cancelarForm()" class="btn btn-secondary me-2">
           Cancelar

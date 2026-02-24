@@ -11,11 +11,12 @@ import { Customservice } from '../../services/customservice';
 import { ViaCepService } from '../../services/viacepservice';
 import { BaseForm } from '../../shared/base-form/base-form';
 import { Pet } from './../../models/pet';
+import { AnexosUpload } from '../../shared/anexos-upload/anexos-upload';
 
 @Component({
   selector: 'app-consulta-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, AnexosUpload],
   templateUrl: './consulta-form.html',
   styleUrls: ['./consulta-form.scss'],
 })
@@ -62,6 +63,7 @@ export class ConsultaForm extends BaseForm<ConsultaModel> {
         internamento: [false],
         status: [null],
       }),
+      anexos: [[]],
     });
   }
 
@@ -74,6 +76,7 @@ export class ConsultaForm extends BaseForm<ConsultaModel> {
         veterinarioNome: this.agendamento.veterinario.nome,
         petNome: this.agendamento.pet.nome,
         consultaOrigem: this.agendamento.consultaOrigem,
+        // NÃO passar anexos aqui - deixar AnexosUpload gerenciar via API
       });
 
       if (this.agendamento.consulta) {
@@ -91,6 +94,9 @@ export class ConsultaForm extends BaseForm<ConsultaModel> {
     this.agendamento!.consulta.diagnostico = this.form.get('consulta.diagnostico')?.value;
     this.agendamento!.consulta.internamento = this.form.get('consulta.internamento')?.value ?? false;
     this.agendamento!.peso = this.form.get('peso')?.value;
+
+    // Anexos são gerenciados APENAS pelo componente AnexosUpload
+    // Nunca modificar anexos aqui
 
     this.agendamento!.consulta.status = 'REALIZADO' as any;
 

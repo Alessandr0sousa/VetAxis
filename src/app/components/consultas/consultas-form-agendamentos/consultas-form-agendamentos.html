@@ -116,6 +116,11 @@
                 }
               </div>
 
+              <!-- Anexos -->
+              <div class="col-12">
+                <app-anexos-upload [agendamentoId]="dto?.id" formControlName="anexos"></app-anexos-upload>
+              </div>
+
               <!-- Botões -->
               <div class="d-flex justify-content-end">
                 <button

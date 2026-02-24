@@ -1,6 +1,7 @@
 import { Pet } from './pet';
 import { VeterinarioModel } from './veterinario-model';
 import { BaseEntity } from "./base-entity";
+import { AnexoModel } from './anexo-model';
 
 export interface AgendamentosModel extends BaseEntity {
   veterinario: VeterinarioModel;
@@ -10,5 +11,5 @@ export interface AgendamentosModel extends BaseEntity {
   isRetorno?: boolean;
   peso: number;
   consultaOrigem: AgendamentosModel | null;
-
+  anexos?: AnexoModel[];
 }

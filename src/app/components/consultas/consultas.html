@@ -70,13 +70,13 @@
           <div class="card-body p-2">
             <h6 class="card-title mb-1">{{ item.veterinario.nome }}</h6>
             <p class="card-text mb-1">{{ item.dia }} - {{ item.horario }}</p>
-            @if (item.consulta.status != 'CANCELADO' && item.consulta.status != 'REALIZADO') {
-              <div class="text-end">
+            <div class="text-end">
+              @if (item.consulta.status != 'CANCELADO' && item.consulta.status != 'REALIZADO') {
                 <button class="btn btn-sm btn-secondary" (click)="iniciarConsulta(item)">
                   Iniciar
                 </button>
-              </div>
-            }
+              }
+            </div>
           </div>
         </div>
       }

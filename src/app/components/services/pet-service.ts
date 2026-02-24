@@ -22,7 +22,6 @@ export class PetService extends ApiService {
   }
 
   salvar(pet: Pet): Observable<Pet> {
-    console.log('Salvando pet no serviço:', pet);
     return this.post<Pet>(this.endpoint, pet);
   }
 

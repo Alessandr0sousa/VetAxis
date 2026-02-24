@@ -1,3 +1,5 @@
+import { AnexoModel } from './anexo-model';
+
 export interface ConsultaModel {
   consulta: {
     anamnese: string;
@@ -8,6 +10,7 @@ export interface ConsultaModel {
     internamento: boolean;
     status: StatusAgendamento;
   };
+  anexos?: AnexoModel[];
 }
 
 export enum StatusAgendamento {

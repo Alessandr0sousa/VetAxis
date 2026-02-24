@@ -161,6 +161,12 @@ export class Agenda implements OnInit {
     this.selectedAgendamentoDto = item;
   }
 
+  editarAgendamento(item: ConsultasFormAgendamentosModel) {
+    this.selectedAgendamento = 'Consultas';
+    this.isvisible = !!this.selectedAgendamento;
+    this.selectedAgendamentoDto = item;
+  }
+
   private alterarDia(dias: number) {
     const data = new Date(this.diaSelected());
     data.setDate(data.getDate() + dias);
