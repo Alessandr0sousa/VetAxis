@@ -37,3 +37,20 @@
     background-color: #f0f0f0e0;
 }
 
+/* Estilo para horários agendados */
+.horario-selector.horario-agendado label {
+    background-color: #ef4848;
+    border-color: #ef4848;
+    color: #ffffff;
+    cursor: not-allowed;
+}
+
+.horario-selector input[type="radio"]:disabled + label {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.horario-selector.horario-agendado:hover label {
+    background-color: #ef4848;
+}
+

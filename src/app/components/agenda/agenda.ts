@@ -9,10 +9,12 @@ import { AgendamentosService } from '../services/agendamentos-service';
 import { AlertService } from '../services/alert-service';
 import { Cirurgias } from './cirurgias/cirurgias';
 import { Exames } from './exames/exames';
+import { Vacinas } from './vacinas/vacinas';
+
 
 @Component({
   selector: 'app-agenda',
-  imports: [FormsModule, CommonModule, ConsultasFormAgendamentos, Exames, Cirurgias],
+  imports: [FormsModule, CommonModule, ConsultasFormAgendamentos, Exames, Cirurgias, Vacinas],
   templateUrl: './agenda.html',
   styleUrls: ['./agenda.scss'],
 })
@@ -94,7 +96,9 @@ export class Agenda implements OnInit {
   }
 
   finalizarConsulta(item: ConsultasFormAgendamentosModel) {
-    this.atualizarConsultaStatus(item, item.consulta.status);
+    if (item.consulta) {
+      this.atualizarConsultaStatus(item, item.consulta.status);
+    }
     this.isFormVisible = false;
     this.selectedAgendamentoDto = undefined;
   }
@@ -123,9 +127,20 @@ export class Agenda implements OnInit {
     mensagem?: string,
     sucesso?: boolean
   ) {
+    // Se não houver consulta, criar estrutura padrão
+    const consultaBase = item.consulta || {
+      anamnese: '',
+      exameFisico: '',
+      tratamento: '',
+      prescricao: '',
+      diagnostico: '',
+      internamento: false,
+      status: status
+    };
+
     const dto: ConsultasFormAgendamentosModel = {
       ...item,
-      consulta: { ...item.consulta, status },
+      consulta: { ...consultaBase, status },
     };
 
     this.limparCampos(dto);

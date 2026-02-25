@@ -1,1 +1,5 @@
-<p>exames works!</p>
+<app-consultas-form-agendamentos
+  [tipoAgendamento]="tipoAgendamento"
+  (cancelar)="onCancelar()"
+  (salvar)="onSalvar($event)"
+></app-consultas-form-agendamentos>

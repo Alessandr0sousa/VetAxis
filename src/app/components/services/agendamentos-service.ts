@@ -10,7 +10,7 @@ import { tap } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class AgendamentosService extends ApiService {
-  private endpoint = 'agendamento';
+  private endpoint = 'agendamentos';
 
   // BehaviorSubject para manter a lista em memória e emitir atualizações
   private agendamentosSource = new BehaviorSubject<ConsultasFormAgendamentosModel[]>([]);
@@ -92,6 +92,24 @@ export class AgendamentosService extends ApiService {
         const listaAtual = this.agendamentosSource.value.filter((a) => a.id !== id);
         this.agendamentosSource.next(listaAtual);
       }),
+    );
+  }
+
+  filtrarEscala(params: {
+    veterinarioId: number;
+    clinicaId: number;
+    mes: number;
+    ano: number;
+  }): Observable<Page<ConsultasFormAgendamentosModel>> {
+    let httpParams = new HttpParams()
+      .set('veterinarioId', params.veterinarioId.toString())
+      .set('clinicaId', params.clinicaId.toString())
+      .set('mes', params.mes.toString())
+      .set('ano', params.ano.toString());
+
+    return this.get<Page<ConsultasFormAgendamentosModel>>(
+      `${this.endpoint}/filtrar`,
+      httpParams,
     );
   }
 }

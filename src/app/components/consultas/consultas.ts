@@ -79,7 +79,12 @@ export class Consultas implements OnInit {
       const agendaDto: ConsultasFormAgendamentosModel = {
         ...(item ?? {}),
         consulta: {
-          ...item.consulta,
+          anamnese: item.consulta?.anamnese || '',
+          exameFisico: item.consulta?.exameFisico || '',
+          tratamento: item.consulta?.tratamento || '',
+          prescricao: item.consulta?.prescricao || '',
+          diagnostico: item.consulta?.diagnostico || '',
+          internamento: item.consulta?.internamento || false,
           status: 'INICIADO' as any,
         },
       };

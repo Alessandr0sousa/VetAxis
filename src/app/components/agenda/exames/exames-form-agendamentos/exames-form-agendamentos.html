@@ -1,0 +1,52 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Agendar Exame</h5>
+    </div>
+    <div class="card-body">
+      <!-- Tipo de exame -->
+      <div class="mb-3">
+        <label for="tipo" class="form-label">Tipo de Exame</label>
+        <input type="text" class="form-control" id="tipo" [ngModel]="tipo()" (ngModelChange)="tipo.set($event)" />
+      </div>
+
+      <!-- Descrição -->
+      <div class="mb-3">
+        <label for="descricao" class="form-label">Descrição</label>
+        <textarea class="form-control" id="descricao" [ngModel]="descricaoExame()" (ngModelChange)="descricaoExame.set($event)" rows="3"></textarea>
+      </div>
+
+      <!-- Horários disponíveis -->
+      <div class="mb-3">
+        <label class="form-label">Horário</label>
+        <div class="horario-selector">
+          @for (horario of horariosDisponiveis(); track horario) {
+            <div class="horario-option">
+              <input
+                type="radio"
+                [id]="'horario-' + horario"
+                name="horario"
+                [value]="horario"
+                (change)="selectedHorario.set(horario)"
+                [checked]="selectedHorario() === horario"
+              />
+              <label [for]="'horario-' + horario">
+                {{ horario }}
+              </label>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Botões -->
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary" (click)="onSalvar()" [disabled]="!selectedHorario() || !tipo()">
+          Agendar
+        </button>
+        <button class="btn btn-secondary" (click)="resetForm()">
+          Limpar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

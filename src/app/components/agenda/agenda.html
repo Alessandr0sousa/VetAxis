@@ -43,6 +43,9 @@
           @case ('Cirurgias') {
             <app-cirurgias></app-cirurgias>
           }
+          @case ('Vacinas') {
+            <app-vacinas></app-vacinas>
+          }
         }
       }
     </div>
@@ -65,7 +68,7 @@
             <div class="card mb-2">
               <div
                 class="card-header p-0 ps-2"
-                [class]="STATUS_BADGE_CLASS[item.consulta.status || 'AGENDADO']"
+                [class]="STATUS_BADGE_CLASS[(item.consulta && item.consulta.status) || 'AGENDADO']"
               >
                 {{ item.pet.nome }}
               </div>
@@ -83,7 +86,7 @@
                   </button>
                 </div>
 
-                @if (item.consulta.status === 'AGENDADO') {
+                @if (!item.consulta || item.consulta.status === 'AGENDADO') {
                   <div class="d-flex justify-content-between">
                     <button class="btn btn-sm btn-primary" (click)="confirmarConsulta(item, true)">
                       Confirmar

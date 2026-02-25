@@ -12,7 +12,7 @@
             ' com ' +
             item.veterinario.nome +
             ' - ' +
-            labelStatus[item.consulta.status]
+            (item.consulta ? labelStatus[item.consulta.status] : 'Agendado')
           "
         >
           <strong>{{ item.pet.nome }}</strong>
@@ -21,11 +21,15 @@
             &nbsp;
             <span>{{ item.horario }}</span>
             &nbsp;
-            <i
-              [class]="
-                iconesStatus[item.consulta.status] + ' ' + fonteColorStatus[item.consulta.status]
-              "
-            ></i>
+            @if (item.consulta) {
+              <i
+                [class]="
+                  iconesStatus[item.consulta.status] + ' ' + fonteColorStatus[item.consulta.status]
+                "
+              ></i>
+            } @else {
+              <i class="fa-solid fa-calendar"></i>
+            }
           </div>
         </li>
       }

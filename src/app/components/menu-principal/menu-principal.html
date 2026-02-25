@@ -38,14 +38,49 @@
         <ul class="nav flex-column ms-3">
           @for (child of iten.children; track child) {
           <li class="nav-item">
-            <a
-              class="nav-link text-white d-flex align-items-center"
-              [routerLink]="child.routerLink"
-              [title]="child.label"
-            >
-              <i [class]="child.icon + ' side-icon'"></i>
-              <span class="ms-2">{{ child.label }}</span>
-            </a>
+            <div class="d-flex align-items-center">
+              <a
+                class="nav-link text-white d-flex align-items-center flex-grow-1"
+                [routerLink]="child.routerLink"
+                [title]="child.label"
+              >
+                <i [class]="child.icon + ' side-icon'"></i>
+                <span class="ms-2">{{ child.label }}</span>
+              </a>
+
+              @if (child.children) {
+              <button
+                type="button"
+                class="btn btn-sm btn-link text-white ms-auto p-0 submenu-toggle"
+                data-bs-toggle="collapse"
+                [attr.data-bs-target]="'#collapse-' + iten.label + '-' + child.label"
+                aria-expanded="false"
+                [attr.aria-controls]="'collapse-' + iten.label + '-' + child.label"
+                [title]="child.label"
+              >
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              }
+            </div>
+
+            @if (child.children) {
+            <div class="collapse" [attr.id]="'collapse-' + iten.label + '-' + child.label">
+              <ul class="nav flex-column ms-4">
+                @for (grandchild of child.children; track grandchild) {
+                <li class="nav-item">
+                  <a
+                    class="nav-link text-white d-flex align-items-center"
+                    [routerLink]="grandchild.routerLink"
+                    [title]="grandchild.label"
+                  >
+                    <i [class]="grandchild.icon + ' side-icon'"></i>
+                    <span class="ms-2">{{ grandchild.label }}</span>
+                  </a>
+                </li>
+                }
+              </ul>
+            </div>
+            }
           </li>
           }
         </ul>

@@ -44,6 +44,11 @@
           "label": "Exames",
           "icon": "fa-solid fa-vials",
           "routerLink": ["/agenda/exames"]
+        },
+        {
+          "label": "Vacinas",
+          "icon": "fa-solid fa-syringe",
+          "routerLink": ["/agenda/vacinas"]
         }
       ]
     },
@@ -102,6 +107,18 @@
           "label": "Perfis de Acesso",
           "icon": "fa-solid fa-lock",
           "routerLink": ["/configuracoes/perfis"]
+        },
+        {
+          "label": "Escala",
+          "icon": "fa-solid fa-calendar-check",
+          "routerLink": ["/configuracoes/escala"],
+          "children": [
+            {
+              "label": "Veterinários",
+              "icon": "fa-solid fa-user-doctor",
+              "routerLink": ["/configuracoes/escala/veterinarios"]
+            }
+          ]
         }
       ]
     }

@@ -63,7 +63,7 @@
         <div class="card mb-1 col-sm-5 col-md-4 col-lg-3 p-0">
           <div
             class="card-header p-0 ps-2"
-            [class]="badgeStatus[item.consulta.status || 'AGENDADO']"
+            [class]="badgeStatus[(item.consulta && item.consulta.status) || 'AGENDADO']"
           >
             {{ item.pet.nome }}
           </div>
@@ -71,7 +71,7 @@
             <h6 class="card-title mb-1">{{ item.veterinario.nome }}</h6>
             <p class="card-text mb-1">{{ item.dia }} - {{ item.horario }}</p>
             <div class="text-end">
-              @if (item.consulta.status != 'CANCELADO' && item.consulta.status != 'REALIZADO') {
+              @if (item.consulta && (item.consulta.status != 'CANCELADO' && item.consulta.status != 'REALIZADO')) {
                 <button class="btn btn-sm btn-secondary" (click)="iniciarConsulta(item)">
                   Iniciar
                 </button>

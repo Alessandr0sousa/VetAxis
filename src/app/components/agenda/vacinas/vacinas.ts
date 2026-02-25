@@ -8,16 +8,16 @@ import { TipoAgendamento } from '../../models/agendamentos-model';
 import { signal } from '@angular/core';
 
 @Component({
-  selector: 'app-cirurgias',
+  selector: 'app-vacinas',
   standalone: true,
   imports: [FormsModule, CommonModule, ConsultasFormAgendamentos],
-  templateUrl: './cirurgias.html',
-  styleUrl: './cirurgias.scss',
+  templateUrl: './vacinas.html',
+  styleUrl: './vacinas.scss',
 })
-export class Cirurgias implements OnInit {
+export class Vacinas implements OnInit {
   isFormVisible = signal(false);
   selectedAgendamentoDto: ConsultasFormAgendamentosModel | undefined;
-  tipoAgendamento = TipoAgendamento.CIRURGIA;
+  tipoAgendamento = TipoAgendamento.VACINA;
 
   constructor(private agendamentoService: AgendamentosService) {}
 
@@ -36,6 +36,6 @@ export class Cirurgias implements OnInit {
   }
 
   onSalvar(agendamento: ConsultasFormAgendamentosModel): void {
-    console.log('Cirurgia agendada:', agendamento);
+    console.log('Vacina agendada:', agendamento);
   }
 }

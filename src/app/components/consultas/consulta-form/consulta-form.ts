@@ -87,18 +87,36 @@ export class ConsultaForm extends BaseForm<ConsultaModel> {
 
 
   salvarConsulta() {
-    this.agendamento!.consulta.anamnese = this.form.get('consulta.anamnese')?.value;
-    this.agendamento!.consulta.exameFisico = this.form.get('consulta.exameFisico')?.value;
-    this.agendamento!.consulta.tratamento = this.form.get('consulta.tratamento')?.value;
-    this.agendamento!.consulta.prescricao = this.form.get('consulta.prescricao')?.value;
-    this.agendamento!.consulta.diagnostico = this.form.get('consulta.diagnostico')?.value;
-    this.agendamento!.consulta.internamento = this.form.get('consulta.internamento')?.value ?? false;
-    this.agendamento!.peso = this.form.get('peso')?.value;
+    if (!this.agendamento) return;
+
+    // Garantir que consulta existe
+    if (!this.agendamento.consulta) {
+      this.agendamento.consulta = {
+        anamnese: '',
+        exameFisico: '',
+        tratamento: '',
+        prescricao: '',
+        diagnostico: '',
+        internamento: false,
+        status: StatusAgendamento.AGENDADO,
+      };
+    }
+
+    // TypeScript agora sabe que consulta está definida
+    const consulta = this.agendamento.consulta;
+
+    consulta.anamnese = this.form.get('consulta.anamnese')?.value;
+    consulta.exameFisico = this.form.get('consulta.exameFisico')?.value;
+    consulta.tratamento = this.form.get('consulta.tratamento')?.value;
+    consulta.prescricao = this.form.get('consulta.prescricao')?.value;
+    consulta.diagnostico = this.form.get('consulta.diagnostico')?.value;
+    consulta.internamento = this.form.get('consulta.internamento')?.value ?? false;
+    this.agendamento.peso = this.form.get('peso')?.value;
 
     // Anexos são gerenciados APENAS pelo componente AnexosUpload
     // Nunca modificar anexos aqui
 
-    this.agendamento!.consulta.status = 'REALIZADO' as any;
+    consulta.status = 'REALIZADO' as any;
 
     delete (this.agendamento as any).veterinarioNome;
     delete (this.agendamento as any).petNome;

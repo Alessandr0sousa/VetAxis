@@ -14,6 +14,7 @@ import { Internacao } from './components/internacao/internacao';
 import { Cadastro } from './components/cadastro/cadastro';
 import { Cirurgias } from './components/agenda/cirurgias/cirurgias';
 import { Exames } from './components/agenda/exames/exames';
+import { Vacinas } from './components/agenda/vacinas/vacinas';
 import { Faturamento } from './components/financeiro/faturamento/faturamento';
 import { Despesas } from './components/financeiro/despesas/despesas';
 import { Comissoes } from './components/financeiro/comissoes/comissoes';
@@ -22,6 +23,8 @@ import { Medicamentos } from './components/estoque/medicamentos/medicamentos';
 import { Produtos } from './components/estoque/produtos/produtos';
 import { Usuarios } from './components/configuracoes/usuarios/usuarios';
 import { Perfis } from './components/configuracoes/perfis/perfis';
+import { Escala } from './components/configuracoes/escala/escala';
+import { VeterinariosConfig } from './components/configuracoes/veterinarios-config/veterinarios-config';
 import { Agenda } from './components/agenda/agenda';
 import { LoginPage } from './components/login/login-page';
 import { authGuard } from './guards/auth.guard';
@@ -56,6 +59,7 @@ export const routes: Routes = [
       { path: 'agenda', component: Agenda, title: 'Agenda' },
       { path: 'agenda/cirurgias', component: Cirurgias, title: 'Cirurgias' },
       { path: 'agenda/exames', component: Exames, title: 'Exames' },
+      { path: 'agenda/vacinas', component: Vacinas, title: 'Vacinas' },
 
       { path: 'financeiro/faturamento', component: Faturamento, title: 'Faturamento' },
       { path: 'financeiro/despesas', component: Despesas, title: 'Despesas' },
@@ -67,6 +71,8 @@ export const routes: Routes = [
 
       { path: 'configuracoes/usuarios', component: Usuarios, title: 'Usuários' },
       { path: 'configuracoes/perfis', component: Perfis, title: 'Perfis de Acesso' },
+      { path: 'configuracoes/escala', component: Escala, title: 'Escala' },
+      { path: 'configuracoes/escala/veterinarios', component: VeterinariosConfig, title: 'Veterinários' },
     ],
   },
   { path: '**', redirectTo: 'login' }, // rota fallback

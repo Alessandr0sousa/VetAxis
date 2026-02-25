@@ -1,0 +1,59 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { ApiService } from '../../api-services/api-sevice';
+
+export type EscalaVeterinariosPayload = {
+  mes: number;
+  ano: number;
+  veterinarioId: number;
+  clinicaId: number;
+  dias: { dia: number; horarios: { horaInicio: string; horaFim: string }[] }[];
+};
+
+export type EscalaVeterinariosItem = {
+  id: number;
+  nome: string;
+  mes: number;
+  ano: number;
+  dia: number;
+  horaInicio: string;
+  horaFim: string;
+  veterinarioId: number;
+  clinicaId: number;
+};
+
+export type EscalaVeterinariosResponse = {
+  content: EscalaVeterinariosItem[];
+};
+
+@Injectable({
+  providedIn: 'root',
+})
+export class EscalaVeterinariosService extends ApiService {
+  private endpoint = 'escala-veterinarios';
+
+  constructor(http: HttpClient) {
+    super(http);
+  }
+
+  salvar(payload: EscalaVeterinariosPayload): Observable<void> {
+    return this.post<void>(`${this.endpoint}/lote`, payload);
+  }
+
+  buscar(
+    ano: number,
+    mes: number,
+    clinicaId: number,
+    page = 0,
+    size = 200,
+  ): Observable<EscalaVeterinariosResponse> {
+    return this.get<EscalaVeterinariosResponse>(`${this.endpoint}/filtrar`, {
+      ano,
+      mes,
+      'clinica.id': clinicaId,
+      page,
+      size,
+    });
+  }
+}

@@ -3,7 +3,7 @@
     <div class="col-sm-8">
       <div class="container">
         <div class="card-header">
-          <h4 class="mb-0">Agendamento de Consulta</h4>
+          <h4 class="mb-0">Agendamento de {{ tipoAgendamentoLabels[tipoAgendamento] }}</h4>
         </div>
         <div class="card-body">
           <!-- Formulário -->
@@ -41,18 +41,33 @@
               <div class="mb-3 col-sm-6 col-md-4">
                 <label class="form-label">Horário</label>
                 <div class="option">
-                  @if (horas.length > 0) { @for (h of horas; track h) {
-                  <div class="horario-selector">
-                    <input
-                      type="radio"
-                      [value]="h"
-                      formControlName="horario"
-                      id="horario-{{ h }}"
-                    />
-                    <label class="form-check-label" for="horario-{{ h }}">{{ h }}</label>
-                  </div>
-                  } } @else {
-                  <p class="text-muted">Sem horários disponíveis</p>
+                  @if (horariosDisponiveis().length > 0) {
+                    @for (h of horariosDisponiveis(); track h.horario) {
+                      <div
+                        class="horario-selector"
+                        [class.horario-agendado]="h.agendado"
+                        [attr.title]="h.agendado ? 'Ocupado' : null"
+                      >
+                        <input
+                          type="radio"
+                          [value]="h.horario"
+                          formControlName="horario"
+                          id="horario-{{ h.horario }}"
+                          [attr.aria-disabled]="h.agendado ? 'true' : null"
+                          (click)="onHorarioClick($event, h)"
+                          (keydown.enter)="onHorarioClick($event, h)"
+                          (keydown.space)="onHorarioClick($event, h)"
+                        />
+                        <label
+                          class="form-check-label"
+                          for="horario-{{ h.horario }}"
+                        >
+                          {{ h.horario }}
+                        </label>
+                      </div>
+                    }
+                  } @else {
+                    <p class="text-muted">Selecione um veterinário e um dia para ver os horários disponíveis</p>
                   }
                 </div>
               </div>
@@ -83,7 +98,7 @@
                   class="form-check-input"
                   formControlName="isRetorno"
                 />
-                <label for="isRetorno" class="form-check-label">Consulta de retorno</label>
+                <label for="isRetorno" class="form-check-label">Retorno</label>
               </div>
 
               <!-- Peso -->
@@ -102,19 +117,70 @@
                 }
               </div>
 
-              <!-- Anamnese -->
-              <div class="mb-3" formGroupName="consulta">
-                <label for="anamnese" class="form-label">Anamnese</label>
-                <textarea
-                  id="anamnese"
-                  rows="2"
-                  class="formControl"
-                  formControlName="anamnese"
-                ></textarea>
-                @if (form.get('anamnese')?.invalid && form.get('anamnese')?.touched) {
-                <div class="text-danger mt-1">Anamnese deve conter pelo menos 10 caracteres.</div>
-                }
-              </div>
+              @if (tipoAgendamento === tipoAgendamentoEnum.CONSULTA) {
+                <!-- Anamnese -->
+                <div class="mb-3" formGroupName="consulta">
+                  <label for="anamnese" class="form-label">Anamnese</label>
+                  <textarea
+                    id="anamnese"
+                    rows="2"
+                    class="formControl"
+                    formControlName="anamnese"
+                  ></textarea>
+                  @if (form.get('consulta.anamnese')?.invalid && form.get('consulta.anamnese')?.touched) {
+                  <div class="text-danger mt-1">Anamnese deve conter pelo menos 10 caracteres.</div>
+                  }
+                </div>
+              }
+
+              @if (tipoAgendamento === tipoAgendamentoEnum.EXAME) {
+                <div class="mb-3" formGroupName="exame">
+                  <label for="exame-tipo" class="form-label">Tipo de Exame</label>
+                  <input id="exame-tipo" class="formControl" formControlName="tipo" />
+                </div>
+                <div class="mb-3" formGroupName="exame">
+                  <label for="exame-descricao" class="form-label">Descrição</label>
+                  <textarea id="exame-descricao" rows="2" class="formControl" formControlName="descricao"></textarea>
+                </div>
+                <div class="mb-3" formGroupName="exame">
+                  <label for="exame-material" class="form-label">Material Coletado</label>
+                  <input id="exame-material" class="formControl" formControlName="materialColetado" />
+                </div>
+              }
+
+              @if (tipoAgendamento === tipoAgendamentoEnum.CIRURGIA) {
+                <div class="mb-3" formGroupName="cirurgia">
+                  <label for="cirurgia-tipo" class="form-label">Tipo de Cirurgia</label>
+                  <input id="cirurgia-tipo" class="formControl" formControlName="tipo" />
+                </div>
+                <div class="mb-3" formGroupName="cirurgia">
+                  <label for="cirurgia-descricao" class="form-label">Descrição</label>
+                  <textarea id="cirurgia-descricao" rows="2" class="formControl" formControlName="descricao"></textarea>
+                </div>
+                <div class="mb-3" formGroupName="cirurgia">
+                  <label for="cirurgia-protocolo" class="form-label">Protocolo Anestesia</label>
+                  <input id="cirurgia-protocolo" class="formControl" formControlName="protocoloAnestesia" />
+                </div>
+                <div class="form-check mb-3" formGroupName="cirurgia">
+                  <input id="cirurgia-internamento" type="checkbox" class="form-check-input" formControlName="internamento" />
+                  <label for="cirurgia-internamento" class="form-check-label">Internamento</label>
+                </div>
+              }
+
+              @if (tipoAgendamento === tipoAgendamentoEnum.VACINA) {
+                <div class="mb-3" formGroupName="vacina">
+                  <label for="vacina-tipo" class="form-label">Tipo de Vacina</label>
+                  <input id="vacina-tipo" class="formControl" formControlName="tipo" />
+                </div>
+                <div class="mb-3" formGroupName="vacina">
+                  <label for="vacina-nome" class="form-label">Nome</label>
+                  <input id="vacina-nome" class="formControl" formControlName="nome" />
+                </div>
+                <div class="mb-3" formGroupName="vacina">
+                  <label for="vacina-dose" class="form-label">Dose</label>
+                  <input id="vacina-dose" class="formControl" formControlName="dose" />
+                </div>
+              }
 
               <!-- Anexos -->
               <div class="col-12">
