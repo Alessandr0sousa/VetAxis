@@ -56,4 +56,18 @@ export class EscalaVeterinariosService extends ApiService {
       size,
     });
   }
+
+  buscarPorVeterinario(
+    veterinarioId: number,
+    clinicaId: number,
+    page = 0,
+    size = 500,
+  ): Observable<EscalaVeterinariosResponse> {
+    return this.get<EscalaVeterinariosResponse>(`${this.endpoint}/filtrar`, {
+      'veterinario.id': veterinarioId,
+      'clinica.id': clinicaId,
+      page,
+      size,
+    });
+  }
 }

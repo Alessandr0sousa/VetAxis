@@ -22,7 +22,7 @@
                   (change)="onChangeSelecionado($event, 'vet')"
                 />
                 <datalist id="vetOptions">
-                  @for (v of vets; track v.id) {
+                  @for (v of vets(); track v.id) {
                   <option [value]="v.nome"></option>
                   }
                 </datalist>
@@ -84,7 +84,7 @@
                   (change)="onChangeSelecionado($event, 'pet')"
                 />
                 <datalist id="petOptions">
-                  @for (p of pets; track p.id) {
+                  @for (p of pets(); track p.id) {
                   <option [value]="p.nome"></option>
                   }
                 </datalist>
@@ -207,6 +207,7 @@
     </div>
     <div class="col-sm-4">
       <app-agenda-calendario
+        [diasHabilitados]="diasHabilitados()"
         (diaSelecionado)="form.get('dia')?.setValue(atualizarDiaSelecionado($event))"
       ></app-agenda-calendario>
       <app-consultas-list [diaSelected]="diaSelected"></app-consultas-list>

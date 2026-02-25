@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, Input, OnInit, Output, ViewChild, computed, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { forkJoin } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { StatusAgendamento } from '../../models/consulta-model';
 import { ConsultasFormAgendamentosModel } from '../../models/consultas-form-agendametos-model';
 import { Pet } from '../../models/pet';
@@ -23,6 +25,7 @@ type HorarioDisponivel = {
 @Component({
   selector: 'app-consultas-form-agendamentos',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [AgendaCalendario, CommonModule, ReactiveFormsModule, ConsultasList, AnexosUpload],
   templateUrl: './consultas-form-agendamentos.html',
   styleUrls: ['./consultas-form-agendamentos.scss'],
@@ -36,8 +39,8 @@ export class ConsultasFormAgendamentos implements OnInit {
   readonly tipoAgendamentoEnum = TipoAgendamento;
   readonly tipoAgendamentoLabels = TipoAgendamentoLabels;
 
-  pets: Pet[] = [];
-  vets: VeterinarioModel[] = [];
+  readonly pets = signal<Pet[]>([]);
+  readonly vets = signal<VeterinarioModel[]>([]);
   form!: FormGroup;
   diaSelected: string = '';
 
@@ -45,6 +48,31 @@ export class ConsultasFormAgendamentos implements OnInit {
   readonly escalasVeterinario = signal<EscalaVeterinariosItem[]>([]);
   readonly agendamentosDodia = signal<ConsultasFormAgendamentosModel[]>([]);
   readonly diaSelecionadoNumero = signal<number | null>(null);
+
+  // Calcula as datas habilitadas no calendário baseado na escala
+  readonly diasHabilitados = computed<Date[]>(() => {
+    const escalas = this.escalasVeterinario();
+    if (escalas.length === 0) return [];
+
+    // Agrupa escalas por mês/ano e dia
+    const datasHabilitadas: Date[] = [];
+    const datasUnicas = new Set<string>();
+
+    escalas.forEach((escala) => {
+      // Valida o dia
+      if (!Number.isInteger(escala.dia) || escala.dia < 1 || escala.dia > 31) return;
+
+      const data = new Date(escala.ano, escala.mes - 1, escala.dia);
+      const dataKey = `${escala.ano}-${escala.mes}-${escala.dia}`;
+
+      if (!datasUnicas.has(dataKey)) {
+        datasUnicas.add(dataKey);
+        datasHabilitadas.push(data);
+      }
+    });
+
+    return datasHabilitadas.sort((a, b) => a.getTime() - b.getTime());
+  });
 
   readonly horariosDisponiveis = computed<HorarioDisponivel[]>(() => {
     const escalas = this.escalasVeterinario();
@@ -57,21 +85,22 @@ export class ConsultasFormAgendamentos implements OnInit {
 
     if (escalasDodia.length === 0) return [];
 
-    const horarios: HorarioDisponivel[] = [];
+    // Usa Set para evitar duplicatas com performance O(1)
+    const horariosUnicos = new Set<string>();
     for (const escala of escalasDodia) {
       const horas = this.gerarHorariosList(escala.horaInicio, escala.horaFim);
       for (const hora of horas) {
-        const existe = horarios.find((h) => h.horario === hora);
-        if (!existe) {
-          horarios.push({
-            horario: hora,
-            agendado: horariosAgendados.has(hora),
-          });
-        }
+        horariosUnicos.add(hora);
       }
     }
 
-    return horarios.sort((a, b) => a.horario.localeCompare(b.horario));
+    // Converte Set para array de HorarioDisponivel ordenado
+    return Array.from(horariosUnicos)
+      .map((horario) => ({
+        horario,
+        agendado: horariosAgendados.has(horario),
+      }))
+      .sort((a, b) => a.horario.localeCompare(b.horario));
   });
 
   constructor(
@@ -81,39 +110,41 @@ export class ConsultasFormAgendamentos implements OnInit {
     private agendamentoService: AgendamentosService,
     private escalaService: EscalaVeterinariosService,
     private swa: AlertService,
+    private destroyRef: DestroyRef,
   ) {}
 
   ngOnInit(): void {
     this.form = this.criarForm();
     this.aplicarValidadoresPorTipo();
-    this.listarPets();
-    this.listarVeterinarios();
+    this.carregarDadosIniciais();
     this.diaSelected = new Date().toLocaleDateString('pt-BR');
 
     if (this.dto) {
       this.carregarDados();
     }
 
-    this.form.valueChanges.subscribe((val) => {
-      const nomeComposto = this.montarNomeAgendamento(val);
-      this.form.get('nome')?.setValue(nomeComposto, { emitEvent: false });
-    });
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((val) => {
+        const nomeComposto = this.montarNomeAgendamento(val);
+        this.form.get('nome')?.setValue(nomeComposto, { emitEvent: false });
+      });
 
     // Monitora mudanças na data selecionada para carregar agendamentos do dia
-    this.form.get('dia')?.valueChanges.subscribe((dia) => {
-      if (dia && this.form.get('veterinario')?.value?.id) {
-        // Extrai o número do dia
-        const [diaNumeroBR] = dia.split('/');
-        const diaNumero = parseInt(diaNumeroBR, 10);
-        this.diaSelecionadoNumero.set(diaNumero);
+    this.form.get('dia')?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((dia) => {
+        if (dia && this.form.get('veterinario')?.value?.id) {
+          // Extrai o número do dia
+          const [diaNumeroBR] = dia.split('/');
+          const diaNumero = parseInt(diaNumeroBR, 10);
+          this.diaSelecionadoNumero.set(diaNumero);
 
-        const vetId = this.form.get('veterinario')!.value.id;
-        // Recarrega escala do mês selecionado
-        this.carregarEscalaVeterinario(vetId, dia);
-        // Carrega agendamentos do dia
-        this.carregarAgendamentosDoDia(dia, vetId);
-      }
-    });
+          const vetId = this.form.get('veterinario')!.value.id;
+          // Carrega agendamentos do dia
+          this.carregarAgendamentosDoDia(dia, vetId);
+        }
+      });
   }
 
   private criarForm(): FormGroup {
@@ -256,18 +287,42 @@ export class ConsultasFormAgendamentos implements OnInit {
     }
   }
 
+  private carregarDadosIniciais(): void {
+    // Carrega veterinários e pets em paralelo para melhor performance
+    forkJoin([
+      this.vetService.listar(0, 100),
+      this.petService.listar(0, 100),
+    ])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ([vetsResponse, petsResponse]) => {
+          this.vets.set(vetsResponse.content ?? []);
+          this.pets.set(petsResponse.content ?? []);
+        },
+        error: () => {
+          this.swa.error('Erro ao carregar Veterinários e Pets');
+        },
+      });
+  }
+
   listarVeterinarios() {
-    this.vetService.listar(0, 10).subscribe({
-      next: (data) => (this.vets = data.content ?? []),
-      error: (err) => this.swa.error('Erro ao carregar Veterinários'),
-    });
+    this.vetService
+      .listar(0, 100)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => this.vets.set(data.content ?? []),
+        error: (err) => this.swa.error('Erro ao carregar Veterinários'),
+      });
   }
 
   listarPets() {
-    this.petService.listar(0, 10).subscribe({
-      next: (data) => (this.pets = data.content ?? []),
-      error: (err) => this.swa.error('Erro ao carregar Pets'),
-    });
+    this.petService
+      .listar(0, 100)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => this.pets.set(data.content ?? []),
+        error: (err) => this.swa.error('Erro ao carregar Pets'),
+      });
   }
 
   onChangeSelecionado(event: Event, tipo: 'vet' | 'pet') {
@@ -275,12 +330,12 @@ export class ConsultasFormAgendamentos implements OnInit {
     const nomeSelecionado = input.value;
 
     if (tipo === 'vet') {
-      const vetSelecionado = this.vets.find((vet) => vet.nome === nomeSelecionado);
+      const vetSelecionado = this.vets().find((vet) => vet.nome === nomeSelecionado);
       this.form.get('veterinario')?.setValue(vetSelecionado ?? null);
 
       // Carrega a escala do veterinário selecionado
       if (vetSelecionado?.id) {
-        this.carregarEscalaVeterinario(vetSelecionado.id, this.diaSelected);
+        this.carregarEscalaVeterinario(vetSelecionado.id);
 
         // Carrega agendamentos do dia se já temos um dia selecionado
         if (this.diaSelected) {
@@ -290,10 +345,12 @@ export class ConsultasFormAgendamentos implements OnInit {
     }
 
     if (tipo === 'pet') {
-      const petSelecionado = this.pets.find((pet) => pet.nome === nomeSelecionado);
+      const petSelecionado = this.pets().find((pet) => pet.nome === nomeSelecionado);
       this.form.get('pet')?.setValue(petSelecionado ?? null);
     }
   }
+
+
 
   salvarAgendamento() {
     if (this.form.valid) {
@@ -328,22 +385,24 @@ export class ConsultasFormAgendamentos implements OnInit {
         ? this.agendamentoService.atualizar(agendaDto)
         : this.agendamentoService.salvar(agendaDto);
 
-      request$.subscribe({
-        next: (agendamentoSalvo) => {
-          const mensagem = agendaDto.id
-            ? 'Agendamento atualizado com sucesso!'
-            : 'Agendamento salvo com sucesso!';
-          this.swa.success(mensagem);
+      request$
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (agendamentoSalvo) => {
+            const mensagem = agendaDto.id
+              ? 'Agendamento atualizado com sucesso!'
+              : 'Agendamento salvo com sucesso!';
+            this.swa.success(mensagem);
 
-          // Salva anexos temporários após criação do agendamento
-          if (agendamentoSalvo?.id && this.anexosUpload) {
-            this.anexosUpload.salvarAnexosTemporarios(agendamentoSalvo.id);
-          }
+            // Salva anexos temporários após criação do agendamento
+            if (agendamentoSalvo?.id && this.anexosUpload) {
+              this.anexosUpload.salvarAnexosTemporarios(agendamentoSalvo.id);
+            }
 
-          this.cancelarAgendamento();
-        },
-        error: () => this.swa.error('Erro ao salvar agendamento'),
-      });
+            this.cancelarAgendamento();
+          },
+          error: () => this.swa.error('Erro ao salvar agendamento'),
+        });
     } else {
       this.swa.warning('Preencha todos os campos obrigatórios antes de salvar.');
     }
@@ -380,7 +439,7 @@ export class ConsultasFormAgendamentos implements OnInit {
 
     // Carrega escala e agendamentos após popular o form
     if (this.dto?.veterinario?.id) {
-      this.carregarEscalaVeterinario(this.dto.veterinario.id, dia);
+      this.carregarEscalaVeterinario(this.dto.veterinario.id);
       this.carregarAgendamentosDoDia(dia, this.dto.veterinario.id);
     }
   }
@@ -390,30 +449,19 @@ export class ConsultasFormAgendamentos implements OnInit {
     this.cancelar.emit();
   }
 
-  private carregarEscalaVeterinario(veterinarioId: number, diaFormatado?: string): void {
-    let ano = new Date().getFullYear();
-    let mes = new Date().getMonth() + 1;
-
-    // Se uma data foi fornecida, usa o mês/ano dessa data
-    if (diaFormatado) {
-      const [, mesBR, anoBR] = diaFormatado.split('/');
-      mes = parseInt(mesBR, 10);
-      ano = parseInt(anoBR, 10);
-    }
-
-    this.escalaService.buscar(ano, mes, 1).subscribe({
-      next: (response) => {
-        // Filtra apenas as escalas do veterinário selecionado
-        const escalasVet = (response.content ?? []).filter(
-          (escala) => escala.veterinarioId === veterinarioId
-        );
-        this.escalasVeterinario.set(escalasVet);
-      },
-      error: () => {
-        this.swa.error('Erro ao carregar escala do veterinário');
-        this.escalasVeterinario.set([]);
-      },
-    });
+  private carregarEscalaVeterinario(veterinarioId: number): void {
+    this.escalaService
+      .buscarPorVeterinario(veterinarioId, 1)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.escalasVeterinario.set(response.content ?? []);
+        },
+        error: () => {
+          this.swa.error('Erro ao carregar escala do veterinário');
+          this.escalasVeterinario.set([]);
+        },
+      });
   }
 
   private carregarAgendamentosDoDia(diaFormatado: string, veterinarioId: number): void {
@@ -428,6 +476,7 @@ export class ConsultasFormAgendamentos implements OnInit {
         size: 50,
         sort: [],
       })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
           const agendamentosVet = (response.content ?? []).filter(
@@ -447,6 +496,7 @@ export class ConsultasFormAgendamentos implements OnInit {
               size: 50,
               sort: [],
             })
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
               next: (responseISO) => {
                 const agendamentosVetISO = (responseISO.content ?? []).filter(
