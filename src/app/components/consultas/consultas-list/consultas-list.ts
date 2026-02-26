@@ -12,6 +12,7 @@ import {
   STATUS_ICON_CLASS,
   StatusAgendamentoLabels,
 } from '../../models/consulta-model';
+import { TipoAgendamentoFrase } from '../../models/agendamentos-model';
 import { ConsultasFormAgendamentosModel } from '../../models/consultas-form-agendametos-model';
 import { AgendamentosService } from '../../services/agendamentos-service';
 
@@ -30,6 +31,7 @@ export class ConsultasList implements OnInit, OnChanges {
   fonteColorStatus = STATUS_FONT_CLASS;
   labelStatus = StatusAgendamentoLabels;
   badgeStatus = STATUS_BADGE_CLASS;
+  agendamentoFrase = TipoAgendamentoFrase;
 
   constructor(
     private agendamentoService: AgendamentosService,
@@ -79,5 +81,12 @@ export class ConsultasList implements OnInit, OnChanges {
     } else {
       this.agendamentosFiltrados = this.agendamentoList;
     }
+  }
+
+  getTipoAgendamentoFrase(tipo: string | undefined): string {
+    if (!tipo || typeof tipo !== 'string') {
+      return 'Agendamento para';
+    }
+    return this.agendamentoFrase[tipo as keyof typeof TipoAgendamentoFrase] ?? 'Agendamento para';
   }
 }

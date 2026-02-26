@@ -17,14 +17,21 @@ export const TipoAgendamentoLabels: { [key in TipoAgendamento]: string } = {
   [TipoAgendamento.VACINA]: 'Vacina',
 };
 
+export const TipoAgendamentoFrase: { [key in TipoAgendamento]: string } = {
+  [TipoAgendamento.CONSULTA]: 'Consulta agendada para',
+  [TipoAgendamento.CIRURGIA]: 'Cirurgia agendada para',
+  [TipoAgendamento.EXAME]: 'Exame agendado para',
+  [TipoAgendamento.VACINA]: 'Vacina agendada para',
+};
+
 export interface AgendamentosModel extends BaseEntity {
   veterinario: VeterinarioModel;
   dia: string;
   horario: string;
   pet: Pet;
+  tipo: TipoAgendamento;
   isRetorno?: boolean;
   peso: number;
-  tipo?: TipoAgendamento;
   consultaOrigem: AgendamentosModel | null;
   anexos?: AnexoModel[];
 }

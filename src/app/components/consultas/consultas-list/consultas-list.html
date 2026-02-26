@@ -5,7 +5,8 @@
         <li
           class="list-group-item inline-flex"
           [title]="
-            'Consulta agendada para ' +
+          getTipoAgendamentoFrase(item.tipo) +
+            ' ' +
             item.dia +
             ' às ' +
             item.horario +
