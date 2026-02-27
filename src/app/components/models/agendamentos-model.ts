@@ -2,6 +2,7 @@ import { Pet } from './pet';
 import { VeterinarioModel } from './veterinario-model';
 import { BaseEntity } from "./base-entity";
 import { AnexoModel } from './anexo-model';
+import { ClinicaModel } from './clinica-model';
 
 export enum TipoAgendamento {
   CONSULTA = 'CONSULTA',
@@ -26,10 +27,11 @@ export const TipoAgendamentoFrase: { [key in TipoAgendamento]: string } = {
 
 export interface AgendamentosModel extends BaseEntity {
   veterinario: VeterinarioModel;
+  clinica?: ClinicaModel;
   dia: string;
   horario: string;
   pet: Pet;
-  tipo: TipoAgendamento;
+  tipoAgendamento?: TipoAgendamento;
   isRetorno?: boolean;
   peso: number;
   consultaOrigem: AgendamentosModel | null;

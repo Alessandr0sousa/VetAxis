@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ConsultasFormAgendamentosModel } from '../../../models/consultas-form-agendametos-model';
 import { AgendamentosService } from '../../../services/agendamentos-service';
 import { TipoAgendamento } from '../../../models/agendamentos-model';
+import { AlertService } from '../../../services/alert-service';
 
 @Component({
   selector: 'app-exames-form-agendamentos',
@@ -27,7 +28,8 @@ export class ExamesFormAgendamentos implements OnInit {
   ]);
 
   constructor(
-    private agendamentosService: AgendamentosService
+    private agendamentosService: AgendamentosService,
+    private alertService: AlertService
   ) {}
 
   ngOnInit(): void {
@@ -40,7 +42,7 @@ export class ExamesFormAgendamentos implements OnInit {
 
   onSalvar(): void {
     if (!this.selectedHorario() || !this.tipo()) {
-      alert('Selecione horário e tipo de exame');
+      this.alertService.warning('Selecione horário e tipo de exame');
       return;
     }
 
@@ -62,12 +64,12 @@ export class ExamesFormAgendamentos implements OnInit {
 
     this.agendamentosService.salvar(agendamento).subscribe({
       next: () => {
-        alert('Exame agendado com sucesso!');
+        this.alertService.success('Exame agendado com sucesso!');
         this.resetForm();
       },
       error: (err: any) => {
         console.error('Erro ao agendar exame', err);
-        alert('Erro ao agendar exame');
+        this.alertService.error('Erro ao agendar exame');
       },
     });
   }

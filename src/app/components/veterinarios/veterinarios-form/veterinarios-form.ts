@@ -4,6 +4,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EspecialidadeVeterinaria, VeterinarioModel } from '../../models/veterinario-model';
 import { Customservice } from '../../services/customservice';
+import { UserProfileService } from '../../services/user-profile-service';
 import { ViaCepService } from '../../services/viacepservice';
 import { BaseForm } from '../../shared/base-form/base-form';
 
@@ -21,7 +22,8 @@ export class VeterinariosForm extends BaseForm<VeterinarioModel> {
     viaCep: ViaCepService,
     customService: Customservice,
     cdr: ChangeDetectorRef,
-    location: Location
+    location: Location,
+    private userProfileService: UserProfileService
   ) {
     super(fb, viaCep, customService, cdr, location);
   }
@@ -29,12 +31,12 @@ export class VeterinariosForm extends BaseForm<VeterinarioModel> {
   protected buildForm(): void {
     this.form = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3)]],
+      cpf: ['', [Validators.required, Validators.minLength(14), Validators.maxLength(14)]],
       telefone: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       crmv: ['', [Validators.required]],
       especialidade: ['', [Validators.required]],
       status: [true],
-      cpf: [''], // importante incluir para não dar erro no salvarForm
       endereco: this.fb.group({
         logradouro: ['', Validators.required],
         numero: ['', Validators.required],
@@ -43,6 +45,7 @@ export class VeterinariosForm extends BaseForm<VeterinarioModel> {
         uf: ['', [Validators.required, Validators.maxLength(2)]],
         cep: ['', Validators.required],
       }),
+      clinicaId: [this.userProfileService.getUserProfile()?.clinicaId],
     });
   }
 }

@@ -5,6 +5,7 @@ import { Cliente } from '../../models/cliente';
 import { Customservice } from '../../services/customservice';
 import { Estado, IbgeService } from '../../services/ibgeservice';
 import { ViaCepService } from '../../services/viacepservice';
+import { UserProfileService } from '../../services/user-profile-service';
 import { BaseForm } from '../../shared/base-form/base-form';
 import { Location } from '@angular/common';
 
@@ -25,7 +26,8 @@ export class ClienteForm extends BaseForm<Cliente> {
     viaCep: ViaCepService,
     customService: Customservice,
     cdr: ChangeDetectorRef,
-    location: Location
+    location: Location,
+    private userProfileService: UserProfileService
   ) {
     super(fb, viaCep, customService, cdr, location);
 
@@ -48,6 +50,7 @@ export class ClienteForm extends BaseForm<Cliente> {
         uf: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(2)]],
         cep: ['', [Validators.minLength(9), Validators.maxLength(9)]],
       }),
+      clinicaId: [this.userProfileService.getUserProfile()?.clinicaId],
     });
   }
 

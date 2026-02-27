@@ -18,6 +18,7 @@ import { BaseEntity } from '../../models/base-entity';
 import { Columns } from '../../models/columns';
 import { Page } from '../../models/page';
 import { BaseForm } from '../../shared/base-form/base-form';
+import { AlertService } from '../../services/alert-service';
 
 @Component({
   selector: 'app-generic-list',
@@ -48,7 +49,11 @@ export class GenericList<T extends BaseEntity> implements OnInit, AfterViewInit 
 
   @ViewChild('formContainer', { read: ViewContainerRef }) formContainer!: ViewContainerRef;
 
-  constructor(private cdr: ChangeDetectorRef, private router: Router) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private router: Router,
+    private alertService: AlertService
+  ) {}
 
   ngAfterViewInit() {
     if (this.formContainer) {
@@ -112,7 +117,7 @@ export class GenericList<T extends BaseEntity> implements OnInit, AfterViewInit 
         this.limparFiltro();
         this.abrirForm();
       },
-      error: () => alert('Erro ao buscar dados.'),
+      error: () => this.alertService.error('Erro ao buscar dados.'),
     });
   }
 
@@ -124,7 +129,7 @@ export class GenericList<T extends BaseEntity> implements OnInit, AfterViewInit 
           state: { pet: item },
         });
       },
-      error: () => alert('Erro ao buscar dados.'),
+      error: () => this.alertService.error('Erro ao buscar dados.'),
     });
   }
 
@@ -134,18 +139,18 @@ export class GenericList<T extends BaseEntity> implements OnInit, AfterViewInit 
         next: () => {
           this.listar();
           this.fecharForm();
-          alert('Atualizado com sucesso.');
+          this.alertService.success('Atualizado com sucesso.');
         },
-        error: () => alert('Erro ao atualizar.'),
+        error: () => this.alertService.error('Erro ao atualizar.'),
       });
     } else {
       this.service.salvar(item).subscribe({
         next: () => {
           this.listar();
           this.fecharForm();
-          alert('Salvo com sucesso.');
+          this.alertService.success('Salvo com sucesso.');
         },
-        error: () => alert('Erro ao salvar.'),
+        error: () => this.alertService.error('Erro ao salvar.'),
       });
     }
     this.limparFiltro();

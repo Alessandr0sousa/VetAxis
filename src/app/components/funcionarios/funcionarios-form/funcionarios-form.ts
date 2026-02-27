@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { FuncionarioModel } from '../../models/funcionario-model';
 import { ViaCepService } from '../../services/viacepservice';
 import { Customservice } from '../../services/customservice';
+import { UserProfileService } from '../../services/user-profile-service';
 import { BaseForm } from '../../shared/base-form/base-form';
 import { Location } from '@angular/common';
 
@@ -20,7 +21,8 @@ export class FuncionariosForm extends BaseForm<FuncionarioModel> {
     viaCep: ViaCepService,
     customService: Customservice,
     cdr: ChangeDetectorRef,
-    location: Location
+    location: Location,
+    private userProfileService: UserProfileService
   ) {
     super(fb, viaCep, customService, cdr, location);
   }
@@ -41,6 +43,7 @@ export class FuncionariosForm extends BaseForm<FuncionarioModel> {
         uf: ['', [Validators.required, Validators.maxLength(2)]],
         cep: ['', Validators.required],
       }),
+      clinicaId: [this.userProfileService.getUserProfile()?.clinicaId],
     });
   }
 }

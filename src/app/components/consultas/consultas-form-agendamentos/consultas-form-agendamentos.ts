@@ -16,6 +16,7 @@ import { AlertService } from '../../services/alert-service';
 import { AnexosUpload } from '../../shared/anexos-upload/anexos-upload';
 import { EscalaVeterinariosService, EscalaVeterinariosItem } from '../../services/escala-veterinarios-service';
 import { TipoAgendamento, TipoAgendamentoLabels } from '../../models/agendamentos-model';
+import { UserProfileService } from '../../services/user-profile-service';
 
 type HorarioDisponivel = {
   horario: string;
@@ -111,6 +112,7 @@ export class ConsultasFormAgendamentos implements OnInit {
     private escalaService: EscalaVeterinariosService,
     private swa: AlertService,
     private destroyRef: DestroyRef,
+    private userProfileService: UserProfileService,
   ) {}
 
   ngOnInit(): void {
@@ -356,12 +358,14 @@ export class ConsultasFormAgendamentos implements OnInit {
     if (this.form.valid) {
       const formValue = this.form.value;
       const { anexos, ...outrosValores } = formValue;
+      const userProfile = this.userProfileService.getUserProfile();
 
       let agendaDto: ConsultasFormAgendamentosModel = {
         ...(this.dto ?? {}),
         ...outrosValores,
-        veterinario: formValue.veterinario,
-        pet: formValue.pet,
+        veterinario: formValue.veterinario?.id ? { id: formValue.veterinario.id } : formValue.veterinario,
+        pet: formValue.pet?.id ? { id: formValue.pet.id } : formValue.pet,
+        clinica: userProfile?.clinicaId ? { id: userProfile.clinicaId } : undefined,
         isRetorno: formValue.isRetorno ?? false,
         tipo: this.tipoAgendamento,
       };

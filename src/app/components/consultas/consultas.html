@@ -22,19 +22,23 @@
       @if (agendamentoConsulta.pet.microchip) {
         <p class="col-auto dadospet"><strong>Chip: </strong>{{ agendamentoConsulta.pet.chip }}</p>
       }
-      <p class="col-auto dadospet">
-        <strong>Repsonsável: </strong>{{ agendamentoConsulta.pet.cliente.nome }}
-      </p>
-      <p class="col-auto dadospet">
-        <strong>Cpf: </strong>{{ agendamentoConsulta.pet.cliente.cpf }}
-      </p>
-      <p class="col-auto dadospet">
-        <strong>Endereço: </strong>{{ agendamentoConsulta.pet.cliente.endereco.logradouro }},
-        {{ agendamentoConsulta.pet.cliente.endereco.bairro }},
-        {{ agendamentoConsulta.pet.cliente.endereco.numero }},
-        {{ agendamentoConsulta.pet.cliente.endereco.cidade }} -
-        {{ agendamentoConsulta.pet.cliente.endereco.uf }}
-      </p>
+      @if (agendamentoConsulta.pet.cliente) {
+        <p class="col-auto dadospet">
+          <strong>Responsável: </strong>{{ agendamentoConsulta.pet.cliente.nome }}
+        </p>
+        <p class="col-auto dadospet">
+          <strong>Cpf: </strong>{{ agendamentoConsulta.pet.cliente.cpf }}
+        </p>
+        @if (agendamentoConsulta.pet.cliente.endereco) {
+          <p class="col-auto dadospet">
+            <strong>Endereço: </strong>{{ agendamentoConsulta.pet.cliente.endereco.logradouro }},
+            {{ agendamentoConsulta.pet.cliente.endereco.bairro }},
+            {{ agendamentoConsulta.pet.cliente.endereco.numero }},
+            {{ agendamentoConsulta.pet.cliente.endereco.cidade }} -
+            {{ agendamentoConsulta.pet.cliente.endereco.uf }}
+          </p>
+        }
+      }
     </div>
   } @else {
     <div class="mt-3 row">

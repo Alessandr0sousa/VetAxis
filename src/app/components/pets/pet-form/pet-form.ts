@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Pet } from '../../models/pet';
 import { ClientesService } from '../../services/clientes-service';
+import { UserProfileService } from '../../services/user-profile-service';
 import { Cliente } from '../../models/cliente';
 import { Especie, Pelagem, Temperamento, getRacasPorEspecie } from '../../models/enum-model';
 
@@ -28,7 +29,11 @@ export class PetForm implements OnInit {
 
   racasSelecionadas: string[] = [];
 
-  constructor(private fb: FormBuilder, private clienteService: ClientesService) {
+  constructor(
+    private fb: FormBuilder,
+    private clienteService: ClientesService,
+    private userProfileService: UserProfileService
+  ) {
     this.petForm = this.fb.group({
       nome: ['', Validators.required],
       sexo: ['', Validators.required],
@@ -91,15 +96,18 @@ export class PetForm implements OnInit {
   salvarPet() {
     if (this.petForm.valid) {
       const formValue = this.petForm.value;
+      const userProfile = this.userProfileService.getUserProfile();
       const pet: Pet = {
         ...(this.dto ?? {}),
         ...formValue,
-        cliente: formValue.cliente,
+        clienteId: formValue.cliente?.id,
         esterilizacao: formValue.esterilizacao ?? false,
         microchip: formValue.microchip ?? false,
         status: formValue.status ?? false,
+        clinicaId: userProfile?.clinicaId,
       };
       delete (pet as any).clienteNome;
+      delete (pet as any).cliente;
       this.salvar.emit(pet);
     }
   }

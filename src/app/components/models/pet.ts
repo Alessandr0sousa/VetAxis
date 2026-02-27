@@ -11,5 +11,7 @@ export interface Pet extends BaseEntity{
   temperamento?: string;
   microchip?: boolean;
   chip?: string;
-  cliente: Cliente;
+  cliente?: Cliente;
+  clienteId?: number;
+  clinicaId?: number;
 }

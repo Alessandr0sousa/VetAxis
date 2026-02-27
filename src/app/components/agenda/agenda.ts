@@ -111,7 +111,7 @@ export class Agenda implements OnInit {
           state: { agendamentoConsulta: item },
         });
       },
-      error: () => alert('Erro ao buscar dados.'),
+      error: () => this.swa.error('Erro ao buscar dados.'),
     });
   }
 
@@ -152,7 +152,7 @@ export class Agenda implements OnInit {
         }
         this.listarAgendamentos();
       },
-      error: () => alert(`Erro ao atualizar consulta: ${mensagem || 'operação'}`),
+      error: () => this.swa.error(`Erro ao atualizar consulta: ${mensagem || 'operação'}`),
     });
   }
 

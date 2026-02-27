@@ -1,9 +1,11 @@
 import { Pessoa } from './pessoa';
 
 export interface VeterinarioModel extends Pessoa {
+  cpf: string;
   crmv: string;
   especialidade: String;
   status: boolean;
+  clinicaId?: number;
 }
 
 // especialidade-veterinaria.enum.ts
