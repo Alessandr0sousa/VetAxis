@@ -1,7 +1,9 @@
 export interface VacinaModel {
-  vacina?: {
-    tipo: string;
-    nome: string;
-    dose: string;
-  };
+  tipo?: string;
+  nome?: string;
+  lote?: string;
+  fabricante?: string;
+  dataValidade?: string;
+  dose?: string;
+  statusVacina?: string;
 }

@@ -29,6 +29,23 @@
             }
           </div>
 
+          <!-- CPF -->
+          <div class="mb-3 col-3">
+            <label for="cpf" class="form-label">CPF</label>
+            <input
+              id="cpf"
+              type="text"
+              class="fomControl"
+              formControlName="cpf"
+              placeholder="Digite o CPF"
+              (keyup)="formatarCampo($event)"
+              maxlength="14"
+            />
+            @if (form.get('cpf')?.invalid && form.get('cpf')?.touched) {
+            <div class="text-danger">CPF é obrigatório.</div>
+            }
+          </div>
+
           <!-- Telefone -->
           <div class="mb-3 col-3">
             <label for="telefone" class="form-label">Telefone</label>
@@ -45,10 +62,28 @@
             <div class="text-danger">Telefone é obrigatório.</div>
             }
           </div>
+
           <!-- crmv -->
           <div class="mb-3 col-3">
             <label class="form-label">CRMV</label>
             <input type="text" class="formControl" formControlName="crmv" />
+          </div>
+
+          <!-- Especialidade -->
+          <div class="mb-3 col-3">
+            <label for="especialidade" class="form-label">Especialidade</label>
+            <input
+              formControlName="especialidade"
+              id="especialidade"
+              list="listaEspecialidade"
+              class="fomControl"
+              placeholder="Digite a especialidade"
+            />
+            <datalist id="listaEspecialidade">
+              @for (e of especialidades; track e) {
+              <option [value]="e"></option>
+              }
+            </datalist>
           </div>
 
           <!-- Email -->
@@ -64,22 +99,6 @@
             @if (form.get('email')?.invalid && form.get('email')?.touched) {
             <div class="text-danger">Email inválido.</div>
             }
-          </div>
-
-          <div class="mb-3 col-3">
-            <label for="especialidade" class="form-label">Especialidade</label>
-            <input
-              formControlName="especialidade"
-              id="especialidade"
-              list="listaEspecialidade"
-              class="fomControl"
-              placeholder="Digite a especialidade"
-            />
-            <datalist id="listaEspecialidade">
-              @for (e of especialidades; track e) {
-              <option [value]="e"></option>
-              }
-            </datalist>
           </div>
 
           <div class="mb-3 col-2" formGroupName="endereco">

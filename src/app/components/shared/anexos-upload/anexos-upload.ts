@@ -36,9 +36,9 @@ export class AnexosUpload implements ControlValueAccessor {
   @Input() agendamentoId?: number;
   @Output() anexosTemporarios = new EventEmitter<Omit<AnexoModel, 'id'>[]>();
 
-  private readonly anexoService = inject(AnexoService);
-  private readonly alertService = inject(AlertService);
-  private readonly destroyRef = inject(DestroyRef);
+  private anexoService!: AnexoService;
+  private alertService!: AlertService;
+  private destroyRef!: DestroyRef;
 
   readonly anexos = signal<AnexoModel[]>([]);
   readonly anexosTemp = signal<Omit<AnexoModel, 'id'>[]>([]);
@@ -50,6 +50,16 @@ export class AnexosUpload implements ControlValueAccessor {
   // ControlValueAccessor
   private onChange: (value: any) => void = () => {};
   private onTouched: () => void = () => {};
+
+  constructor(
+    anexoService: AnexoService,
+    alertService: AlertService,
+    destroyRef: DestroyRef
+  ) {
+    this.anexoService = anexoService;
+    this.alertService = alertService;
+    this.destroyRef = destroyRef;
+  }
 
   writeValue(value: AnexoModel[]): void {
     // Implementação do ControlValueAccessor

@@ -63,6 +63,14 @@ export abstract class BaseForm<T> {
 
   salvarForm(): void {
     if (this.form.valid) {
+      // Validação crítica: clinicaId NUNCA pode ser 0 ou negativo
+      const clinicaId = this.form.get('clinicaId')?.value;
+
+      if (clinicaId !== undefined && clinicaId !== null && clinicaId <= 0) {
+        console.error('ERRO: Tentativa de salvar com clinicaId inválido:', clinicaId);
+        return;
+      }
+
       // lista de campos que precisam ser limpos
       const camposParaLimpar = ['cpf', 'telefone', 'endereco.cep'];
 
@@ -88,6 +96,17 @@ export abstract class BaseForm<T> {
 
       this.salvar.emit(atualizado);
     }
+  }
+
+  private getFormValidationErrors() {
+    const errors: any = {};
+    Object.keys(this.form.controls).forEach(key => {
+      const controlErrors = this.form.get(key)?.errors;
+      if (controlErrors) {
+        errors[key] = controlErrors;
+      }
+    });
+    return errors;
   }
 
   cancelarForm(): void {

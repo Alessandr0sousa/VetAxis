@@ -79,8 +79,16 @@ export class ConsultaForm extends BaseForm<ConsultaModel> {
         // NÃO passar anexos aqui - deixar AnexosUpload gerenciar via API
       });
 
-      if (this.agendamento.consulta) {
-        this.form.get('consulta')?.patchValue(this.agendamento.consulta);
+      if (this.agendamento.anamnese) {
+        this.form.get('consulta')?.patchValue({
+          anamnese: this.agendamento.anamnese,
+          exameFisico: this.agendamento.exameFisico,
+          tratamento: this.agendamento.tratamento,
+          prescricao: this.agendamento.prescricao,
+          diagnostico: this.agendamento.diagnostico,
+          internamento: this.agendamento.internamento,
+          status: this.agendamento.status,
+        });
       }
     }
   }
@@ -89,34 +97,26 @@ export class ConsultaForm extends BaseForm<ConsultaModel> {
   salvarConsulta() {
     if (!this.agendamento) return;
 
-    // Garantir que consulta existe
-    if (!this.agendamento.consulta) {
-      this.agendamento.consulta = {
-        anamnese: '',
-        exameFisico: '',
-        tratamento: '',
-        prescricao: '',
-        diagnostico: '',
-        internamento: false,
-        status: StatusAgendamento.AGENDADO,
-      };
+    const veterinarioId = (this.agendamento as any)?.veterinario?.id ?? (this.agendamento as any)?.veterinarioId;
+    const petId = (this.agendamento as any)?.pet?.id ?? (this.agendamento as any)?.petId;
+
+    if (!veterinarioId || !petId) {
+      return;
     }
 
-    // TypeScript agora sabe que consulta está definida
-    const consulta = this.agendamento.consulta;
-
-    consulta.anamnese = this.form.get('consulta.anamnese')?.value;
-    consulta.exameFisico = this.form.get('consulta.exameFisico')?.value;
-    consulta.tratamento = this.form.get('consulta.tratamento')?.value;
-    consulta.prescricao = this.form.get('consulta.prescricao')?.value;
-    consulta.diagnostico = this.form.get('consulta.diagnostico')?.value;
-    consulta.internamento = this.form.get('consulta.internamento')?.value ?? false;
+    // Atualizar campos de consulta diretamente no agendamento (campos flattened)
+    this.agendamento.anamnese = this.form.get('consulta.anamnese')?.value || '';
+    this.agendamento.exameFisico = this.form.get('consulta.exameFisico')?.value || '';
+    this.agendamento.tratamento = this.form.get('consulta.tratamento')?.value || '';
+    this.agendamento.prescricao = this.form.get('consulta.prescricao')?.value || '';
+    this.agendamento.diagnostico = this.form.get('consulta.diagnostico')?.value || '';
+    this.agendamento.internamento = this.form.get('consulta.internamento')?.value ?? false;
     this.agendamento.peso = this.form.get('peso')?.value;
-
-    // Anexos são gerenciados APENAS pelo componente AnexosUpload
-    // Nunca modificar anexos aqui
-
-    consulta.status = 'REALIZADO' as any;
+    this.agendamento.status = 'REALIZADO';
+    (this.agendamento as any).veterinarioId = Number(veterinarioId);
+    (this.agendamento as any).petId = Number(petId);
+    this.agendamento.veterinario = { id: Number(veterinarioId) } as any;
+    this.agendamento.pet = { id: Number(petId) } as any;
 
     delete (this.agendamento as any).veterinarioNome;
     delete (this.agendamento as any).petNome;

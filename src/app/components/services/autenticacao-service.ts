@@ -26,8 +26,11 @@ export class AutenticacaoService extends ApiService {
   }
 
   logout(): void {
+    // Limpa apenas token e perfil do usuário
     this.tokenService.clearToken();
     this.userProfileService.clearUserProfile();
-    this.router.navigate(['/login']);
+
+    // Redireciona para login
+    this.router.navigate(['/login'], { replaceUrl: true });
   }
 }

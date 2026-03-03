@@ -1,4 +1,4 @@
-import { Injectable, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { Injectable, PLATFORM_ID, computed, inject, signal, afterNextRender } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
@@ -6,8 +6,18 @@ import { isPlatformBrowser } from '@angular/common';
 })
 export class NavigationStateService {
   private readonly platformId = inject(PLATFORM_ID);
-  private readonly lastRoute = signal<string | null>(this.readLastRoute());
+  private readonly lastRoute = signal<string | null>(null);
   readonly lastRouteSignal = computed(() => this.lastRoute());
+
+  constructor() {
+    // Carrega a última rota após a aplicação estar inicializada
+    afterNextRender(() => {
+      const route = this.readLastRoute();
+      if (route) {
+        this.lastRoute.set(route);
+      }
+    });
+  }
 
   setLastRoute(route: string): void {
     if (!this.isBrowser() || route === '/login') {

@@ -30,21 +30,38 @@
 
       <!-- Renderização condicional dos componentes -->
       @if (isvisible) {
-        @switch (selectedAgendamento) {
-          @case ('Consultas') {
+        @switch (selectedTipoAgendamento) {
+          @case (TipoAgendamento.CONSULTA) {
             <app-consultas-form-agendamentos
-              (cancelar)="onCancelar()"
+              [tipoAgendamento]="TipoAgendamento.CONSULTA"
               [dto]="selectedAgendamentoDto"
+              (cancelar)="onCancelar()"
             ></app-consultas-form-agendamentos>
           }
-          @case ('Exames') {
-            <app-exames></app-exames>
+          @case (TipoAgendamento.EXAME) {
+            <app-exames
+              [selectedAgendamento]="selectedAgendamentoDto"
+              [abrirFormularioDireto]="true"
+            ></app-exames>
           }
-          @case ('Cirurgias') {
-            <app-cirurgias></app-cirurgias>
+          @case (TipoAgendamento.CIRURGIA) {
+            <app-cirurgias
+              [selectedAgendamento]="selectedAgendamentoDto"
+              [abrirFormularioDireto]="true"
+            ></app-cirurgias>
           }
-          @case ('Vacinas') {
-            <app-vacinas></app-vacinas>
+          @case (TipoAgendamento.VACINA) {
+            <app-vacinas
+              [selectedAgendamento]="selectedAgendamentoDto"
+              [abrirFormularioDireto]="true"
+            ></app-vacinas>
+          }
+          @default {
+            <app-consultas-form-agendamentos
+              [tipoAgendamento]="TipoAgendamento.CONSULTA"
+              [dto]="selectedAgendamentoDto"
+              (cancelar)="onCancelar()"
+            ></app-consultas-form-agendamentos>
           }
         }
       }
@@ -62,47 +79,185 @@
             <i class="fa-solid fa-angle-right"></i>
           </button>
         </div>
-        @if (agendamentosList().length > 0) {
-          <!-- Lista de agendamentos -->
-          @for (item of agendamentosList(); track $index ) {
-            <div class="card mb-2">
-              <div
-                class="card-header p-0 ps-2"
-                [class]="STATUS_BADGE_CLASS[(item.consulta && item.consulta.status) || 'AGENDADO']"
-              >
-                {{ item.pet.nome }}
-              </div>
-              <div class="card-body p-2">
-                <h6 class="card-title mb-1">{{ item.veterinario.nome }}</h6>
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                  <span class="card-text">{{ item.dia }} - {{ item.horario }}</span>
-                  <button
-                    class="btn btn-sm p-0"
-                    type="button"
-                    title="Editar"
-                    (click)="editarAgendamento(item)"
-                  >
-                    <i class="fa-solid fa-pen text-warning"></i>
-                  </button>
-                </div>
 
-                @if (!item.consulta || item.consulta.status === 'AGENDADO') {
-                  <div class="d-flex justify-content-between">
-                    <button class="btn btn-sm btn-primary" (click)="confirmarConsulta(item, true)">
-                      Confirmar
-                    </button>
-                    <button class="btn btn-sm btn-danger" (click)="confirmarConsulta(item, false)">
-                      Cancelar
-                    </button>
-                  </div>
-                } @else if (item.consulta.status == 'CANCELADO') {
-                  <button class="btn btn-sm btn-secondary" (click)="reagendarConsulta(item)">
-                    Reagendar
-                  </button>
+        @if (agendamentosList().length > 0) {
+          <!-- Consultas -->
+          @if (agendamentosAgrupados.totalConsultas > 0) {
+            <div class="mb-3">
+              <h6 class="mb-2">
+                <strong>Consultas ({{ agendamentosAgrupados.totalConsultas }})</strong>
+              </h6>
+              <ul class="list-group list-group-sm">
+                @for (item of agendamentosAgrupados.consultas; track item.id) {
+                  <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div class="flex-grow-1">
+                        <small><strong>{{ item.pet.nome }}</strong></small>
+                        <div class="text-muted small">{{ item.dia }} - {{ item.horario }}</div>
+                        <div class="text-secondary small">{{ item.veterinario.nome }}</div>
+                      </div>
+                      <button
+                        class="btn btn-sm p-0 ms-2"
+                        type="button"
+                        title="Editar"
+                        (click)="editarAgendamento(item)"
+                      >
+                        <i class="fa-solid fa-pen text-warning"></i>
+                      </button>
+                    </div>
+                    @if (!item.status || item.status === 'AGENDADO') {
+                      <div class="d-flex gap-1 mt-2">
+                        <button class="btn btn-sm btn-primary flex-grow-1" (click)="confirmarConsulta(item, true)">
+                          Confirmar
+                        </button>
+                        <button class="btn btn-sm btn-danger flex-grow-1" (click)="confirmarConsulta(item, false)">
+                          Cancelar
+                        </button>
+                      </div>
+                    } @else if (item.status === 'CANCELADO') {
+                      <button class="btn btn-sm btn-secondary w-100 mt-2" (click)="reagendarConsulta(item)">
+                        Reagendar
+                      </button>
+                    }
+                  </li>
                 }
-              </div>
+              </ul>
             </div>
           }
+
+          <!-- Cirurgias -->
+          @if (agendamentosAgrupados.totalCirurgias > 0) {
+            <div class="mb-3">
+              <h6 class="mb-2">
+                <strong>Cirurgias ({{ agendamentosAgrupados.totalCirurgias }})</strong>
+              </h6>
+              <ul class="list-group list-group-sm">
+                @for (item of agendamentosAgrupados.cirurgias; track item.id) {
+                  <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div class="flex-grow-1">
+                        <small><strong>{{ item.pet.nome }}</strong></small>
+                        <div class="text-muted small">{{ item.dia }} - {{ item.horario }}</div>
+                        <div class="text-secondary small">{{ item.veterinario.nome }}</div>
+                      </div>
+                      <button
+                        class="btn btn-sm p-0 ms-2"
+                        type="button"
+                        title="Editar"
+                        (click)="editarAgendamento(item)"
+                      >
+                        <i class="fa-solid fa-pen text-warning"></i>
+                      </button>
+                    </div>
+                    @if (!item.status || item.status === 'AGENDADO') {
+                      <div class="d-flex gap-1 mt-2">
+                        <button class="btn btn-sm btn-primary flex-grow-1" (click)="confirmarConsulta(item, true)">
+                          Confirmar
+                        </button>
+                        <button class="btn btn-sm btn-danger flex-grow-1" (click)="confirmarConsulta(item, false)">
+                          Cancelar
+                        </button>
+                      </div>
+                    } @else if (item.status === 'CANCELADO') {
+                      <button class="btn btn-sm btn-secondary w-100 mt-2" (click)="reagendarConsulta(item)">
+                        Reagendar
+                      </button>
+                    }
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+
+          <!-- Exames -->
+          @if (agendamentosAgrupados.totalExames > 0) {
+            <div class="mb-3">
+              <h6 class="mb-2">
+                <strong>Exames ({{ agendamentosAgrupados.totalExames }})</strong>
+              </h6>
+              <ul class="list-group list-group-sm">
+                @for (item of agendamentosAgrupados.exames; track item.id) {
+                  <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div class="flex-grow-1">
+                        <small><strong>{{ item.pet.nome }}</strong></small>
+                        <div class="text-muted small">{{ item.dia }} - {{ item.horario }}</div>
+                        <div class="text-secondary small">{{ item.veterinario.nome }}</div>
+                      </div>
+                      <button
+                        class="btn btn-sm p-0 ms-2"
+                        type="button"
+                        title="Editar"
+                        (click)="editarAgendamento(item)"
+                      >
+                        <i class="fa-solid fa-pen text-warning"></i>
+                      </button>
+                    </div>
+                    @if (!item.status || item.status === 'AGENDADO') {
+                      <div class="d-flex gap-1 mt-2">
+                        <button class="btn btn-sm btn-primary flex-grow-1" (click)="confirmarConsulta(item, true)">
+                          Confirmar
+                        </button>
+                        <button class="btn btn-sm btn-danger flex-grow-1" (click)="confirmarConsulta(item, false)">
+                          Cancelar
+                        </button>
+                      </div>
+                    } @else if (item.status === 'CANCELADO') {
+                      <button class="btn btn-sm btn-secondary w-100 mt-2" (click)="reagendarConsulta(item)">
+                        Reagendar
+                      </button>
+                    }
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+
+          <!-- Vacinas -->
+          @if (agendamentosAgrupados.totalVacinas > 0) {
+            <div class="mb-3">
+              <h6 class="mb-2">
+                <strong>Vacinas ({{ agendamentosAgrupados.totalVacinas }})</strong>
+              </h6>
+              <ul class="list-group list-group-sm">
+                @for (item of agendamentosAgrupados.vacinas; track item.id) {
+                  <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div class="flex-grow-1">
+                        <small><strong>{{ item.pet.nome }}</strong></small>
+                        <div class="text-muted small">{{ item.dia }} - {{ item.horario }}</div>
+                        <div class="text-secondary small">{{ item.veterinario.nome }}</div>
+                      </div>
+                      <button
+                        class="btn btn-sm p-0 ms-2"
+                        type="button"
+                        title="Editar"
+                        (click)="editarAgendamento(item)"
+                      >
+                        <i class="fa-solid fa-pen text-warning"></i>
+                      </button>
+                    </div>
+                    @if (!item.status || item.status === 'AGENDADO') {
+                      <div class="d-flex gap-1 mt-2">
+                        <button class="btn btn-sm btn-primary flex-grow-1" (click)="confirmarConsulta(item, true)">
+                          Confirmar
+                        </button>
+                        <button class="btn btn-sm btn-danger flex-grow-1" (click)="confirmarConsulta(item, false)">
+                          Cancelar
+                        </button>
+                      </div>
+                    } @else if (item.status === 'CANCELADO') {
+                      <button class="btn btn-sm btn-secondary w-100 mt-2" (click)="reagendarConsulta(item)">
+                        Reagendar
+                      </button>
+                    }
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+        } @else {
+          <p class="text-muted">Nenhum agendamento para este dia</p>
         }
       </aside>
     }

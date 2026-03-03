@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, Input, OnInit, Output, ViewChild, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, Input, OnInit, Output, ViewChild, computed, signal, inject } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -37,8 +37,18 @@ export class ConsultasFormAgendamentos implements OnInit {
   @Output() cancelar = new EventEmitter<void>();
   @Output() salvar = new EventEmitter<ConsultasFormAgendamentosModel>();
   @ViewChild(AnexosUpload) anexosUpload?: AnexosUpload;
+
   readonly tipoAgendamentoEnum = TipoAgendamento;
   readonly tipoAgendamentoLabels = TipoAgendamentoLabels;
+
+  private fb!: FormBuilder;
+  private vetService!: VeterinarioService;
+  private petService!: PetService;
+  private agendamentoService!: AgendamentosService;
+  private escalaService!: EscalaVeterinariosService;
+  private swa!: AlertService;
+  private destroyRef!: DestroyRef;
+  private userProfileService!: UserProfileService;
 
   readonly pets = signal<Pet[]>([]);
   readonly vets = signal<VeterinarioModel[]>([]);
@@ -105,15 +115,24 @@ export class ConsultasFormAgendamentos implements OnInit {
   });
 
   constructor(
-    private fb: FormBuilder,
-    private vetService: VeterinarioService,
-    private petService: PetService,
-    private agendamentoService: AgendamentosService,
-    private escalaService: EscalaVeterinariosService,
-    private swa: AlertService,
-    private destroyRef: DestroyRef,
-    private userProfileService: UserProfileService,
-  ) {}
+    fb: FormBuilder,
+    vetService: VeterinarioService,
+    petService: PetService,
+    agendamentoService: AgendamentosService,
+    escalaService: EscalaVeterinariosService,
+    swa: AlertService,
+    destroyRef: DestroyRef,
+    userProfileService: UserProfileService
+  ) {
+    this.fb = fb;
+    this.vetService = vetService;
+    this.petService = petService;
+    this.agendamentoService = agendamentoService;
+    this.escalaService = escalaService;
+    this.swa = swa;
+    this.destroyRef = destroyRef;
+    this.userProfileService = userProfileService;
+  }
 
   ngOnInit(): void {
     this.form = this.criarForm();
@@ -152,12 +171,12 @@ export class ConsultasFormAgendamentos implements OnInit {
   private criarForm(): FormGroup {
     return this.fb.group({
       nome: [''],
-      veterinario: [null],
+      veterinario: [null, Validators.required],
       veterinarioNome: ['', Validators.required],
       dia: ['', Validators.required],
       horario: ['', Validators.required],
       horarios: this.fb.array([]), // ✅ corrigido
-      pet: [null],
+      pet: [null, Validators.required],
       petNome: ['', Validators.required],
       isRetorno: [false],
       peso: [0, [Validators.required, Validators.min(0)]],
@@ -334,6 +353,7 @@ export class ConsultasFormAgendamentos implements OnInit {
     if (tipo === 'vet') {
       const vetSelecionado = this.vets().find((vet) => vet.nome === nomeSelecionado);
       this.form.get('veterinario')?.setValue(vetSelecionado ?? null);
+      this.form.get('veterinario')?.markAsTouched();
 
       // Carrega a escala do veterinário selecionado
       if (vetSelecionado?.id) {
@@ -349,25 +369,62 @@ export class ConsultasFormAgendamentos implements OnInit {
     if (tipo === 'pet') {
       const petSelecionado = this.pets().find((pet) => pet.nome === nomeSelecionado);
       this.form.get('pet')?.setValue(petSelecionado ?? null);
+      this.form.get('pet')?.markAsTouched();
     }
   }
 
 
 
   salvarAgendamento() {
+    const userProfile = this.userProfileService.getUserProfile();
+
+    // Validação essencial: userProfile não pode estar null e clinicaId deve ser válido
+    if (!userProfile || !userProfile.clinicaId || userProfile.clinicaId <= 0) {
+      this.swa.error('Perfil de usuário inválido. Por favor, faça login novamente.');
+      console.error('Perfil inválido ou clinicaId <= 0:', { userProfile });
+      return;
+    }
+
     if (this.form.valid) {
       const formValue = this.form.value;
+
+      if (!formValue.veterinario?.id) {
+        this.form.get('veterinario')?.setErrors({ required: true });
+        this.form.get('veterinario')?.markAsTouched();
+        this.swa.warning('Selecione um veterinário válido da lista.');
+        return;
+      }
+
+      if (!formValue.pet?.id) {
+        this.form.get('pet')?.setErrors({ required: true });
+        this.form.get('pet')?.markAsTouched();
+        this.swa.warning('Selecione um pet válido da lista.');
+        return;
+      }
+
+      // Validação condicional: consultaOrigemId obrigatório apenas quando isRetorno = true
+      if (formValue.isRetorno === true) {
+        const consultaOrigemId = formValue.consultaOrigem?.id ?? formValue.consultaOrigemId;
+        if (!Number.isFinite(Number(consultaOrigemId)) || Number(consultaOrigemId) <= 0) {
+          this.swa.warning('Selecione uma consulta válida para marcar como retorno.');
+          return;
+        }
+      }
+
       const { anexos, ...outrosValores } = formValue;
-      const userProfile = this.userProfileService.getUserProfile();
 
       let agendaDto: ConsultasFormAgendamentosModel = {
         ...(this.dto ?? {}),
         ...outrosValores,
         veterinario: formValue.veterinario?.id ? { id: formValue.veterinario.id } : formValue.veterinario,
         pet: formValue.pet?.id ? { id: formValue.pet.id } : formValue.pet,
-        clinica: userProfile?.clinicaId ? { id: userProfile.clinicaId } : undefined,
+        clinicaId: userProfile.clinicaId,
         isRetorno: formValue.isRetorno ?? false,
         tipo: this.tipoAgendamento,
+        // Extrair consultaOrigemId quando isRetorno = true
+        ...(formValue.isRetorno === true && {
+          consultaOrigemId: Number(formValue.consultaOrigem?.id ?? formValue.consultaOrigemId),
+        }),
       };
 
       if (this.tipoAgendamento !== TipoAgendamento.CONSULTA) {
@@ -385,14 +442,48 @@ export class ConsultasFormAgendamentos implements OnInit {
 
       agendaDto = this.limparCampos(agendaDto);
 
-      const request$ = agendaDto.id
-        ? this.agendamentoService.atualizar(agendaDto)
-        : this.agendamentoService.salvar(agendaDto);
+      // Escolher método correto baseado no tipo de agendamento
+      let request$;
+      if (agendaDto.id) {
+        // Atualizar - escolher método baseado no tipo
+        switch (this.tipoAgendamento) {
+          case TipoAgendamento.CIRURGIA:
+            request$ = this.agendamentoService.atualizarCirurgia(agendaDto);
+            break;
+          case TipoAgendamento.EXAME:
+            request$ = this.agendamentoService.atualizarExame(agendaDto);
+            break;
+          case TipoAgendamento.VACINA:
+            request$ = this.agendamentoService.atualizarVacina(agendaDto);
+            break;
+          case TipoAgendamento.CONSULTA:
+          default:
+            request$ = this.agendamentoService.atualizarConsulta(agendaDto);
+            break;
+        }
+      } else {
+        // Salvar novo - escolher método baseado no tipo
+        switch (this.tipoAgendamento) {
+          case TipoAgendamento.CIRURGIA:
+            request$ = this.agendamentoService.salvarCirurgia(agendaDto);
+            break;
+          case TipoAgendamento.EXAME:
+            request$ = this.agendamentoService.salvarExame(agendaDto);
+            break;
+          case TipoAgendamento.VACINA:
+            request$ = this.agendamentoService.salvarVacina(agendaDto);
+            break;
+          case TipoAgendamento.CONSULTA:
+          default:
+            request$ = this.agendamentoService.salvarConsulta(agendaDto);
+            break;
+        }
+      }
 
       request$
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
-          next: (agendamentoSalvo) => {
+          next: (agendamentoSalvo: ConsultasFormAgendamentosModel) => {
             const mensagem = agendaDto.id
               ? 'Agendamento atualizado com sucesso!'
               : 'Agendamento salvo com sucesso!';
@@ -436,8 +527,8 @@ export class ConsultasFormAgendamentos implements OnInit {
       consultaOrigem: this.dto,
       isRetorno: this.dto?.isRetorno ?? false,
       consulta: {
-        anamnese: this.dto?.consulta?.anamnese ?? '',
-        status: StatusAgendamento.AGENDADO,
+        anamnese: this.dto?.anamnese ?? '',
+        status: this.dto?.status ?? StatusAgendamento.AGENDADO,
       },
     });
 
@@ -551,6 +642,7 @@ export class ConsultasFormAgendamentos implements OnInit {
     const copia = { ...dto };
     delete (copia as any).veterinarioNome;
     delete (copia as any).petNome;
+    delete (copia as any).consultaOrigem; // Remover objeto, passar apenas consultaOrigemId
     return copia;
   }
 }

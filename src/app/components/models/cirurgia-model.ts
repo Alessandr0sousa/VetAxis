@@ -1,8 +1,9 @@
 export interface CirurgiaModel {
-  cirurgia?: {
-    tipo: string;
-    descricao: string;
-    protocoloAnestesia: string;
-    internamento: boolean;
-  };
+  tipo?: string;
+  descricao?: string;
+  anestesia?: string;
+  protocoloAnestesia?: string;
+  relaProcedimento?: string;
+  internamento?: boolean;
+  statusCirurgia?: string;
 }

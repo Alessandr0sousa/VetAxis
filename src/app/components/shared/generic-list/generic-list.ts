@@ -71,16 +71,23 @@ export class GenericList<T extends BaseEntity> implements OnInit, AfterViewInit 
     const compRef = this.formContainer.createComponent(this.formComponent) as ComponentRef<
       BaseForm<T>
     >;
+
     compRef.setInput(this.formInputName, this.selecionado());
+    this.cdr.detectChanges();
+
+    if (!compRef.instance.salvar) {
+      console.error('ERRO: compRef.instance.salvar não existe!');
+      return;
+    }
+
+    compRef.instance.salvar.subscribe((item: T) => this.salvar(item));
+    compRef.instance.cancelar.subscribe(() => this.fecharForm());
 
     setTimeout(() => {
       if (this.selecionado() && compRef.instance.form) {
         compRef.instance.form.patchValue(this.selecionado()!);
       }
     });
-
-    compRef.instance.salvar.subscribe((item: T) => this.salvar(item));
-    compRef.instance.cancelar.subscribe(() => this.fecharForm());
   }
 
   ngOnInit(): void {}
@@ -141,7 +148,9 @@ export class GenericList<T extends BaseEntity> implements OnInit, AfterViewInit 
           this.fecharForm();
           this.alertService.success('Atualizado com sucesso.');
         },
-        error: () => this.alertService.error('Erro ao atualizar.'),
+        error: () => {
+          this.alertService.error('Erro ao atualizar.');
+        },
       });
     } else {
       this.service.salvar(item).subscribe({
@@ -150,7 +159,9 @@ export class GenericList<T extends BaseEntity> implements OnInit, AfterViewInit 
           this.fecharForm();
           this.alertService.success('Salvo com sucesso.');
         },
-        error: () => this.alertService.error('Erro ao salvar.'),
+        error: () => {
+          this.alertService.error('Erro ao salvar.');
+        },
       });
     }
     this.limparFiltro();

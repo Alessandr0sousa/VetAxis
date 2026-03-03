@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, inject, signal, afterNextRender } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal, afterNextRender, effect } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { MenuPrincipal } from './components/menu-principal/menu-principal';
 import { Navbar } from './components/navbar/navbar';
@@ -29,6 +29,12 @@ export class App {
   constructor() {
     afterNextRender(() => {
       this.ready.set(true);
+
+      // Verifica autenticação após o token ser carregado
+      if (this.isAuthenticated() && this.router.url === '/login') {
+        const target = this.navState.getLastRoute() ?? '/dashboard';
+        this.router.navigateByUrl(target);
+      }
     });
 
     this.router.events
@@ -39,11 +45,6 @@ export class App {
       .subscribe((event) => {
         this.navState.setLastRoute(event.urlAfterRedirects);
       });
-
-    if (this.isAuthenticated() && this.router.url === '/login') {
-      const target = this.navState.getLastRoute() ?? '/dashboard';
-      this.router.navigateByUrl(target);
-    }
   }
 
   toggleSidebar() {

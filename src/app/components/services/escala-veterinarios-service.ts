@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ApiService } from '../../api-services/api-sevice';
 
 export type EscalaVeterinariosPayload = {
@@ -38,7 +38,22 @@ export class EscalaVeterinariosService extends ApiService {
   }
 
   salvar(payload: EscalaVeterinariosPayload): Observable<void> {
-    return this.post<void>(`${this.endpoint}/lote`, payload);
+    const veterinarioId = Number(payload?.veterinarioId);
+    const clinicaId = Number(payload?.clinicaId);
+
+    if (!Number.isFinite(veterinarioId) || veterinarioId <= 0) {
+      return throwError(() => new Error('ID do veterinário é obrigatório'));
+    }
+
+    if (!Number.isFinite(clinicaId) || clinicaId <= 0) {
+      return throwError(() => new Error('ID da clínica é obrigatório'));
+    }
+
+    return this.post<void>(`${this.endpoint}/lote`, {
+      ...payload,
+      veterinarioId,
+      clinicaId,
+    });
   }
 
   buscar(

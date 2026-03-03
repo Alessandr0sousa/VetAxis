@@ -16,24 +16,43 @@ import { AlertService } from '../services/alert-service';
   styleUrls: ['./login-page.scss'],
 })
 export class LoginPage {
-  private readonly fb = inject(FormBuilder);
-  private readonly authService = inject(AutenticacaoService);
-  private readonly alertService = inject(AlertService);
-  private readonly router = inject(Router);
-  private readonly tokenService = inject(AuthTokenService);
-  private readonly navState = inject(NavigationStateService);
-  private readonly userProfileService = inject(UserProfileService);
-  private readonly destroyRef = inject(DestroyRef);
+  private fb!: FormBuilder;
+  private authService!: AutenticacaoService;
+  private alertService!: AlertService;
+  private router!: Router;
+  private tokenService!: AuthTokenService;
+  private navState!: NavigationStateService;
+  private userProfileService!: UserProfileService;
+  private destroyRef!: DestroyRef;
 
-  readonly form = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(5)]],
-  });
-
+  readonly form!: any;
   readonly loading = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
-  constructor() {
+  constructor(
+    fb: FormBuilder,
+    authService: AutenticacaoService,
+    alertService: AlertService,
+    router: Router,
+    tokenService: AuthTokenService,
+    navState: NavigationStateService,
+    userProfileService: UserProfileService,
+    destroyRef: DestroyRef
+  ) {
+    this.fb = fb;
+    this.authService = authService;
+    this.alertService = alertService;
+    this.router = router;
+    this.tokenService = tokenService;
+    this.navState = navState;
+    this.userProfileService = userProfileService;
+    this.destroyRef = destroyRef;
+
+    this.form = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(5)]],
+    });
+
     this.form.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {

@@ -1,15 +1,13 @@
 import { AnexoModel } from './anexo-model';
 
 export interface ConsultaModel {
-  consulta?: {
-    anamnese: string;
-    exameFisico: string;
-    tratamento: string;
-    prescricao: string;
-    diagnostico: string;
-    internamento: boolean;
-    status: StatusAgendamento;
-  };
+  anamnese?: string;
+  exameFisico?: string;
+  tratamento?: string;
+  prescricao?: string;
+  diagnostico?: string;
+  internamento?: boolean;
+  status?: string;  // String genérico, pode ser "AGENDADO", "REALIZADO", etc.
   anexos?: AnexoModel[];
 }
 

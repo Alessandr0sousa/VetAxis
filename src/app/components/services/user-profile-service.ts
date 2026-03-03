@@ -1,4 +1,4 @@
-import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject, signal, afterNextRender } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { UserProfile } from '../../models/user-profile.model';
 
@@ -15,7 +15,10 @@ export class UserProfileService {
   private readonly storageKey = 'userProfile';
 
   constructor() {
-    this.loadUserProfile();
+    // Carrega o perfil após a aplicação estar inicializada
+    afterNextRender(() => {
+      this.loadUserProfile();
+    });
   }
 
   setUserProfile(profile: UserProfile): void {
@@ -27,6 +30,16 @@ export class UserProfileService {
 
   getUserProfile(): UserProfile | null {
     return this.userProfile();
+  }
+
+  isProfileValid(): boolean {
+    const profile = this.userProfile();
+    return !!(profile && profile.clinicaId && profile.clinicaId > 0);
+  }
+
+  getClinicaId(): number {
+    const profile = this.userProfile();
+    return profile?.clinicaId ?? 0;
   }
 
   clearUserProfile(): void {

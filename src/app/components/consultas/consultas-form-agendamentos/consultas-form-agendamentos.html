@@ -21,6 +21,9 @@
                   placeholder="Selecione o Veterinário"
                   (change)="onChangeSelecionado($event, 'vet')"
                 />
+                @if (form.get('veterinario')?.invalid && form.get('veterinario')?.touched) {
+                <div class="text-danger mt-1">Selecione um veterinário válido da lista.</div>
+                }
                 <datalist id="vetOptions">
                   @for (v of vets(); track v.id) {
                   <option [value]="v.nome"></option>
@@ -83,6 +86,9 @@
                   placeholder="Selecione o Pet"
                   (change)="onChangeSelecionado($event, 'pet')"
                 />
+                @if (form.get('pet')?.invalid && form.get('pet')?.touched) {
+                <div class="text-danger mt-1">Selecione um pet válido da lista.</div>
+                }
                 <datalist id="petOptions">
                   @for (p of pets(); track p.id) {
                   <option [value]="p.nome"></option>
@@ -168,15 +174,15 @@
               }
 
               @if (tipoAgendamento === tipoAgendamentoEnum.VACINA) {
-                <div class="mb-3" formGroupName="vacina">
+                <div class="mb-3 col-4" formGroupName="vacina">
                   <label for="vacina-tipo" class="form-label">Tipo de Vacina</label>
                   <input id="vacina-tipo" class="formControl" formControlName="tipo" />
                 </div>
-                <div class="mb-3" formGroupName="vacina">
+                <div class="mb-3 col-4" formGroupName="vacina">
                   <label for="vacina-nome" class="form-label">Nome</label>
                   <input id="vacina-nome" class="formControl" formControlName="nome" />
                 </div>
-                <div class="mb-3" formGroupName="vacina">
+                <div class="mb-3 col-4" formGroupName="vacina">
                   <label for="vacina-dose" class="form-label">Dose</label>
                   <input id="vacina-dose" class="formControl" formControlName="dose" />
                 </div>

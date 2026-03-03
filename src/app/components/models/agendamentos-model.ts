@@ -26,14 +26,29 @@ export const TipoAgendamentoFrase: { [key in TipoAgendamento]: string } = {
 };
 
 export interface AgendamentosModel extends BaseEntity {
+  nome: string;
   veterinario: VeterinarioModel;
   clinica?: ClinicaModel;
+  clinicaId: number;
   dia: string;
   horario: string;
   pet: Pet;
   tipoAgendamento?: TipoAgendamento;
   isRetorno?: boolean;
   peso: number;
-  consultaOrigem: AgendamentosModel | null;
+  consultaOrigem?: AgendamentosModel | null;
   anexos?: AnexoModel[];
+  status?: string;
+}
+
+export interface AgendamentosAgrupados {
+  consultas: AgendamentosModel[];
+  cirurgias: AgendamentosModel[];
+  exames: AgendamentosModel[];
+  vacinas: AgendamentosModel[];
+  totalConsultas: number;
+  totalCirurgias: number;
+  totalExames: number;
+  totalVacinas: number;
+  total: number;
 }

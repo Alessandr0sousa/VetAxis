@@ -2,9 +2,12 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Pet } from '../../models/pet';
 import { ClientesService } from '../../services/clientes-service';
+import { PetService } from '../../services/pet-service';
 import { UserProfileService } from '../../services/user-profile-service';
+import { AlertService } from '../../services/alert-service';
 import { Cliente } from '../../models/cliente';
 import { Especie, Pelagem, Temperamento, getRacasPorEspecie } from '../../models/enum-model';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-pet-form',
@@ -32,7 +35,10 @@ export class PetForm implements OnInit {
   constructor(
     private fb: FormBuilder,
     private clienteService: ClientesService,
-    private userProfileService: UserProfileService
+    private userProfileService: UserProfileService,
+    private alertService: AlertService,
+    private petService: PetService,
+    private location: Location
   ) {
     this.petForm = this.fb.group({
       nome: ['', Validators.required],
@@ -95,8 +101,16 @@ export class PetForm implements OnInit {
 
   salvarPet() {
     if (this.petForm.valid) {
+      // Obtém clinicaId atualizado
+      const clinicaId = this.userProfileService.getClinicaId();
+
+      // Validação essencial: clinicaId deve ser válido
+      if (!this.userProfileService.isProfileValid() || clinicaId <= 0) {
+        this.alertService.error('Perfil de usuário inválido. Por favor, faça login novamente.');
+        return;
+      }
+
       const formValue = this.petForm.value;
-      const userProfile = this.userProfileService.getUserProfile();
       const pet: Pet = {
         ...(this.dto ?? {}),
         ...formValue,
@@ -104,11 +118,47 @@ export class PetForm implements OnInit {
         esterilizacao: formValue.esterilizacao ?? false,
         microchip: formValue.microchip ?? false,
         status: formValue.status ?? false,
-        clinicaId: userProfile?.clinicaId,
+        clinicaId: clinicaId,
       };
       delete (pet as any).clienteNome;
       delete (pet as any).cliente;
-      this.salvar.emit(pet);
+
+      // Verifica se há observers registrados (formulário dentro do GenericList)
+      const temObservers = this.salvar['observers']?.length > 0;
+
+      if (temObservers) {
+        // Formulário usado dentro do GenericList - emite evento normalmente
+        this.salvar.emit(pet);
+      } else {
+        // Formulário standalone - salva diretamente através do serviço
+        if (pet.id) {
+          this.petService.atualizar(pet).subscribe({
+            next: () => {
+              this.alertService.success('Pet atualizado com sucesso!');
+              this.location.back();
+            },
+            error: (err) => {
+              this.alertService.error(`Erro ao atualizar pet: ${err.error?.message || err.message}`);
+            },
+          });
+        } else {
+          this.petService.salvar(pet).subscribe({
+            next: () => {
+              this.alertService.success('Pet cadastrado com sucesso!');
+              this.location.back();
+            },
+            error: (err) => {
+              if (err.status === 403) {
+                this.alertService.error('Acesso negado. Verifique suas permissões.');
+              } else if (err.status === 401) {
+                this.alertService.error('Sessão expirada. Faça login novamente.');
+              } else {
+                this.alertService.error(`Erro ao cadastrar: ${err.error?.message || err.message}`);
+              }
+            },
+          });
+        }
+      }
     }
   }
 

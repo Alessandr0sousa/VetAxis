@@ -1,4 +1,4 @@
-import { Injectable, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { Injectable, PLATFORM_ID, computed, inject, signal, afterNextRender } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
@@ -6,8 +6,18 @@ import { isPlatformBrowser } from '@angular/common';
 })
 export class AuthTokenService {
   private readonly platformId = inject(PLATFORM_ID);
-  private readonly token = signal<string | null>(this.readToken());
+  private readonly token = signal<string | null>(null);
   readonly authenticated = computed(() => !!this.token());
+
+  constructor() {
+    // Carrega o token após a aplicação estar inicializada no navegador
+    afterNextRender(() => {
+      const savedToken = this.readToken();
+      if (savedToken) {
+        this.token.set(savedToken);
+      }
+    });
+  }
 
   setToken(token: string): void {
     if (!this.isBrowser()) {
@@ -18,7 +28,10 @@ export class AuthTokenService {
   }
 
   getToken(): string | null {
-    return this.token();
+    const token = this.token();
+
+    // Retorna o token mesmo se expirado - a validação será feita no guard/interceptor
+    return token;
   }
 
   clearToken(): void {
@@ -30,7 +43,31 @@ export class AuthTokenService {
   }
 
   isAuthenticated(): boolean {
-    return this.authenticated();
+    return this.isTokenValid();
+  }
+
+  isTokenValid(): boolean {
+    const token = this.token();
+    return !!token && !this.isTokenExpired();
+  }
+
+  private isTokenExpired(): boolean {
+    const token = this.token();
+    if (!token) return true;
+
+    try {
+      // Decodifica o payload do JWT (parte do meio)
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const exp = payload.exp;
+
+      if (!exp) return false; // Se não tem exp, considera válido
+
+      // Verifica se expirou (exp está em segundos, Date.now() em milissegundos)
+      return Date.now() >= exp * 1000;
+    } catch {
+      // Se não conseguir decodificar, considera expirado
+      return true;
+    }
   }
 
   private isBrowser(): boolean {

@@ -5,6 +5,7 @@ import { ConsultasFormAgendamentosModel } from '../../../models/consultas-form-a
 import { AgendamentosService } from '../../../services/agendamentos-service';
 import { TipoAgendamento } from '../../../models/agendamentos-model';
 import { AlertService } from '../../../services/alert-service';
+import { UserProfileService } from '../../../services/user-profile-service';
 
 @Component({
   selector: 'app-exames-form-agendamentos',
@@ -29,7 +30,8 @@ export class ExamesFormAgendamentos implements OnInit {
 
   constructor(
     private agendamentosService: AgendamentosService,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private userProfileService: UserProfileService
   ) {}
 
   ngOnInit(): void {
@@ -46,23 +48,36 @@ export class ExamesFormAgendamentos implements OnInit {
       return;
     }
 
-    const agendamento: any = {
+    // Obtém clinicaId atualizado
+    const clinicaId = this.userProfileService.getClinicaId();
+
+    // Validação essencial: clinicaId deve ser válido
+    if (!this.userProfileService.isProfileValid() || clinicaId <= 0) {
+      this.alertService.error('Perfil de usuário inválido. Por favor, faça login novamente.');
+      console.error('Perfil inválido ou clinicaId <= 0:', { clinicaId });
+      return;
+    }
+
+    const agendamento: ConsultasFormAgendamentosModel = {
+      id: 0,
+      nome: 'Exame',
       veterinario: this.selectedVeterinario(),
       dia: this.diaSelecionado(),
       horario: this.selectedHorario()!,
-      tipo: this.tipoAgendamento,
+      pet: {} as any,  // Será preenchido pelo componente pai
+      tipoAgendamento: TipoAgendamento.EXAME,
       peso: 0,
-      exame: {
-        tipo: this.tipo(),
-        descricao: this.descricaoExame(),
-        materialColetado: '',
-        achados: '',
-        laudo: '',
-        statusExame: 'AGENDADO',
-      }
-    };
+      clinicaId: clinicaId,
+      // Campos de exame (flattened)
+      tipo: this.tipo(),
+      descricao: this.descricaoExame(),
+      materialColetado: '',
+      achados: '',
+      laudo: '',
+      statusExame: 'AGENDADO',
+    } as ConsultasFormAgendamentosModel;
 
-    this.agendamentosService.salvar(agendamento).subscribe({
+    this.agendamentosService.salvarExame(agendamento).subscribe({
       next: () => {
         this.alertService.success('Exame agendado com sucesso!');
         this.resetForm();

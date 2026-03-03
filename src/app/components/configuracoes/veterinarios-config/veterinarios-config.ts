@@ -25,10 +25,10 @@ type CelulaCalendario = DiaEscala | null;
   styleUrl: './veterinarios-config.scss',
 })
 export class VeterinariosConfig implements OnInit {
-  private readonly veterinarioService = inject(VeterinarioService);
-  private readonly escalaService = inject(EscalaVeterinariosService);
-  private readonly alertService = inject(AlertService);
-  private readonly fb = inject(FormBuilder);
+  private veterinarioService = inject(VeterinarioService);
+  private escalaService = inject(EscalaVeterinariosService);
+  private alertService = inject(AlertService);
+  private fb = inject(FormBuilder);
 
   readonly veterinarios = signal<VeterinarioModel[]>([]);
   readonly veterinarioSelecionado = signal<VeterinarioModel | null>(null);

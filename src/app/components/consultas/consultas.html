@@ -40,13 +40,7 @@
         }
       }
     </div>
-  } @else {
-    <div class="mt-3 row">
-      <h2 class="col-12">{{ nome }} Consulta</h2>
-      <div class="col-2 text-end group-novo"></div>
-    </div>
   }
-  <hr />
   @if (agendamentoConsulta) {
     <app-consulta-form
       [agendamento]="agendamentoConsulta"
@@ -54,20 +48,28 @@
       (cancelar)="onCancelar()"
     ></app-consulta-form>
   } @else if (!isAgedamento && !agendamentoConsulta) {
-    <div class="alert alert-warning row" role="alert">
-      <p class="col-9 aviso">
-        Você precisa selecionar um agendamento para poder realizar uma consulta ou agendar uma.
-      </p>
-      <div class="text-end col-3">
+    <div class="mt-3 row">
+      <h2 class="col-10">Consultas do Dia</h2>
+      <div class="col-2 text-end">
         <button class="btn btn-sm btn-secondary" (click)="onClickEmitter()">Agendar</button>
       </div>
     </div>
+    <hr />
+    @if (agendamentosFiltrados.length === 0) {
+      <div class="alert alert-warning" role="alert">
+        Não há consultas agendadas para hoje.
+      </div>
+    } @else {
+      <div class="alert alert-info" role="alert">
+        Selecione uma consulta para iniciar o atendimento.
+      </div>
+    }
     <div class="row mt-2 g-1">
       @for (item of agendamentosFiltrados; track item.id) {
         <div class="card mb-1 col-sm-5 col-md-4 col-lg-3 p-0">
           <div
             class="card-header p-0 ps-2"
-            [class]="badgeStatus[(item.consulta && item.consulta.status) || 'AGENDADO']"
+            [class]="getStatusClass(item.status)"
           >
             {{ item.pet.nome }}
           </div>
@@ -75,7 +77,7 @@
             <h6 class="card-title mb-1">{{ item.veterinario.nome }}</h6>
             <p class="card-text mb-1">{{ item.dia }} - {{ item.horario }}</p>
             <div class="text-end">
-              @if (item.consulta && (item.consulta.status != 'CANCELADO' && item.consulta.status != 'REALIZADO')) {
+              @if (item.status && (item.status != 'CANCELADO' && item.status != 'REALIZADO')) {
                 <button class="btn btn-sm btn-secondary" (click)="iniciarConsulta(item)">
                   Iniciar
                 </button>

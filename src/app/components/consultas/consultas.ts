@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { STATUS_BADGE_CLASS } from '../models/consulta-model';
+import { STATUS_BADGE_CLASS, StatusAgendamento } from '../models/consulta-model';
 import { ConsultasFormAgendamentosModel } from '../models/consultas-form-agendametos-model';
 import { AgendamentosService } from '../services/agendamentos-service';
 import { AlertService } from '../services/alert-service';
@@ -78,21 +78,19 @@ export class Consultas implements OnInit {
     try {
       const agendaDto: ConsultasFormAgendamentosModel = {
         ...(item ?? {}),
-        consulta: {
-          anamnese: item.consulta?.anamnese || '',
-          exameFisico: item.consulta?.exameFisico || '',
-          tratamento: item.consulta?.tratamento || '',
-          prescricao: item.consulta?.prescricao || '',
-          diagnostico: item.consulta?.diagnostico || '',
-          internamento: item.consulta?.internamento || false,
-          status: 'INICIADO' as any,
-        },
+        anamnese: item.anamnese || '',
+        exameFisico: item.exameFisico || '',
+        tratamento: item.tratamento || '',
+        prescricao: item.prescricao || '',
+        diagnostico: item.diagnostico || '',
+        internamento: item.internamento || false,
+        status: 'INICIADO',
       };
 
       delete (agendaDto as any).veterinarioNome;
       delete (agendaDto as any).petNome;
 
-      await firstValueFrom(this.agendamentoService.atualizar(agendaDto));
+      await firstValueFrom(this.agendamentoService.atualizarConsulta(agendaDto));
 
       const agendamento = await firstValueFrom(this.agendamentoService.buscarPorId(item.id));
       this.listarAgendamentos();
@@ -112,12 +110,12 @@ export class Consultas implements OnInit {
   }
 
   onConsultaConcluida(event: ConsultasFormAgendamentosModel) {
-    this.agendamentoService.atualizar(event).subscribe({
+    this.agendamentoService.atualizarConsulta(event).subscribe({
       next: () => {
         this.listarAgendamentos();
         this.marcarRetorno(event);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.alertService.error('Erro ao salvar consulta');
       },
     });
@@ -136,5 +134,15 @@ export class Consultas implements OnInit {
         this.alertService.success('Consulta conclída com sucesso!');
       }
     });
+  }
+
+  getStatusClass(status: string | null | undefined): string {
+    const statusNormalizado = status ?? StatusAgendamento.AGENDADO;
+
+    if (statusNormalizado in this.badgeStatus) {
+      return this.badgeStatus[statusNormalizado as StatusAgendamento];
+    }
+
+    return this.badgeStatus[StatusAgendamento.AGENDADO];
   }
 }

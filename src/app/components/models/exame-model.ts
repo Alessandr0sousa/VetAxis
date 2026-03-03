@@ -11,9 +11,10 @@ export const StatusExameLabels: { [key in StatusExame]: string } = {
 };
 
 export interface ExameModel {
-  exame?: {
-    tipo: string;
-    descricao: string;
-    materialColetado: string;
-  };
+  tipo?: string;
+  descricao?: string;
+  materialColetado?: string;
+  achados?: string;
+  laudo?: string;
+  statusExame?: string;
 }
