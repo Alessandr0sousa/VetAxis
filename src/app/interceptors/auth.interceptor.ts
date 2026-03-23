@@ -3,8 +3,7 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { AuthTokenService } from '../components/services/auth-token-service';
-import { UserProfileService } from '../components/services/user-profile-service';
+import { AuthTokenService, UserProfileService } from '@infrastructure/storage';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
@@ -16,12 +15,23 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const redirectToLogin = () => {
     tokenService.clearToken();
     userProfileService.clearUserProfile();
-    void router.navigate(['/login']);
+    if (router.url !== '/login') {
+      void router.navigate(['/login'], { replaceUrl: true });
+    }
+  };
+
+  const onError = (error: any) => {
+    if (error?.status === 401) {
+      redirectToLogin();
+    }
+
+    console.error('HTTP Error:', error.status, error.message);
+    return throwError(() => error);
   };
 
   // Skip token injection for login requests or when token is not available
   if (isLoginRequest || !token) {
-    return next(req);
+    return next(req).pipe(catchError(onError));
   }
 
   if (!tokenService.isTokenValid()) {
@@ -35,14 +45,5 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   });
 
   // Handle HTTP errors
-  return next(clonedRequest).pipe(
-    catchError((error) => {
-      if (error?.status === 401 || error?.status === 403) {
-        redirectToLogin();
-      }
-
-      console.error('HTTP Error:', error.status, error.message);
-      return throwError(() => error);
-    })
-  );
+  return next(clonedRequest).pipe(catchError(onError));
 };

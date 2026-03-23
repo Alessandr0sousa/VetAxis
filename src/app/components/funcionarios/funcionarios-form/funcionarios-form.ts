@@ -1,11 +1,11 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FuncionarioModel } from '../../models/funcionario-model';
-import { ViaCepService } from '../../services/viacepservice';
-import { Customservice } from '../../services/customservice';
-import { UserProfileService } from '../../services/user-profile-service';
-import { AlertService } from '../../services/alert-service';
-import { FuncionarioService } from '../../services/funcionario-service';
+import { ViaCepService } from '@shared/services';
+import { Customservice } from '@shared/services';
+import { UserProfileService } from '@infrastructure/storage';
+import { AlertService } from '@shared/services';
+import { FuncionarioService } from '@features/funcionarios';
 import { BaseForm } from '../../shared/base-form/base-form';
 import { Location } from '@angular/common';
 

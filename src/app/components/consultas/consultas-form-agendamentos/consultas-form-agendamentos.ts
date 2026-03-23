@@ -6,17 +6,17 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { StatusAgendamento } from '../../models/consulta-model';
 import { ConsultasFormAgendamentosModel } from '../../models/consultas-form-agendametos-model';
 import { Pet } from '../../models/pet';
-import { AgendamentosService } from '../../services/agendamentos-service';
-import { PetService } from '../../services/pet-service';
+import { AgendamentosService } from '@features/agendamentos';
+import { PetService } from '@features/pets';
 import { AgendaCalendario } from '../../shared/agenda-calendario/agenda-calendario';
 import { VeterinarioModel } from './../../models/veterinario-model';
-import { VeterinarioService } from './../../services/veterinario-service';
+import { VeterinarioService } from '@features/veterinarios';
 import { ConsultasList } from '../consultas-list/consultas-list';
-import { AlertService } from '../../services/alert-service';
+import { AlertService } from '@shared/services';
 import { AnexosUpload } from '../../shared/anexos-upload/anexos-upload';
-import { EscalaVeterinariosService, EscalaVeterinariosItem } from '../../services/escala-veterinarios-service';
+import { EscalaVeterinariosService, EscalaVeterinariosItem } from '@features/veterinarios';
 import { TipoAgendamento, TipoAgendamentoLabels } from '../../models/agendamentos-model';
-import { UserProfileService } from '../../services/user-profile-service';
+import { UserProfileService } from '@infrastructure/storage';
 
 type HorarioDisponivel = {
   horario: string;
@@ -574,7 +574,38 @@ export class ConsultasFormAgendamentos implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          const agendamentosVet = (response.content ?? []).filter(
+          // Normalizar status se estiver vindo em campos aninhados
+          const conteudoNormalizado = (response.content ?? []).map(item => {
+            if (!item.status) {
+              let statusEncontrado: string | undefined;
+
+              // Tentar encontrar status em qualquer campo aninhado por tipo
+              if ((item as any).consulta?.statusConsulta) {
+                statusEncontrado = (item as any).consulta.statusConsulta;
+              } else if ((item as any).consulta?.status) {
+                statusEncontrado = (item as any).consulta.status;
+              } else if ((item as any).cirurgia?.statusCirurgia) {
+                statusEncontrado = (item as any).cirurgia.statusCirurgia;
+              } else if ((item as any).cirurgia?.status) {
+                statusEncontrado = (item as any).cirurgia.status;
+              } else if ((item as any).exame?.statusExame) {
+                statusEncontrado = (item as any).exame.statusExame;
+              } else if ((item as any).exame?.status) {
+                statusEncontrado = (item as any).exame.status;
+              } else if ((item as any).vacina?.statusVacina) {
+                statusEncontrado = (item as any).vacina.statusVacina;
+              } else if ((item as any).vacina?.status) {
+                statusEncontrado = (item as any).vacina.status;
+              }
+
+              if (statusEncontrado) {
+                return { ...item, status: statusEncontrado };
+              }
+            }
+            return item;
+          });
+
+          const agendamentosVet = conteudoNormalizado.filter(
             (agendamento) => agendamento.veterinario?.id === veterinarioId
           );
 
@@ -594,7 +625,38 @@ export class ConsultasFormAgendamentos implements OnInit {
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
               next: (responseISO) => {
-                const agendamentosVetISO = (responseISO.content ?? []).filter(
+                // Normalizar status se estiver vindo em campos aninhados
+                const conteudoNormalizadoISO = (responseISO.content ?? []).map(item => {
+                  if (!item.status) {
+                    let statusEncontrado: string | undefined;
+
+                    // Tentar encontrar status em qualquer campo aninhado por tipo
+                    if ((item as any).consulta?.statusConsulta) {
+                      statusEncontrado = (item as any).consulta.statusConsulta;
+                    } else if ((item as any).consulta?.status) {
+                      statusEncontrado = (item as any).consulta.status;
+                    } else if ((item as any).cirurgia?.statusCirurgia) {
+                      statusEncontrado = (item as any).cirurgia.statusCirurgia;
+                    } else if ((item as any).cirurgia?.status) {
+                      statusEncontrado = (item as any).cirurgia.status;
+                    } else if ((item as any).exame?.statusExame) {
+                      statusEncontrado = (item as any).exame.statusExame;
+                    } else if ((item as any).exame?.status) {
+                      statusEncontrado = (item as any).exame.status;
+                    } else if ((item as any).vacina?.statusVacina) {
+                      statusEncontrado = (item as any).vacina.statusVacina;
+                    } else if ((item as any).vacina?.status) {
+                      statusEncontrado = (item as any).vacina.status;
+                    }
+
+                    if (statusEncontrado) {
+                      return { ...item, status: statusEncontrado };
+                    }
+                  }
+                  return item;
+                });
+
+                const agendamentosVetISO = conteudoNormalizadoISO.filter(
                   (agendamento) => agendamento.veterinario?.id === veterinarioId
                 );
                 this.agendamentosDodia.set(agendamentosVetISO);

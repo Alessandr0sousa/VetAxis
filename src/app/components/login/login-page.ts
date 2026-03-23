@@ -3,11 +3,9 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Login } from './login';
-import { AutenticacaoService } from '../services/autenticacao-service';
-import { AuthTokenService } from '../services/auth-token-service';
-import { UserProfileService } from '../services/user-profile-service';
-import { NavigationStateService } from '../services/navigation-state-service';
-import { AlertService } from '../services/alert-service';
+import { AutenticacaoService } from '@core/services';
+import { AuthTokenService, UserProfileService, NavigationStateService } from '@infrastructure/storage';
+import { AlertService } from '@shared/services';
 
 @Component({
   selector: 'app-login-page',

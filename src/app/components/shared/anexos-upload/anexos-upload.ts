@@ -11,13 +11,13 @@ import {
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AnexoService } from '../../services/anexo-service';
+import { AnexoService } from '@features/agendamentos';
 import {
   AnexoModel,
   TIPOS_ANEXOS_PERMITIDOS,
   TAMANHO_MAXIMO_ANEXO,
 } from '../../models/anexo-model';
-import { AlertService } from '../../services/alert-service';
+import { AlertService } from '@shared/services';
 
 @Component({
   selector: 'app-anexos-upload',

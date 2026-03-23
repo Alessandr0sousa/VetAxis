@@ -3,11 +3,11 @@ import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EspecialidadeVeterinaria, VeterinarioModel } from '../../models/veterinario-model';
-import { Customservice } from '../../services/customservice';
-import { AlertService } from '../../services/alert-service';
-import { UserProfileService } from '../../services/user-profile-service';
-import { VeterinarioService } from '../../services/veterinario-service';
-import { ViaCepService } from '../../services/viacepservice';
+import { Customservice } from '@shared/services';
+import { AlertService } from '@shared/services';
+import { UserProfileService } from '@infrastructure/storage';
+import { VeterinarioService } from '@features/veterinarios';
+import { ViaCepService } from '@shared/services';
 import { BaseForm } from '../../shared/base-form/base-form';
 
 @Component({

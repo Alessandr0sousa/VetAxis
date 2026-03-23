@@ -2,8 +2,8 @@ import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@ang
 import { firstValueFrom } from 'rxjs';
 import { STATUS_BADGE_CLASS, StatusAgendamento } from '../models/consulta-model';
 import { ConsultasFormAgendamentosModel } from '../models/consultas-form-agendametos-model';
-import { AgendamentosService } from '../services/agendamentos-service';
-import { AlertService } from '../services/alert-service';
+import { AgendamentosService } from '@features/agendamentos';
+import { AlertService } from '@shared/services';
 import { ConsultaForm } from './consulta-form/consulta-form';
 import { ConsultasFormAgendamentos } from './consultas-form-agendamentos/consultas-form-agendamentos';
 
@@ -55,7 +55,41 @@ export class Consultas implements OnInit {
       })
       .subscribe({
         next: (data) => {
-          this.agendamentosFiltrados = data.content ?? [];
+          // Normalizar status se estiver vindo em campos aninhados
+          const conteudoNormalizado = (data.content ?? []).map(item => {
+            if (!item.status) {
+              let statusEncontrado: string | undefined;
+
+              // Tentar encontrar status em qualquer campo aninhado por tipo
+              if ((item as any).consulta?.statusConsulta) {
+                statusEncontrado = (item as any).consulta.statusConsulta;
+              } else if ((item as any).consulta?.status) {
+                statusEncontrado = (item as any).consulta.status;
+              } else if ((item as any).cirurgia?.statusCirurgia) {
+                statusEncontrado = (item as any).cirurgia.statusCirurgia;
+              } else if ((item as any).cirurgia?.status) {
+                statusEncontrado = (item as any).cirurgia.status;
+              } else if ((item as any).exame?.statusExame) {
+                statusEncontrado = (item as any).exame.statusExame;
+              } else if ((item as any).exame?.status) {
+                statusEncontrado = (item as any).exame.status;
+              } else if ((item as any).vacina?.statusVacina) {
+                statusEncontrado = (item as any).vacina.statusVacina;
+              } else if ((item as any).vacina?.status) {
+                statusEncontrado = (item as any).vacina.status;
+              }
+
+              if (statusEncontrado) {
+                return { ...item, status: statusEncontrado };
+              }
+            }
+            return item;
+          });
+
+          // Filtrar apenas agendamentos do tipo CONSULTA
+          this.agendamentosFiltrados = conteudoNormalizado.filter(
+            (item) => item.tipoAgendamento === 'CONSULTA',
+          );
           this.cdr.detectChanges();
         },
         error: (err) => console.error('Erro ao carregar os agendamentos', err),

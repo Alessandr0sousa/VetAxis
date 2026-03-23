@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { GenericList } from '../shared/generic-list/generic-list';
 import { Cliente } from './../models/cliente';
-import { ClientesService } from '../services/clientes-service';
+import { ClientesService } from '@features/clientes';
 import { ClienteForm } from './cliente-form/cliente-form';
 import { Columns } from '../models/columns';
 

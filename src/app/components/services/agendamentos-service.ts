@@ -4,12 +4,12 @@ import { ApiService } from '../../api-services/api-sevice';
 import { Page } from '../models/page';
 import { ConsultasFormAgendamentosModel } from '../models/consultas-form-agendametos-model';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
-import { tap, switchMap, catchError } from 'rxjs/operators';
+import { tap, catchError, map } from 'rxjs/operators';
 import { TipoAgendamento, AgendamentosAgrupados } from '../models/agendamentos-model';
-import { ConsultaService } from './consulta-service';
-import { ExameService } from './exame-service';
-import { CirurgiaService } from './cirurgia-service';
-import { VacinaService } from './vacina-service';
+import { ConsultaService } from '@features/agendamentos';
+import { ExameService } from '@features/exames';
+import { CirurgiaService } from '@features/cirurgias';
+import { VacinaService } from '@features/vacinas';
 
 @Injectable({
   providedIn: 'root',
@@ -189,8 +189,7 @@ export class AgendamentosService extends ApiService {
 
   /**
    * Salvar consulta
-   * Fluxo: 1. Criar registro específico de consulta (ConsultaService)
-   *        2. Criar agendamento base com referência ao ID da consulta
+   * POST /agendamentos/consultas
    */
   salvarConsulta(consulta: ConsultasFormAgendamentosModel): Observable<ConsultasFormAgendamentosModel> {
     try {
@@ -238,30 +237,18 @@ export class AgendamentosService extends ApiService {
       console.log('AgendamentosService - Iniciando POST /agendamentos/consultas');
 
       return this.consultaService.criar(tipoPayload).pipe(
-        // Passo 2: Criar agendamento base com ID da consulta criada
-        switchMap((consultaCriada) => {
+        map((consultaCriada) => {
           console.log('AgendamentosService - Consulta criada, ID:', consultaCriada.id);
 
-          const agendamentoPayload = {
-            nome: (consulta as any)?.nome,
-            veterinario: { id: veterinarioId } as any,
-            veterinarioId: veterinarioId,
-            pet: { id: petId } as any,
-            petId: petId,
-            clinicaId: (consulta as any)?.clinicaId,
-            dia: (consulta as any)?.dia,
-            horario: (consulta as any)?.horario,
-            peso: (consulta as any)?.peso,
+          return {
+            ...(consulta as any),
+            ...(consultaCriada as any),
             tipoAgendamento: TipoAgendamento.CONSULTA,
-            isRetorno: (consulta as any)?.isRetorno ?? false,
-            consultaId: consultaCriada.id,
-            ...(((consulta as any)?.isRetorno && (consulta as any)?.consultaOrigemId)
-              ? { consultaOrigemId: (consulta as any)?.consultaOrigemId }
-              : {}),
-          };
-
-          console.log('AgendamentosService - Criando agendamento com consultaId:', consultaCriada.id);
-          return this.post<ConsultasFormAgendamentosModel>(this.endpoint, agendamentoPayload);
+            veterinario: { id: veterinarioId } as any,
+            veterinarioId,
+            pet: { id: petId } as any,
+            petId,
+          } as ConsultasFormAgendamentosModel;
         }),
         tap((agendamentoCriado) => {
           const listaAtual = this.agendamentosSource.value;
@@ -278,13 +265,18 @@ export class AgendamentosService extends ApiService {
             tipoPayload: tipoPayload,
           });
 
+          // Diferenciar erros para melhor mensagem ao usuário
           if (error.status === 403) {
-            return throwError(() => new Error('❌ Erro 403 Forbidden: Você não tem permissão para criar consultas. Verifique suas permissões no sistema.'));
+            return throwError(() => new Error('Você não tem permissão para criar consultas. Verifique suas permissões no sistema.'));
           }
           if (error.status === 401) {
-            return throwError(() => new Error('❌ Erro 401 Unauthorized: Sessão expirada. Por favor, faça login novamente.'));
+            return throwError(() => new Error('Sessão expirada. Por favor, faça login novamente.'));
           }
-          return throwError(() => error);
+          if (error.status === 400) {
+            const mensagemBackend = error.error?.message || error.error?.resultado?.mensagem || 'Dados inválidos';
+            return throwError(() => new Error(`Dados inválidos: ${mensagemBackend}`));
+          }
+          return throwError(() => new Error(`Erro ao criar consulta: ${error.message || 'Erro desconhecido'}`));
         }),
       );
     } catch (error) {
@@ -295,8 +287,7 @@ export class AgendamentosService extends ApiService {
 
   /**
    * Salvar cirurgia
-   * Fluxo: 1. Criar registro específico de cirurgia (CirurgiaService)
-   *        2. Criar agendamento base com referência ao ID da cirurgia
+   * POST /agendamentos/cirurgias
    */
   salvarCirurgia(cirurgia: ConsultasFormAgendamentosModel): Observable<ConsultasFormAgendamentosModel> {
     try {
@@ -342,30 +333,18 @@ export class AgendamentosService extends ApiService {
       console.log('AgendamentosService - Iniciando POST /agendamentos/cirurgias');
 
       return this.cirurgiaService.criar(tipoPayload).pipe(
-        // Passo 2: Criar agendamento base com ID da cirurgia criada
-        switchMap((cirurgiaCriada) => {
+        map((cirurgiaCriada) => {
           console.log('AgendamentosService - Cirurgia criada, ID:', cirurgiaCriada.id);
 
-          const agendamentoPayload = {
-            nome: (cirurgia as any)?.nome,
-            veterinario: { id: veterinarioId } as any,
-            veterinarioId: veterinarioId,
-            pet: { id: petId } as any,
-            petId: petId,
-            clinicaId: (cirurgia as any)?.clinicaId,
-            dia: (cirurgia as any)?.dia,
-            horario: (cirurgia as any)?.horario,
-            peso: (cirurgia as any)?.peso,
+          return {
+            ...(cirurgia as any),
+            ...(cirurgiaCriada as any),
             tipoAgendamento: TipoAgendamento.CIRURGIA,
-            isRetorno: (cirurgia as any)?.isRetorno ?? false,
-            cirurgiaId: cirurgiaCriada.id,
-            ...(((cirurgia as any)?.isRetorno && (cirurgia as any)?.consultaOrigemId)
-              ? { consultaOrigemId: (cirurgia as any)?.consultaOrigemId }
-              : {}),
-          };
-
-          console.log('AgendamentosService - Criando agendamento com cirurgiaId:', cirurgiaCriada.id);
-          return this.post<ConsultasFormAgendamentosModel>(this.endpoint, agendamentoPayload);
+            veterinario: { id: veterinarioId } as any,
+            veterinarioId,
+            pet: { id: petId } as any,
+            petId,
+          } as ConsultasFormAgendamentosModel;
         }),
         tap((agendamentoCriado) => {
           const listaAtual = this.agendamentosSource.value;
@@ -399,8 +378,7 @@ export class AgendamentosService extends ApiService {
 
   /**
    * Salvar exame
-   * Fluxo: 1. Criar registro específico de exame (ExameService)
-   *        2. Criar agendamento base com referência ao ID do exame
+   * POST /agendamentos/exames
    */
   salvarExame(exame: ConsultasFormAgendamentosModel): Observable<ConsultasFormAgendamentosModel> {
     try {
@@ -446,30 +424,18 @@ export class AgendamentosService extends ApiService {
       console.log('AgendamentosService - Iniciando POST /agendamentos/exames');
 
       return this.exameService.criar(tipoPayload).pipe(
-        // Passo 2: Criar agendamento base com ID do exame criado
-        switchMap((exameCriado) => {
+        map((exameCriado) => {
           console.log('AgendamentosService - Exame criado, ID:', exameCriado.id);
 
-          const agendamentoPayload = {
-            nome: (exame as any)?.nome,
-            veterinario: { id: veterinarioId } as any,
-            veterinarioId: veterinarioId,
-            pet: { id: petId } as any,
-            petId: petId,
-            clinicaId: (exame as any)?.clinicaId,
-            dia: (exame as any)?.dia,
-            horario: (exame as any)?.horario,
-            peso: (exame as any)?.peso,
+          return {
+            ...(exame as any),
+            ...(exameCriado as any),
             tipoAgendamento: TipoAgendamento.EXAME,
-            isRetorno: (exame as any)?.isRetorno ?? false,
-            exameId: exameCriado.id,
-            ...(((exame as any)?.isRetorno && (exame as any)?.consultaOrigemId)
-              ? { consultaOrigemId: (exame as any)?.consultaOrigemId }
-              : {}),
-          };
-
-          console.log('AgendamentosService - Criando agendamento com exameId:', exameCriado.id);
-          return this.post<ConsultasFormAgendamentosModel>(this.endpoint, agendamentoPayload);
+            veterinario: { id: veterinarioId } as any,
+            veterinarioId,
+            pet: { id: petId } as any,
+            petId,
+          } as ConsultasFormAgendamentosModel;
         }),
         tap((agendamentoCriado) => {
           const listaAtual = this.agendamentosSource.value;
@@ -503,8 +469,7 @@ export class AgendamentosService extends ApiService {
 
   /**
    * Salvar vacina
-   * Fluxo: 1. Criar registro específico de vacina (VacinaService)
-   *        2. Criar agendamento base com referência ao ID da vacina
+   * POST /agendamentos/vacinas
    */
   salvarVacina(vacina: ConsultasFormAgendamentosModel): Observable<ConsultasFormAgendamentosModel> {
     try {
@@ -550,30 +515,18 @@ export class AgendamentosService extends ApiService {
       console.log('AgendamentosService - Iniciando POST /agendamentos/vacinas');
 
       return this.vacinaService.criar(tipoPayload).pipe(
-        // Passo 2: Criar agendamento base com ID da vacina criada
-        switchMap((vacinaCriada) => {
+        map((vacinaCriada) => {
           console.log('AgendamentosService - Vacina criada, ID:', vacinaCriada.id);
 
-          const agendamentoPayload = {
-            nome: (vacina as any)?.nome,
-            veterinario: { id: veterinarioId } as any,
-            veterinarioId: veterinarioId,
-            pet: { id: petId } as any,
-            petId: petId,
-            clinicaId: (vacina as any)?.clinicaId,
-            dia: (vacina as any)?.dia,
-            horario: (vacina as any)?.horario,
-            peso: (vacina as any)?.peso,
+          return {
+            ...(vacina as any),
+            ...(vacinaCriada as any),
             tipoAgendamento: TipoAgendamento.VACINA,
-            isRetorno: (vacina as any)?.isRetorno ?? false,
-            vacinaId: vacinaCriada.id,
-            ...(((vacina as any)?.isRetorno && (vacina as any)?.consultaOrigemId)
-              ? { consultaOrigemId: (vacina as any)?.consultaOrigemId }
-              : {}),
-          };
-
-          console.log('AgendamentosService - Criando agendamento com vacinaId:', vacinaCriada.id);
-          return this.post<ConsultasFormAgendamentosModel>(this.endpoint, agendamentoPayload);
+            veterinario: { id: veterinarioId } as any,
+            veterinarioId,
+            pet: { id: petId } as any,
+            petId,
+          } as ConsultasFormAgendamentosModel;
         }),
         tap((agendamentoCriado) => {
           const listaAtual = this.agendamentosSource.value;
@@ -618,6 +571,18 @@ export class AgendamentosService extends ApiService {
         `${this.endpoint}/consultas/${payload.id}`,
         payload,
       ).pipe(
+        catchError((error) => {
+          if (error?.status === 403) {
+            console.warn(
+              'AgendamentosService.atualizarConsulta - 403 no endpoint específico, tentando fallback no endpoint genérico',
+            );
+            return this.put<ConsultasFormAgendamentosModel>(
+              `${this.endpoint}/${payload.id}`,
+              payload,
+            );
+          }
+          return throwError(() => error);
+        }),
         tap((atualizado) => {
           const listaAtual = this.agendamentosSource.value.map((a) =>
             a.id === atualizado.id ? atualizado : a,
@@ -626,6 +591,107 @@ export class AgendamentosService extends ApiService {
         }),
       );
     } catch (error) {
+      return throwError(() => (error instanceof Error ? error : new Error('Erro ao validar agendamento')));
+    }
+  }
+
+  /**
+   * Atualizar agendamento genérico com detecção de tipo
+   * Usa o serviço específico apropriado (ConsultaService, ExameService, etc.)
+   * PUT /agendamentos/{tipo}/{id}
+   */
+  atualizarAgendamento(
+    agendamento: ConsultasFormAgendamentosModel,
+  ): Observable<ConsultasFormAgendamentosModel> {
+    try {
+      const payload = this.normalizarPayload(agendamento);
+      const tipoAgendamento = (payload as any)?.tipoAgendamento;
+
+      console.log('📨 AgendamentosService.atualizarAgendamento - Tipo detectado:', tipoAgendamento, 'ID:', payload.id);
+
+      // Preparar payload com status em todos os níveis
+      const payloadComStatus = {
+        ...payload,
+        status: (payload as any)?.status ?? 'AGENDADO',
+        ...((payload as any)?.tipoAgendamento === TipoAgendamento.CONSULTA
+          ? { consulta: { ...((payload as any)?.consulta ?? {}), status: (payload as any)?.status } }
+          : {}),
+        ...((payload as any)?.tipoAgendamento === TipoAgendamento.CIRURGIA
+          ? {
+              cirurgia: {
+                ...((payload as any)?.cirurgia ?? {}),
+                status: (payload as any)?.status,
+                statusCirurgia: (payload as any)?.status,
+              },
+            }
+          : {}),
+        ...((payload as any)?.tipoAgendamento === TipoAgendamento.EXAME
+          ? {
+              exame: {
+                ...((payload as any)?.exame ?? {}),
+                status: (payload as any)?.status,
+                statusExame: (payload as any)?.status,
+              },
+            }
+          : {}),
+        ...((payload as any)?.tipoAgendamento === TipoAgendamento.VACINA
+          ? {
+              vacina: {
+                ...((payload as any)?.vacina ?? {}),
+                status: (payload as any)?.status,
+                statusVacina: (payload as any)?.status,
+              },
+            }
+          : {}),
+      } as ConsultasFormAgendamentosModel;
+
+      console.log('📨 AgendamentosService.atualizarAgendamento - Payload completo:', payloadComStatus);
+
+      // Escolher serviço específico por tipo de agendamento
+      let updateRequest$: Observable<any>;
+
+      if (tipoAgendamento === TipoAgendamento.CONSULTA) {
+        console.log('🔄 Usando ConsultaService para atualizar PUT /agendamentos/consultas/' + payload.id);
+        updateRequest$ = this.consultaService.atualizar(payload.id, payloadComStatus as any);
+      } else if (tipoAgendamento === TipoAgendamento.CIRURGIA) {
+        console.log('🔄 Usando CirurgiaService para atualizar PUT /agendamentos/cirurgias/' + payload.id);
+        updateRequest$ = this.cirurgiaService.atualizar(payload.id, payloadComStatus as any);
+      } else if (tipoAgendamento === TipoAgendamento.EXAME) {
+        console.log('🔄 Usando ExameService para atualizar PUT /agendamentos/exames/' + payload.id);
+        updateRequest$ = this.exameService.atualizar(payload.id, payloadComStatus as any);
+      } else if (tipoAgendamento === TipoAgendamento.VACINA) {
+        console.log('🔄 Usando VacinaService para atualizar PUT /agendamentos/vacinas/' + payload.id);
+        updateRequest$ = this.vacinaService.atualizar(payload.id, payloadComStatus as any);
+      } else {
+        console.warn('⚠️ Tipo de agendamento não identificado, usando endpoint genérico');
+        updateRequest$ = this.put<ConsultasFormAgendamentosModel>(
+          `${this.endpoint}/${payload.id}`,
+          payloadComStatus,
+        );
+      }
+
+      return updateRequest$.pipe(
+        catchError((error: any) => {
+          // Se receber 403, tentar endpoint genérico como fallback
+          if (error?.status === 403) {
+            console.warn('⚠️ Recebido 403 no endpoint específico, tentando endpoint genérico:', `${this.endpoint}/${payload.id}`);
+            return this.put<ConsultasFormAgendamentosModel>(
+              `${this.endpoint}/${payload.id}`,
+              payloadComStatus,
+            );
+          }
+          return throwError(() => error);
+        }),
+        tap((atualizado) => {
+          console.log('✅ AgendamentosService.atualizarAgendamento - Resposta:', atualizado);
+          const listaAtual = this.agendamentosSource.value.map((a) =>
+            a.id === atualizado.id ? atualizado : a,
+          );
+          this.agendamentosSource.next(listaAtual);
+        }),
+      );
+    } catch (error) {
+      console.error('❌ AgendamentosService.atualizarAgendamento - Erro:', error);
       return throwError(() => (error instanceof Error ? error : new Error('Erro ao validar agendamento')));
     }
   }

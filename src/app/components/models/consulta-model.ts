@@ -1,6 +1,7 @@
 import { AnexoModel } from './anexo-model';
 
 export interface ConsultaModel {
+  id?: number;
   anamnese?: string;
   exameFisico?: string;
   tratamento?: string;

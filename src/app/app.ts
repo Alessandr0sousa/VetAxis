@@ -1,10 +1,9 @@
 import { Component, DestroyRef, computed, inject, signal, afterNextRender, effect } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { MenuPrincipal } from './components/menu-principal/menu-principal';
-import { Navbar } from './components/navbar/navbar';
+import { MenuPrincipal } from './layout/menu-principal/menu-principal';
+import { Navbar } from './layout/navbar/navbar';
 import { CommonModule } from '@angular/common';
-import { AuthTokenService } from './components/services/auth-token-service';
-import { NavigationStateService } from './components/services/navigation-state-service';
+import { AuthTokenService, NavigationStateService } from '@infrastructure/storage';
 import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 

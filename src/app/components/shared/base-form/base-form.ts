@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Directive, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { ViaCepService } from '../../services/viacepservice';
-import { Customservice } from '../../services/customservice';
+import { ViaCepService } from '@shared/services';
+import { Customservice } from '@shared/services';
 import { Location } from '@angular/common';
 
 @Directive()

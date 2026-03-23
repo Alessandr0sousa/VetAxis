@@ -2,12 +2,12 @@ import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Cliente } from '../../models/cliente';
-import { Customservice } from '../../services/customservice';
-import { Estado, IbgeService } from '../../services/ibgeservice';
-import { ViaCepService } from '../../services/viacepservice';
-import { UserProfileService } from '../../services/user-profile-service';
-import { AlertService } from '../../services/alert-service';
-import { ClientesService } from '../../services/clientes-service';
+import { Customservice } from '@shared/services';
+import { Estado, IbgeService } from '@shared/services';
+import { ViaCepService } from '@shared/services';
+import { UserProfileService } from '@infrastructure/storage';
+import { AlertService } from '@shared/services';
+import { ClientesService } from '@features/clientes';
 import { BaseForm } from '../../shared/base-form/base-form';
 import { Location } from '@angular/common';
 

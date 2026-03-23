@@ -2,10 +2,10 @@ import { Component, Input, OnInit, computed, signal, effect } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ConsultasFormAgendamentosModel } from '../../../models/consultas-form-agendametos-model';
-import { AgendamentosService } from '../../../services/agendamentos-service';
+import { AgendamentosService } from '@features/agendamentos';
 import { TipoAgendamento } from '../../../models/agendamentos-model';
-import { AlertService } from '../../../services/alert-service';
-import { UserProfileService } from '../../../services/user-profile-service';
+import { AlertService } from '@shared/services';
+import { UserProfileService } from '@infrastructure/storage';
 
 @Component({
   selector: 'app-exames-form-agendamentos',

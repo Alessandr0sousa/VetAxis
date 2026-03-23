@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ConsultasFormAgendamentos } from '../../consultas/consultas-form-agendamentos/consultas-form-agendamentos';
 import { ConsultasFormAgendamentosModel } from '../../models/consultas-form-agendametos-model';
-import { AgendamentosService } from '../../services/agendamentos-service';
+import { AgendamentosService } from '@features/agendamentos';
 import { TipoAgendamento } from '../../models/agendamentos-model';
 import { STATUS_BADGE_CLASS, StatusAgendamento } from '../../models/consulta-model';
-import { AlertService } from '../../services/alert-service';
+import { AlertService } from '@shared/services';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -55,8 +55,35 @@ export class Vacinas implements OnInit {
       })
       .subscribe({
         next: (data) => {
+          console.log('Vacinas.listarAgendamentos - Dados brutos:', data.content);
+
+          // Normalizar status se estiver vindo em campos aninhados
+          const conteudoNormalizado = (data.content ?? []).map((item, idx) => {
+            console.log(`[${idx}] ID: ${item.id}, tipoAgendamento: "${item.tipoAgendamento}", status: "${item.status}"`);
+            console.log(`    Vacina completa:`, (item as any).vacina);
+
+            if (!item.status) {
+              let statusEncontrado: string | undefined;
+
+              if ((item as any).vacina?.statusVacina) {
+                statusEncontrado = (item as any).vacina.statusVacina;
+                console.log(`  ✨ Status encontrado em vacina.statusVacina: "${statusEncontrado}"`);
+              } else if ((item as any).vacina?.status) {
+                statusEncontrado = (item as any).vacina.status;
+                console.log(`  ✨ Status encontrado em vacina.status: "${statusEncontrado}"`);
+              }
+
+              if (statusEncontrado) {
+                return { ...item, status: statusEncontrado };
+              }
+            }
+            return item;
+          });
+
+          console.log('Vacinas.listarAgendamentos - Normalizado:', conteudoNormalizado.map(v => ({ id: v.id, status: v.status })));
+
           // Filtrar apenas vacinas
-          this.agendamentosFiltrados = (data.content ?? []).filter(
+          this.agendamentosFiltrados = conteudoNormalizado.filter(
             a => a.tipoAgendamento === TipoAgendamento.VACINA
           );
           this.cdr.detectChanges();

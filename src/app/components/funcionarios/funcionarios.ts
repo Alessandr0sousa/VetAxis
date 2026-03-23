@@ -1,5 +1,5 @@
 import { FuncionarioModel } from './../models/funcionario-model';
-import { FuncionarioService } from './../services/funcionario-service';
+import { FuncionarioService } from '@features/funcionarios';
 import { Component, inject } from '@angular/core';
 import { GenericList } from '../shared/generic-list/generic-list';
 import { FuncionariosForm } from './funcionarios-form/funcionarios-form';

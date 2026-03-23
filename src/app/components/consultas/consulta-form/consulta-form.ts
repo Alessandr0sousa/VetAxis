@@ -7,8 +7,8 @@ import {
   StatusAgendamentoLabels,
 } from '../../models/consulta-model';
 import { ConsultasFormAgendamentosModel } from '../../models/consultas-form-agendametos-model';
-import { Customservice } from '../../services/customservice';
-import { ViaCepService } from '../../services/viacepservice';
+import { Customservice } from '@shared/services';
+import { ViaCepService } from '@shared/services';
 import { BaseForm } from '../../shared/base-form/base-form';
 import { Pet } from './../../models/pet';
 import { AnexosUpload } from '../../shared/anexos-upload/anexos-upload';

@@ -1,4 +1,5 @@
 export interface VacinaModel {
+  id?: number;
   tipo?: string;
   nome?: string;
   lote?: string;

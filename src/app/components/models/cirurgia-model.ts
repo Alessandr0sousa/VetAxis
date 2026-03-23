@@ -1,4 +1,5 @@
 export interface CirurgiaModel {
+  id?: number;
   tipo?: string;
   descricao?: string;
   anestesia?: string;

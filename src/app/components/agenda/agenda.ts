@@ -2,20 +2,21 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectorRef,
   Component,
+  Injector,
   OnInit,
   SimpleChanges,
   computed,
   effect,
+  inject,
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ConsultasFormAgendamentos } from '../consultas/consultas-form-agendamentos/consultas-form-agendamentos';
 import { STATUS_BADGE_CLASS, StatusAgendamento } from '../models/consulta-model';
-import { ConsultasFormAgendamentosModel } from '../models/consultas-form-agendametos-model';
-import { TipoAgendamento, AgendamentosAgrupados } from '../models/agendamentos-model';
-import { AgendamentosService } from '../services/agendamentos-service';
-import { AlertService } from '../services/alert-service';
+import { TipoAgendamento, AgendamentosAgrupados, AgendamentoCompleto } from '@core/models';
+import type { AgendamentosService } from '@features/agendamentos';
+import { AlertService } from '@shared/services';
 import { Cirurgias } from './cirurgias/cirurgias';
 import { Exames } from './exames/exames';
 import { Vacinas } from './vacinas/vacinas';
@@ -33,15 +34,15 @@ export class Agenda implements OnInit {
   isvisible: boolean = false;
   STATUS_BADGE_CLASS = STATUS_BADGE_CLASS;
   isFormVisible: boolean = false;
-  selectedAgendamentoDto?: ConsultasFormAgendamentosModel;
+  selectedAgendamentoDto?: AgendamentoCompleto;
   diaSelected = signal<Date>(new Date());
   refreshCards = false;
   diaFormatado = computed(() => this.diaSelected().toLocaleDateString('pt-BR'));
 
-  agendamentosList = signal<ConsultasFormAgendamentosModel[]>([]);
+  agendamentosList = signal<AgendamentoCompleto[]>([]);
 
   // Agendamentos agrupados por tipo
-  agendamentosAgrupados: AgendamentosAgrupados = {
+  agendamentosAgrupados = signal<AgendamentosAgrupados>({
     consultas: [],
     cirurgias: [],
     exames: [],
@@ -51,25 +52,45 @@ export class Agenda implements OnInit {
     totalExames: 0,
     totalVacinas: 0,
     total: 0,
-  };
+  });
   TipoAgendamento = TipoAgendamento;
 
-  constructor(
-    private cdr: ChangeDetectorRef,
-    private service: AgendamentosService,
-    private router: Router,
-    private swa: AlertService,
-  ) {
+  private cdr = inject(ChangeDetectorRef);
+  private injector = inject(Injector);
+  private service: AgendamentosService | null = null;
+  private router = inject(Router);
+  private swa = inject(AlertService);
+
+  constructor() {
     effect(() => {
       const data = this.diaSelected();
+      if (!this.service) {
+        return;
+      }
       setTimeout(() => {
         this.listarAgendamentos();
       }, 50);
     });
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    await this.ensureService();
     this.listarAgendamentos();
+  }
+
+  private async ensureService(): Promise<void> {
+    if (this.service) {
+      return;
+    }
+    const module = await import('@features/agendamentos');
+    this.service = this.injector.get(module.AgendamentosService);
+  }
+
+  private getService(): AgendamentosService {
+    if (!this.service) {
+      throw new Error('AgendamentosService ainda não inicializado');
+    }
+    return this.service;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -105,7 +126,9 @@ export class Agenda implements OnInit {
 
   listarAgendamentos() {
     const dataEnviada = this.formatDataISO(this.diaSelected());
-    this.service
+    console.log('🔄 Agenda.listarAgendamentos - Buscando agendamentos para:', dataEnviada);
+
+    this.getService()
       .buscarPorCampo({
         campo: 'dia',
         valor: dataEnviada,
@@ -119,15 +142,67 @@ export class Agenda implements OnInit {
       .subscribe({
         next: (data) => {
           const conteudo = data.content ?? [];
+          console.log('📊 Agenda.listarAgendamentos - Dados recebidos:', conteudo);
+
+          // Log detalhado com estrutura completa
+          conteudo.forEach((item, index) => {
+            console.log(`[${index}] ID: ${item.id}, Status: "${item.status}", Tipo: ${item.tipoAgendamento}`);
+            console.log(`    Campos de status alternativos:`, {
+              statusConsulta: (item as any).statusConsulta,
+              statusCirurgia: (item as any).statusCirurgia,
+              statusExame: (item as any).statusExame,
+              statusVacina: (item as any).statusVacina,
+              'consulta?.status': (item as any).consulta?.status,
+              'cirurgia?.status': (item as any).cirurgia?.status,
+              'exame?.status': (item as any).exame?.status,
+              'vacina?.status': (item as any).vacina?.status,
+            });
+          });
+
           this.agendamentosList.set([...conteudo]);
 
-          // Agrupar agendamentos por tipo
-          const consultas = conteudo.filter(a => a.tipoAgendamento === TipoAgendamento.CONSULTA);
-          const cirurgias = conteudo.filter(a => a.tipoAgendamento === TipoAgendamento.CIRURGIA);
-          const exames = conteudo.filter(a => a.tipoAgendamento === TipoAgendamento.EXAME);
-          const vacinas = conteudo.filter(a => a.tipoAgendamento === TipoAgendamento.VACINA);
+          // Normalizar status se estiver vindo em campos diferentes
+          const conteudoNormalizado = conteudo.map(item => {
+            if (!item.status) {
+              // Procurar status nos objetos aninhados por tipo
+              let statusEncontrado: string | undefined;
 
-          this.agendamentosAgrupados = {
+              // Tentar encontrar status em qualquer campo aninhado
+              if ((item as any).consulta?.statusConsulta) {
+                statusEncontrado = (item as any).consulta.statusConsulta;
+              } else if ((item as any).consulta?.status) {
+                statusEncontrado = (item as any).consulta.status;
+              } else if ((item as any).cirurgia?.statusCirurgia) {
+                statusEncontrado = (item as any).cirurgia.statusCirurgia;
+              } else if ((item as any).cirurgia?.status) {
+                statusEncontrado = (item as any).cirurgia.status;
+              } else if ((item as any).exame?.statusExame) {
+                statusEncontrado = (item as any).exame.statusExame;
+              } else if ((item as any).exame?.status) {
+                statusEncontrado = (item as any).exame.status;
+              } else if ((item as any).vacina?.statusVacina) {
+                statusEncontrado = (item as any).vacina.statusVacina;
+              } else if ((item as any).vacina?.status) {
+                statusEncontrado = (item as any).vacina.status;
+              }
+
+              if (statusEncontrado) {
+                console.log(`  ✨ Normalizando ID ${item.id}: ${item.tipoAgendamento}.status = "${statusEncontrado}"`);
+                return { ...item, status: statusEncontrado };
+              }
+            }
+            return item;
+          });
+
+          this.agendamentosList.set([...conteudoNormalizado]);
+
+          // Agrupar agendamentos por tipo
+          const consultas = conteudoNormalizado.filter(a => a.tipoAgendamento === TipoAgendamento.CONSULTA);
+          const cirurgias = conteudoNormalizado.filter(a => a.tipoAgendamento === TipoAgendamento.CIRURGIA);
+          const exames = conteudoNormalizado.filter(a => a.tipoAgendamento === TipoAgendamento.EXAME);
+          const vacinas = conteudoNormalizado.filter(a => a.tipoAgendamento === TipoAgendamento.VACINA);
+
+          this.agendamentosAgrupados.set({
             consultas,
             cirurgias,
             exames,
@@ -137,19 +212,27 @@ export class Agenda implements OnInit {
             totalExames: exames.length,
             totalVacinas: vacinas.length,
             total: conteudo.length,
-          };
+          });
+
+          console.log('✅ Agenda.listarAgendamentos - Agrupados:', {
+            consultas: consultas.map(c => ({ id: c.id, status: c.status })),
+            cirurgias: cirurgias.map(c => ({ id: c.id, status: c.status })),
+            exames: exames.map(e => ({ id: e.id, status: e.status })),
+            vacinas: vacinas.map(v => ({ id: v.id, status: v.status })),
+          });
 
           this.cdr.detectChanges();
+          this.cdr.markForCheck();
         },
-        error: (err) => console.error('Erro ao carregar os agendamentos', err),
+        error: (err) => console.error('Erro ao listar agendamentos:', err),
       });
   }
 
-  iniciarConsulta(item: ConsultasFormAgendamentosModel) {
+  iniciarConsulta(item: AgendamentoCompleto) {
     this.atualizarConsultaStatus(item, 'INICIADO' as any);
   }
 
-  finalizarConsulta(item: ConsultasFormAgendamentosModel) {
+  finalizarConsulta(item: AgendamentoCompleto) {
     if (item.status) {
       this.atualizarConsultaStatus(item, item.status);
     }
@@ -158,8 +241,8 @@ export class Agenda implements OnInit {
   }
 
   consultarPet(id: number): void {
-    this.service.buscarPorId(id).subscribe({
-      next: (item: ConsultasFormAgendamentosModel) => {
+    this.getService().buscarPorId(id).subscribe({
+      next: (item: AgendamentoCompleto) => {
         this.selectedAgendamentoDto = item;
         this.router.navigate(['/consultas'], {
           state: { agendamentoConsulta: item },
@@ -169,37 +252,75 @@ export class Agenda implements OnInit {
     });
   }
 
-  confirmarConsulta(dto: ConsultasFormAgendamentosModel, confirmar: boolean) {
+  confirmarConsulta(dto: AgendamentoCompleto, confirmar: boolean) {
     const novoStatus = confirmar ? StatusAgendamento.CONFIRMADO : StatusAgendamento.CANCELADO;
     const msg = confirmar ? 'Consulta confirmada!' : 'Consulta cancelada!';
     this.atualizarConsultaStatus(dto, novoStatus as any, msg, confirmar);
   }
 
   private atualizarConsultaStatus(
-    item: ConsultasFormAgendamentosModel,
+    item: AgendamentoCompleto,
     status: any,
     mensagem?: string,
     sucesso?: boolean,
   ) {
-    const dtoBase: ConsultasFormAgendamentosModel = {
+    const dtoBase: AgendamentoCompleto = {
       ...item,
-      status: status,
+      status,
+      ...( { statusAgendamento: status } as any ),
+      ...(item.tipoAgendamento === TipoAgendamento.CONSULTA
+        ? ({ statusConsulta: status, consulta: { ...(item as any).consulta, status } } as any)
+        : {}),
+      ...(item.tipoAgendamento === TipoAgendamento.CIRURGIA
+        ? ({ statusCirurgia: status, cirurgia: { ...(item as any).cirurgia, status, statusCirurgia: status } } as any)
+        : {}),
+      ...(item.tipoAgendamento === TipoAgendamento.EXAME
+        ? ({ statusExame: status, exame: { ...(item as any).exame, status, statusExame: status } } as any)
+        : {}),
+      ...(item.tipoAgendamento === TipoAgendamento.VACINA
+        ? ({ statusVacina: status, vacina: { ...(item as any).vacina, status, statusVacina: status } } as any)
+        : {}),
     };
 
     const dto = this.limparCampos(dtoBase);
 
-    this.service.atualizarConsulta(dto).subscribe({
-      next: () => {
+    console.log('📤 Agenda.atualizarConsultaStatus - DTO construído:', {
+      id: dto.id,
+      tipoAgendamento: dto.tipoAgendamento,
+      status: dto.status,
+      statusAgendamento: (dto as any).statusAgendamento,
+      statusConsulta: (dto as any).statusConsulta,
+      statusCirurgia: (dto as any).statusCirurgia,
+      statusExame: (dto as any).statusExame,
+      statusVacina: (dto as any).statusVacina,
+      dtoCompleto: dto,
+    });
+
+    this.getService().atualizarAgendamento(dto).subscribe({
+      next: (resposta) => {
+        console.log('✅ Agenda.atualizarConsultaStatus - Resposta do servidor:', resposta);
+
         if (mensagem) {
           sucesso ? this.swa.success(mensagem) : this.swa.warning(mensagem);
         }
-        this.listarAgendamentos();
+
+        // Forçar recarregamento total da lista
+        console.log('🔄 Agenda.atualizarConsultaStatus - Recarregando lista de agendamentos...');
+        setTimeout(() => {
+          this.listarAgendamentos();
+          this.cdr.detectChanges();
+          this.cdr.markForCheck();
+          console.log('✅ Agenda.atualizarConsultaStatus - Lista recarregada e detecção de mudanças acionada');
+        }, 100);
       },
-      error: () => this.swa.error(`Erro ao atualizar consulta: ${mensagem || 'operação'}`),
+      error: (err) => {
+        console.error('❌ Agenda.atualizarConsultaStatus - Erro ao atualizar:', err);
+        this.swa.error(`Erro ao atualizar consulta: ${mensagem || 'operação'}`);
+      },
     });
   }
 
-  private limparCampos(dto: ConsultasFormAgendamentosModel): ConsultasFormAgendamentosModel {
+  private limparCampos(dto: AgendamentoCompleto): AgendamentoCompleto {
     const copia = { ...dto };
     delete (copia as any).veterinarioNome;
     delete (copia as any).petNome;
@@ -214,14 +335,14 @@ export class Agenda implements OnInit {
     this.listarAgendamentos();
   }
 
-  reagendarConsulta(item: ConsultasFormAgendamentosModel) {
+  reagendarConsulta(item: AgendamentoCompleto) {
     this.selectedTipoAgendamento = TipoAgendamento.CONSULTA;
     this.selectedAgendamento = this.getTipoAgendamentoLabel(this.selectedTipoAgendamento);
     this.isvisible = !!this.selectedAgendamento;
     this.selectedAgendamentoDto = item;
   }
 
-  editarAgendamento(item: ConsultasFormAgendamentosModel) {
+  editarAgendamento(item: AgendamentoCompleto) {
     this.selectedTipoAgendamento = this.parseTipoAgendamento(item.tipoAgendamento);
     this.selectedAgendamento = this.selectedTipoAgendamento
       ? this.getTipoAgendamentoLabel(this.selectedTipoAgendamento)

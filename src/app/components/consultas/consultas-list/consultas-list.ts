@@ -15,7 +15,7 @@ import {
 } from '../../models/consulta-model';
 import { TipoAgendamento, TipoAgendamentoFrase, TipoAgendamentoLabels, AgendamentosAgrupados } from '../../models/agendamentos-model';
 import { ConsultasFormAgendamentosModel } from '../../models/consultas-form-agendametos-model';
-import { AgendamentosService } from '../../services/agendamentos-service';
+import { AgendamentosService } from '@features/agendamentos';
 
 @Component({
   selector: 'app-consultas-list',
@@ -90,11 +90,42 @@ export class ConsultasList implements OnInit, OnChanges {
       })
       .subscribe({
         next: (data) => {
+          // Normalizar status se estiver vindo em campos aninhados
+          const conteudoNormalizado = (data.content ?? []).map(item => {
+            if (!item.status) {
+              let statusEncontrado: string | undefined;
+
+              // Tentar encontrar status em qualquer campo aninhado por tipo
+              if ((item as any).consulta?.statusConsulta) {
+                statusEncontrado = (item as any).consulta.statusConsulta;
+              } else if ((item as any).consulta?.status) {
+                statusEncontrado = (item as any).consulta.status;
+              } else if ((item as any).cirurgia?.statusCirurgia) {
+                statusEncontrado = (item as any).cirurgia.statusCirurgia;
+              } else if ((item as any).cirurgia?.status) {
+                statusEncontrado = (item as any).cirurgia.status;
+              } else if ((item as any).exame?.statusExame) {
+                statusEncontrado = (item as any).exame.statusExame;
+              } else if ((item as any).exame?.status) {
+                statusEncontrado = (item as any).exame.status;
+              } else if ((item as any).vacina?.statusVacina) {
+                statusEncontrado = (item as any).vacina.statusVacina;
+              } else if ((item as any).vacina?.status) {
+                statusEncontrado = (item as any).vacina.status;
+              }
+
+              if (statusEncontrado) {
+                return { ...item, status: statusEncontrado };
+              }
+            }
+            return item;
+          });
+
           // Agrupar manualmente os dados recebidos
-          const consultas = data.content?.filter(a => a.tipoAgendamento === 'CONSULTA') ?? [];
-          const cirurgias = data.content?.filter(a => a.tipoAgendamento === 'CIRURGIA') ?? [];
-          const exames = data.content?.filter(a => a.tipoAgendamento === 'EXAME') ?? [];
-          const vacinas = data.content?.filter(a => a.tipoAgendamento === 'VACINA') ?? [];
+          const consultas = conteudoNormalizado.filter(a => a.tipoAgendamento === 'CONSULTA') ?? [];
+          const cirurgias = conteudoNormalizado.filter(a => a.tipoAgendamento === 'CIRURGIA') ?? [];
+          const exames = conteudoNormalizado.filter(a => a.tipoAgendamento === 'EXAME') ?? [];
+          const vacinas = conteudoNormalizado.filter(a => a.tipoAgendamento === 'VACINA') ?? [];
 
           this.agendamentosAgrupados = {
             consultas,

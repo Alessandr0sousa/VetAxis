@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ConsultasFormAgendamentos } from '../../consultas/consultas-form-agendamentos/consultas-form-agendamentos';
 import { ConsultasFormAgendamentosModel } from '../../models/consultas-form-agendametos-model';
-import { AgendamentosService } from '../../services/agendamentos-service';
+import { AgendamentosService } from '@features/agendamentos';
 import { TipoAgendamento } from '../../models/agendamentos-model';
 import { STATUS_BADGE_CLASS, StatusAgendamento } from '../../models/consulta-model';
-import { AlertService } from '../../services/alert-service';
+import { AlertService } from '@shared/services';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -55,8 +55,35 @@ export class Exames implements OnInit {
       })
       .subscribe({
         next: (data) => {
+          console.log('Exames.listarAgendamentos - Dados brutos:', data.content);
+
+          // Normalizar status se estiver vindo em campos aninhados
+          const conteudoNormalizado = (data.content ?? []).map((item, idx) => {
+            console.log(`[${idx}] ID: ${item.id}, tipoAgendamento: "${item.tipoAgendamento}", status: "${item.status}"`);
+            console.log(`    Exame completo:`, (item as any).exame);
+
+            if (!item.status) {
+              let statusEncontrado: string | undefined;
+
+              if ((item as any).exame?.statusExame) {
+                statusEncontrado = (item as any).exame.statusExame;
+                console.log(`  ✨ Status encontrado em exame.statusExame: "${statusEncontrado}"`);
+              } else if ((item as any).exame?.status) {
+                statusEncontrado = (item as any).exame.status;
+                console.log(`  ✨ Status encontrado em exame.status: "${statusEncontrado}"`);
+              }
+
+              if (statusEncontrado) {
+                return { ...item, status: statusEncontrado };
+              }
+            }
+            return item;
+          });
+
+          console.log('Exames.listarAgendamentos - Normalizado:', conteudoNormalizado.map(e => ({ id: e.id, status: e.status })));
+
           // Filtrar apenas exames
-          this.agendamentosFiltrados = (data.content ?? []).filter(
+          this.agendamentosFiltrados = conteudoNormalizado.filter(
             a => a.tipoAgendamento === TipoAgendamento.EXAME
           );
           this.cdr.detectChanges();

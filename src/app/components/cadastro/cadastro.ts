@@ -2,12 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { MenuItem } from '../models/menu-item';
-import { ClientesService } from './../services/clientes-service';
-import { FuncionarioService } from './../services/funcionario-service';
-import { VeterinarioService } from './../services/veterinario-service';
-import { PetService } from '../services/pet-service';
+import { ClientesService } from '@features/clientes';
+import { FuncionarioService } from '@features/funcionarios';
+import { VeterinarioService } from '@features/veterinarios';
+import { PetService } from '@features/pets';
 import { ListService } from '../models/list-service';
-import { DashboardStore } from '../services/dashboard-store';
+import { DashboardStore } from '@shared/services';
 
 @Component({
   selector: 'app-cadastro',

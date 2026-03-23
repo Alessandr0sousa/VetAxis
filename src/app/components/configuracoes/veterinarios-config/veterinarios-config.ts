@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AlertService } from '../../services/alert-service';
+import { AlertService } from '@shared/services';
 import { VeterinarioModel } from '../../models/veterinario-model';
-import { VeterinarioService } from '../../services/veterinario-service';
+import { VeterinarioService } from '@features/veterinarios';
 import {
   EscalaVeterinariosItem,
   EscalaVeterinariosService,
-} from '../../services/escala-veterinarios-service';
+} from '@features/veterinarios';
 
 type DiaEscala = {
   diaNumero: number;
@@ -40,7 +40,7 @@ export class VeterinariosConfig implements OnInit {
   readonly meses = [
     { value: 1, label: 'Janeiro' },
     { value: 2, label: 'Fevereiro' },
-    { value: 3, label: 'Marco' },
+    { value: 3, label: 'Março' },
     { value: 4, label: 'Abril' },
     { value: 5, label: 'Maio' },
     { value: 6, label: 'Junho' },
@@ -122,10 +122,16 @@ export class VeterinariosConfig implements OnInit {
   });
 
   ngOnInit(): void {
-    const anoAtual = new Date().getFullYear();
+    const hoje = new Date();
+    const anoAtual = hoje.getFullYear();
+    const mesAtual = hoje.getMonth() + 1;
+    const mesLabel = this.meses.find((m) => m.value === mesAtual)?.label ?? '';
+
     this.anoSelecionado.set(anoAtual);
-    this.form.patchValue({ ano: anoAtual, clinicaId: 1 });
+    this.mesSelecionado.set(mesAtual);
+    this.form.patchValue({ ano: anoAtual, mes: mesAtual, mesNome: mesLabel, clinicaId: 1 });
     this.carregarVeterinarios();
+    this.carregarEscalasMes();
   }
 
   get diasForm(): FormArray {

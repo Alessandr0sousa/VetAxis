@@ -27,8 +27,7 @@ import { Escala } from './components/configuracoes/escala/escala';
 import { VeterinariosConfig } from './components/configuracoes/veterinarios-config/veterinarios-config';
 import { Agenda } from './components/agenda/agenda';
 import { LoginPage } from './components/login/login-page';
-import { authGuard } from './guards/auth.guard';
-import { loginRedirectGuard } from './guards/login-redirect.guard';
+import { authGuard, loginRedirectGuard } from '@infrastructure/guards';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPage, title: 'Login', canActivate: [loginRedirectGuard] },

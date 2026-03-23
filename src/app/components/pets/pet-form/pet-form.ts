@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Pet } from '../../models/pet';
-import { ClientesService } from '../../services/clientes-service';
-import { PetService } from '../../services/pet-service';
-import { UserProfileService } from '../../services/user-profile-service';
-import { AlertService } from '../../services/alert-service';
+import { ClientesService } from '@features/clientes';
+import { PetService } from '@features/pets';
+import { UserProfileService } from '@infrastructure/storage';
+import { AlertService } from '@shared/services';
 import { Cliente } from '../../models/cliente';
 import { Especie, Pelagem, Temperamento, getRacasPorEspecie } from '../../models/enum-model';
 import { Location } from '@angular/common';

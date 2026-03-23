@@ -1,6 +1,6 @@
 import { VeterinarioModel } from './../models/veterinario-model';
 import { Component, inject } from '@angular/core';
-import { VeterinarioService } from '../services/veterinario-service';
+import { VeterinarioService } from '@features/veterinarios';
 import { VeterinariosForm } from './veterinarios-form/veterinarios-form';
 import { GenericList } from '../shared/generic-list/generic-list';
 import { Columns } from '../models/columns';

@@ -5,7 +5,7 @@ import { routes } from './app.routes';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { NoReuseStrategy } from './no-reuse-strategy';
 import { RouteReuseStrategy } from '@angular/router';
-import { authInterceptor } from './interceptors/auth.interceptor';
+import { authInterceptor } from '@infrastructure/interceptors';
 
 export const appConfig: ApplicationConfig = {
   providers: [

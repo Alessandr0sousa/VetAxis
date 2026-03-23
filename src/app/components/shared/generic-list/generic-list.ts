@@ -18,7 +18,7 @@ import { BaseEntity } from '../../models/base-entity';
 import { Columns } from '../../models/columns';
 import { Page } from '../../models/page';
 import { BaseForm } from '../../shared/base-form/base-form';
-import { AlertService } from '../../services/alert-service';
+import { AlertService } from '@shared/services';
 
 @Component({
   selector: 'app-generic-list',

@@ -1,0 +1,35 @@
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
+import { ApiService } from '../../api-services/api-sevice';
+import { AuthTokenService, UserProfileService } from '@infrastructure/storage';
+import { AuthResponse } from '../../models/auth-response.model';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class AutenticacaoService extends ApiService {
+  private readonly endpoint = 'login';
+  private readonly tokenService = inject(AuthTokenService);
+  private readonly userProfileService = inject(UserProfileService);
+  private readonly router = inject(Router);
+
+  constructor(http: HttpClient) {
+    super(http);
+  }
+
+  autenticar(email: string, senha: string): Observable<AuthResponse> {
+    const payload = { login: email, password: senha };
+    return this.post<AuthResponse>(this.endpoint, payload);
+  }
+
+  logout(): void {
+    // Limpa apenas token e perfil do usuário
+    this.tokenService.clearToken();
+    this.userProfileService.clearUserProfile();
+
+    // Redireciona para login
+    this.router.navigate(['/login'], { replaceUrl: true });
+  }
+}

@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Columns } from '../models/columns';
-import { PetService } from '../services/pet-service';
+import { PetService } from '@features/pets';
 import { Pet } from './../models/pet';
 import { GenericList } from './../shared/generic-list/generic-list';
 import { PetForm } from './pet-form/pet-form';

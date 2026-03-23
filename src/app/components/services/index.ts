@@ -47,13 +47,13 @@
  * 6. Atualiza BehaviorSubject com novo agendamento
  */
 
-export { AgendamentosService } from './agendamentos-service';
-export { ConsultaService } from './consulta-service';
-export { ExameService } from './exame-service';
-export { CirurgiaService } from './cirurgia-service';
-export { VacinaService } from './vacina-service';
+export { AgendamentosService } from '@features/agendamentos';
+export { ConsultaService } from '@features/agendamentos';
+export { ExameService } from '@features/exames';
+export { CirurgiaService } from '@features/cirurgias';
+export { VacinaService } from '@features/vacinas';
 
-export type { ConsultaModel } from './consulta-service';
-export type { ExameModel } from './exame-service';
-export type { CirurgiaModel } from './cirurgia-service';
-export type { VacinaModel } from './vacina-service';
+export type { ConsultaModel } from '@features/agendamentos';
+export type { ExameModel } from '@features/exames';
+export type { CirurgiaModel } from '@features/cirurgias';
+export type { VacinaModel } from '@features/vacinas';

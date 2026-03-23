@@ -1,5 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
-import { UserProfileService } from '../services/user-profile-service';
+import { UserProfileService } from '@infrastructure/storage';
 
 @Component({
   selector: 'app-card-company',
