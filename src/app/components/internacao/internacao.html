@@ -1,1 +1,87 @@
-<p>internacao works!</p>
+<div class="internacoes-page">
+	<div class="toolbar">
+		<div class="toolbar-left">
+			<h1>Internações</h1>
+			<p>Gerencie admissão, evolução clínica e alta médica.</p>
+		</div>
+		<button type="button" class="btn btn-primary" (click)="abrirModalNovaInternacao()">
+			Nova Internação
+		</button>
+	</div>
+
+	<div class="layout-grid">
+		<aside class="sidebar">
+			<app-internacao-sidebar-filters
+				[busca]="busca()"
+				[filtroStatus]="filtroStatus()"
+				[statusOptions]="statusOptions"
+				[listLoading]="listLoading()"
+				[totalResultados]="internacoesFiltradas().length"
+				[listPage]="listPage()"
+				[listTotalPages]="listTotalPages()"
+				(buscaChange)="onBuscarChange($event)"
+				(filtroStatusChange)="onFiltroStatusChange($event)"
+				(pageChange)="carregarInternacoes($event)"
+			></app-internacao-sidebar-filters>
+
+			<app-internacao-patient-list
+				[listLoading]="listLoading()"
+				[internacoes]="internacoesFiltradas()"
+				[selectedId]="selected()?.id ?? null"
+				(selecionar)="carregarDetalhe($event)"
+			></app-internacao-patient-list>
+		</aside>
+
+		<section class="detail">
+			<app-internacao-detail
+				[detailLoading]="detailLoading()"
+				[selected]="selected()"
+				[activeTab]="activeTab()"
+				[selectedIsFinalizado]="selectedIsFinalizado()"
+				[evolucoesLoading]="evolucoesLoading()"
+				[evolucoes]="evolucoes()"
+				[evolucoesPage]="evolucoesPage()"
+				[evolucoesTotalPages]="evolucoesTotalPages()"
+				(tabChange)="setTab($event)"
+				(abrirEvolucao)="abrirModalEvolucao()"
+				(carregarEvolucoes)="carregarEvolucoes($event)"
+				(abrirAlta)="abrirModalAlta()"
+				(abrirStatus)="abrirModalStatus()"
+				(remover)="removerInternacao($event)"
+			></app-internacao-detail>
+		</section>
+	</div>
+</div>
+
+<app-internacao-modal-admissao
+	[aberto]="modalNovaInternacao()"
+	[form]="admissaoForm"
+	[pets]="pets()"
+	[veterinarios]="veterinarios()"
+	[origemTipos]="origemTipos"
+	(fechar)="fecharModalNovaInternacao()"
+	(salvar)="salvarNovaInternacao()"
+></app-internacao-modal-admissao>
+
+<app-internacao-modal-evolucao
+	[aberto]="modalNovaEvolucao()"
+	[form]="evolucaoForm"
+	[veterinarios]="veterinarios()"
+	(fechar)="fecharModalEvolucao()"
+	(salvar)="salvarEvolucao()"
+></app-internacao-modal-evolucao>
+
+<app-internacao-modal-status
+	[aberto]="modalAlterarStatus()"
+	[form]="statusForm"
+	[statusPermitidos]="statusPermitidos()"
+	(fechar)="fecharModalStatus()"
+	(salvar)="salvarStatus()"
+></app-internacao-modal-status>
+
+<app-internacao-modal-alta
+	[aberto]="modalAlta()"
+	[form]="altaForm"
+	(fechar)="fecharModalAlta()"
+	(salvar)="salvarAlta()"
+></app-internacao-modal-alta>

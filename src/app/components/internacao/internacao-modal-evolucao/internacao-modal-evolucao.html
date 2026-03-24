@@ -1,0 +1,48 @@
+@if (aberto()) {
+  <div class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Nova Evolução</h3>
+        <button type="button" class="btn-close" (click)="onFechar()"></button>
+      </div>
+
+      <form [formGroup]="form()" (ngSubmit)="onSalvar()" class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Veterinário</label>
+            <select class="form-select" formControlName="veterinarioId">
+              <option [ngValue]="null">Selecione</option>
+              @for (vet of veterinarios(); track vet.id) {
+                <option [ngValue]="vet.id">{{ vet.nome }}</option>
+              }
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Data/Hora</label>
+            <input type="datetime-local" class="form-control" formControlName="dataHora" />
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Descrição</label>
+            <textarea rows="3" class="form-control" formControlName="descricao"></textarea>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Conduta (opcional)</label>
+            <textarea rows="2" class="form-control" formControlName="conduta"></textarea>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Próxima reavaliação (opcional)</label>
+            <input type="datetime-local" class="form-control" formControlName="proximaReavaliacao" />
+          </div>
+        </div>
+
+        <div class="modal-actions mt-4">
+          <button type="button" class="btn btn-outline-secondary" (click)="onFechar()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Evolução</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

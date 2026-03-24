@@ -1,0 +1,28 @@
+@if (aberto()) {
+  <div class="modal-backdrop">
+    <div class="modal-card modal-sm">
+      <div class="modal-head">
+        <h3>Alterar Status</h3>
+        <button type="button" class="btn-close" (click)="onFechar()"></button>
+      </div>
+
+      <form [formGroup]="form()" (ngSubmit)="onSalvar()" class="modal-body">
+        <label class="form-label">Novo status</label>
+        <select class="form-select" formControlName="novoStatus">
+          <option [ngValue]="null">Selecione</option>
+          @for (status of statusPermitidos(); track status) {
+            <option [ngValue]="status">{{ getStatusLabel(status) }}</option>
+          }
+        </select>
+
+        <label class="form-label mt-3">Justificativa (opcional)</label>
+        <textarea rows="3" class="form-control" formControlName="justificativa"></textarea>
+
+        <div class="modal-actions mt-4">
+          <button type="button" class="btn btn-outline-secondary" (click)="onFechar()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

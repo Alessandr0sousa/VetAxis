@@ -52,6 +52,7 @@ export const routes: Routes = [
 
       { path: 'consultas', component: Consultas, title: 'Consultas' },
       { path: 'internacao', component: Internacao, title: 'Internação' },
+      { path: 'internacoes', component: Internacao, title: 'Internações' },
 
       { path: 'cadastro', component: Cadastro, title: 'Cadastro' },
 

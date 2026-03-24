@@ -1,0 +1,54 @@
+<div class="card-block">
+  <label for="busca" class="form-label">Busca</label>
+  <input
+    id="busca"
+    type="text"
+    class="form-control"
+    placeholder="Pet, internação ou veterinário"
+    [value]="busca()"
+    (input)="onBuscaInput($any($event.target).value)"
+  />
+
+  <label for="statusFiltro" class="form-label mt-3">Status</label>
+  <select
+    id="statusFiltro"
+    class="form-select"
+    [value]="filtroStatus()"
+    (change)="onStatusChange($any($event.target).value)"
+  >
+    <option value="">Todos</option>
+    @for (status of statusOptions(); track status) {
+      <option [value]="status">{{ getStatusLabel(status) }}</option>
+    }
+  </select>
+</div>
+
+<div class="card-block list-header">
+  <div>
+    <strong>Pacientes Internados</strong>
+    <p class="muted">{{ totalResultados() }} resultados</p>
+  </div>
+  @if (listLoading()) {
+    <span class="badge text-bg-secondary">Carregando...</span>
+  }
+</div>
+
+<div class="pagination-row">
+  <button
+    type="button"
+    class="btn btn-outline-secondary btn-sm"
+    [disabled]="listPage() === 0 || listLoading()"
+    (click)="pageAnterior()"
+  >
+    Anterior
+  </button>
+  <span>Página {{ listPage() + 1 }} de {{ listTotalPages() }}</span>
+  <button
+    type="button"
+    class="btn btn-outline-secondary btn-sm"
+    [disabled]="listPage() + 1 >= listTotalPages() || listLoading()"
+    (click)="pageProxima()"
+  >
+    Próxima
+  </button>
+</div>

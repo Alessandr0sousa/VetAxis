@@ -1,0 +1,160 @@
+@if (detailLoading()) {
+  <div class="card-block">Carregando detalhes...</div>
+} @else if (selected(); as internacao) {
+  <div class="card-block detail-header">
+    <div>
+      <h2>{{ internacao.petNome }}</h2>
+      <p>
+        {{ internacao.nome }}
+        <span class="dot">•</span>
+        {{ internacao.veterinarioNome }}
+      </p>
+    </div>
+    <span [class]="getStatusClass(internacao.statusInternacao)">
+      {{ getStatusLabel(internacao.statusInternacao) }}
+    </span>
+  </div>
+
+  <div class="card-block tabs-row">
+    <button
+      type="button"
+      [class]="'tab-btn ' + (activeTab() === 'resumo' ? 'active' : '')"
+      (click)="onTabChange('resumo')"
+    >
+      Resumo
+    </button>
+    <button
+      type="button"
+      [class]="'tab-btn ' + (activeTab() === 'evolucao' ? 'active' : '')"
+      (click)="onTabChange('evolucao')"
+    >
+      Evolução
+    </button>
+    <button
+      type="button"
+      [class]="'tab-btn ' + (activeTab() === 'alta' ? 'active' : '')"
+      (click)="onTabChange('alta')"
+    >
+      Alta
+    </button>
+  </div>
+
+  <div class="card-block tab-content">
+    @if (activeTab() === 'resumo') {
+      <div class="field-grid">
+        <div>
+          <label>Origem</label>
+          <p>{{ internacao.origemTipo }} @if (internacao.origemId) { #{{ internacao.origemId }} }</p>
+        </div>
+        <div>
+          <label>Admissão</label>
+          <p>{{ formatarData(internacao.dataHoraAdmissao) }}</p>
+        </div>
+        <div>
+          <label>Peso Entrada</label>
+          <p>{{ internacao.pesoEntrada ?? '-' }} kg</p>
+        </div>
+        <div>
+          <label>Peso Atual</label>
+          <p>{{ internacao.pesoAtual ?? '-' }} kg</p>
+        </div>
+        <div class="full">
+          <label>Motivo da internação</label>
+          <p>{{ internacao.motivoInternacao }}</p>
+        </div>
+      </div>
+    }
+
+    @if (activeTab() === 'evolucao') {
+      <div class="actions-inline mb-3">
+        <button
+          type="button"
+          class="btn btn-outline-primary btn-sm"
+          [disabled]="selectedIsFinalizado()"
+          (click)="onAbrirEvolucao()"
+        >
+          Nova Evolução
+        </button>
+      </div>
+
+      @if (evolucoesLoading()) {
+        <p>Carregando evoluções...</p>
+      } @else if (evolucoes().length === 0) {
+        <p class="muted">Sem evoluções registradas.</p>
+      } @else {
+        <div class="timeline">
+          @for (evolucao of evolucoes(); track evolucao.id) {
+            <article class="timeline-item">
+              <header>
+                <strong>{{ evolucao.veterinarioNome }}</strong>
+                <span>{{ formatarData(evolucao.dataHora) }}</span>
+              </header>
+              <p>{{ evolucao.descricao }}</p>
+              @if (evolucao.conduta) {
+                <small><strong>Conduta:</strong> {{ evolucao.conduta }}</small>
+              }
+              @if (evolucao.proximaReavaliacao) {
+                <small><strong>Próxima reavaliação:</strong> {{ formatarData(evolucao.proximaReavaliacao) }}</small>
+              }
+            </article>
+          }
+        </div>
+      }
+
+      <div class="pagination-row">
+        <button
+          type="button"
+          class="btn btn-outline-secondary btn-sm"
+          [disabled]="evolucoesPage() === 0 || evolucoesLoading()"
+          (click)="onEvolucaoPageChange(evolucoesPage() - 1)"
+        >
+          Anterior
+        </button>
+        <span>Página {{ evolucoesPage() + 1 }} de {{ evolucoesTotalPages() }}</span>
+        <button
+          type="button"
+          class="btn btn-outline-secondary btn-sm"
+          [disabled]="evolucoesPage() + 1 >= evolucoesTotalPages() || evolucoesLoading()"
+          (click)="onEvolucaoPageChange(evolucoesPage() + 1)"
+        >
+          Próxima
+        </button>
+      </div>
+    }
+
+    @if (activeTab() === 'alta') {
+      @if (internacao.statusInternacao === 'ALTA_CONCLUIDA' || internacao.statusInternacao === 'OBITO') {
+        <div class="alert alert-info mb-0">
+          Internação encerrada em {{ formatarData(internacao.dataHoraAlta) }}.
+        </div>
+      } @else {
+        <div class="alert alert-warning mb-3">
+          A alta encerra a internação e bloqueia novas evoluções.
+        </div>
+        <button type="button" class="btn btn-success btn-sm" (click)="onAbrirAlta()">Dar Alta</button>
+      }
+    }
+  </div>
+
+  <div class="card-block actions-inline">
+    <button
+      type="button"
+      class="btn btn-outline-primary btn-sm"
+      [disabled]="selectedIsFinalizado()"
+      (click)="onAbrirStatus()"
+    >
+      Alterar Status
+    </button>
+    <button
+      type="button"
+      class="btn btn-outline-danger btn-sm"
+      (click)="onRemover(internacao.id)"
+    >
+      Remover
+    </button>
+  </div>
+} @else {
+  <div class="card-block empty-state">
+    Selecione uma internação para visualizar os detalhes.
+  </div>
+}
