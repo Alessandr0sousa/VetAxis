@@ -13,7 +13,7 @@ describe('Internacao Form Factory', () => {
   it('should create admissao form with defaults and validators', () => {
     const form = createAdmissaoForm(fb, agora);
 
-    expect(form.get('origemTipo')?.value).toBe('CONSULTA');
+    expect(form.get('origemTipo')?.value).toBe('OUTRO');
     expect(form.get('internamento')?.value).toBeTrue();
     expect(form.get('dataHoraAdmissao')?.value).toBe(agora);
     expect(form.valid).toBeFalse();
@@ -35,7 +35,7 @@ describe('Internacao Form Factory', () => {
 
     form.patchValue({
       veterinarioId: 2,
-      descricao: 'Paciente estável e aceitando alimentação normalmente',
+      estadoGeral: 'Paciente estável e aceitando alimentação normalmente',
     });
 
     expect(form.valid).toBeTrue();

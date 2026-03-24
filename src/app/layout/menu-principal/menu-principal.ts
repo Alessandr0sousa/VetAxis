@@ -36,6 +36,8 @@ export class MenuPrincipal implements OnInit {
 	@Output() toggle = new EventEmitter<void>();
 
 	itens: MenuItem[] = [];
+	private expandedItems = new Set<string>();
+	private expandedChildren = new Set<string>();
 
 	constructor(
 		private el: ElementRef,
@@ -46,8 +48,45 @@ export class MenuPrincipal implements OnInit {
 	ngOnInit() {
 		const typedMenu: MenuData = menuData;
 		this.itens = typedMenu.items;
+		this.expandedItems.add('Agenda');
 		this.checkScreenSize();
 		this.toggleContentClass();
+	}
+
+	onParentItemClick(event: Event, item: MenuItem): void {
+		this.toggleItem(item.label);
+
+		if (!item.routerLink?.length) {
+			event.preventDefault();
+		}
+	}
+
+	toggleItem(label: string): void {
+		if (this.expandedItems.has(label)) {
+			this.expandedItems.delete(label);
+			return;
+		}
+
+		this.expandedItems.add(label);
+	}
+
+	isItemExpanded(label: string): boolean {
+		return this.expandedItems.has(label);
+	}
+
+	toggleChild(parentLabel: string, childLabel: string): void {
+		const key = `${parentLabel}::${childLabel}`;
+
+		if (this.expandedChildren.has(key)) {
+			this.expandedChildren.delete(key);
+			return;
+		}
+
+		this.expandedChildren.add(key);
+	}
+
+	isChildExpanded(parentLabel: string, childLabel: string): boolean {
+		return this.expandedChildren.has(`${parentLabel}::${childLabel}`);
 	}
 
 	@HostListener('window:resize')

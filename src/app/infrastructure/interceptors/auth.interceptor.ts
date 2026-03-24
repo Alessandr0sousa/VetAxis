@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AuthTokenService, UserProfileService } from '../storage';
+import { AlertService } from '@shared/services';
 
 /**
  * Interceptor HTTP para autenticação
@@ -18,6 +19,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const tokenService = inject(AuthTokenService);
   const userProfileService = inject(UserProfileService);
+  const alertService = inject(AlertService);
 
   const token = tokenService.getToken();
   const isLoginRequest = req.url.includes('/login');
@@ -42,6 +44,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     if (error?.status === 401) {
       console.error('❌ HTTP 401 - Token inválido ou expirado');
       redirectToLogin();
+    } else if (error?.status === 403) {
+      alertService.error(
+        'Acesso negado para este usuário neste recurso. Verifique seu perfil/permissões.',
+        'Sem permissão'
+      );
     } else {
       console.error('❌ HTTP Error:', error.status, error.message);
     }

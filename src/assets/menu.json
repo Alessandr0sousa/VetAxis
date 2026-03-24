@@ -23,32 +23,34 @@
     {
       "label": "Agenda",
       "icon": "fa-solid fa-calendar-days",
-      "routerLink": ["/agenda"]
+      "routerLink": ["/agenda"],
+      "children": [
+        {
+          "label": "Consultas",
+          "icon": "fa-solid fa-stethoscope",
+          "routerLink": ["/consultas"]
+        },
+        {
+          "label": "Cirurgias",
+          "icon": "fa-solid fa-scissors",
+          "routerLink": ["/agenda/cirurgias"]
+        },
+        {
+          "label": "Exames",
+          "icon": "fa-solid fa-vials",
+          "routerLink": ["/agenda/exames"]
+        },
+        {
+          "label": "Vacinas",
+          "icon": "fa-solid fa-syringe",
+          "routerLink": ["/agenda/vacinas"]
+        }
+      ]
     },
     {
-      "label": "Consultas",
-      "icon": "fa-solid fa-stethoscope",
-      "routerLink": ["/consultas"]
-    },
-    {
-      "label": "Cirurgias",
-      "icon": "fa-solid fa-scissors",
-      "routerLink": ["/agenda/cirurgias"]
-    },
-    {
-      "label": "Exames",
-      "icon": "fa-solid fa-vials",
-      "routerLink": ["/agenda/exames"]
-    },
-    {
-      "label": "Vacinas",
-      "icon": "fa-solid fa-syringe",
-      "routerLink": ["/agenda/vacinas"]
-    },
-    {
-      "label": "Internação",
+      "label": "Internações",
       "icon": "fa-solid fa-procedures",
-      "routerLink": ["/internacao"]
+      "routerLink": ["/internacoes"]
     },
     {
       "label": "Financeiro",

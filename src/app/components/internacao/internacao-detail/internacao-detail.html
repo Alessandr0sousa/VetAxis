@@ -84,19 +84,22 @@
       } @else {
         <div class="timeline">
           @for (evolucao of evolucoes(); track evolucao.id) {
-            <article class="timeline-item">
+            <button
+              type="button"
+              class="timeline-item timeline-item-button"
+              (click)="abrirDetalhesEvolucao(evolucao)"
+              [attr.title]="'Data/Hora: ' + formatarData(evolucao.dataHora)"
+            >
+              <span class="timeline-dot" aria-hidden="true"></span>
               <header>
-                <strong>{{ evolucao.veterinarioNome }}</strong>
-                <span>{{ formatarData(evolucao.dataHora) }}</span>
+                <div class="timeline-main">
+                  <strong>{{ evolucao.veterinarioNome }}</strong>
+                </div>
+                @if (hasProximaReavaliacaoPendente(evolucao)) {
+                  <span class="timeline-badge-pendente">Reavaliação pendente</span>
+                }
               </header>
-              <p>{{ evolucao.descricao }}</p>
-              @if (evolucao.conduta) {
-                <small><strong>Conduta:</strong> {{ evolucao.conduta }}</small>
-              }
-              @if (evolucao.proximaReavaliacao) {
-                <small><strong>Próxima reavaliação:</strong> {{ formatarData(evolucao.proximaReavaliacao) }}</small>
-              }
-            </article>
+            </button>
           }
         </div>
       }
@@ -153,6 +156,52 @@
       Remover
     </button>
   </div>
+
+  @if (evolucaoSelecionada(); as evolucaoModal) {
+    <div class="internacao-dialog-overlay">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Detalhes da Evolução</h5>
+            <button type="button" class="btn-close" (click)="fecharDetalhesEvolucao()"></button>
+          </div>
+
+          <div class="modal-body">
+            <div class="field-grid mb-3">
+              <div>
+                <label>Veterinário</label>
+                <p>{{ evolucaoModal.veterinarioNome }}</p>
+              </div>
+              <div>
+                <label>Data/Hora do Registro</label>
+                <p>{{ formatarData(evolucaoModal.dataHora) }}</p>
+              </div>
+            </div>
+
+            <div class="evolucao-qa-sections">
+              @for (section of getEvolucaoQASections(evolucaoModal); track section.title) {
+                <section class="evolucao-qa-card">
+                  <h6>{{ section.title }}</h6>
+                  <div class="qa-grid">
+                    @for (item of section.items; track item.question) {
+                      <div class="qa-item">
+                        <label>{{ item.question }}</label>
+                        <p>{{ item.answer }}</p>
+                      </div>
+                    }
+                  </div>
+                </section>
+              }
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" (click)="fecharDetalhesEvolucao()">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 } @else {
   <div class="card-block empty-state">
     Selecione uma internação para visualizar os detalhes.

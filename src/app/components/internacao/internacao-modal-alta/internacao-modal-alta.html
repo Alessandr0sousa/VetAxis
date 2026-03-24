@@ -1,56 +1,60 @@
 @if (aberto()) {
-  <div class="modal-backdrop">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h3>Confirmar Alta</h3>
-        <button type="button" class="btn-close" (click)="onFechar()"></button>
-      </div>
+  <div class="internacao-dialog-overlay">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirmar Alta</h5>
+          <button type="button" class="btn-close" (click)="onFechar()"></button>
+        </div>
 
-      <form [formGroup]="form()" (ngSubmit)="onSalvar()" class="modal-body">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">Data/Hora Alta</label>
-            <input type="datetime-local" class="form-control" formControlName="dataHoraAlta" />
-          </div>
+        <form [formGroup]="form()" (ngSubmit)="onSalvar()">
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Data/Hora Alta</label>
+                <input type="datetime-local" class="form-control" formControlName="dataHoraAlta" />
+              </div>
 
-          <div class="col-12">
-            <label class="form-label">Condição da Alta</label>
-            <input type="text" class="form-control" formControlName="condicaoAlta" />
-          </div>
+              <div class="col-12">
+                <label class="form-label">Condição da Alta</label>
+                <input type="text" class="form-control" formControlName="condicaoAlta" />
+              </div>
 
-          <div class="col-12">
-            <label class="form-label">Resumo da Alta</label>
-            <textarea rows="3" class="form-control" formControlName="resumoAlta"></textarea>
-          </div>
+              <div class="col-12">
+                <label class="form-label">Resumo da Alta</label>
+                <textarea rows="3" class="form-control" formControlName="resumoAlta"></textarea>
+              </div>
 
-          <div class="col-12">
-            <label class="form-label">Orientações ao Tutor</label>
-            <textarea rows="3" class="form-control" formControlName="orientacoesTutor"></textarea>
-          </div>
+              <div class="col-12">
+                <label class="form-label">Orientações ao Tutor</label>
+                <textarea rows="3" class="form-control" formControlName="orientacoesTutor"></textarea>
+              </div>
 
-          <div class="col-md-6">
-            <div class="form-check mt-2">
-              <input id="retornoRecomendado" class="form-check-input" type="checkbox" formControlName="retornoRecomendado" />
-              <label for="retornoRecomendado" class="form-check-label">Retorno recomendado</label>
+              <div class="col-md-6">
+                <div class="form-check mt-2">
+                  <input id="retornoRecomendado" class="form-check-input" type="checkbox" formControlName="retornoRecomendado" />
+                  <label for="retornoRecomendado" class="form-check-label">Retorno recomendado</label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Data do retorno</label>
+                <input
+                  type="datetime-local"
+                  class="form-control"
+                  formControlName="dataRetorno"
+                  [disabled]="!form().get('retornoRecomendado')?.value"
+                />
+              </div>
             </div>
           </div>
 
-          <div class="col-md-6">
-            <label class="form-label">Data do retorno</label>
-            <input
-              type="datetime-local"
-              class="form-control"
-              formControlName="dataRetorno"
-              [disabled]="!form().get('retornoRecomendado')?.value"
-            />
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" (click)="onFechar()">Cancelar</button>
+            <button type="submit" class="btn btn-success">Confirmar Alta</button>
           </div>
-        </div>
-
-        <div class="modal-actions mt-4">
-          <button type="button" class="btn btn-outline-secondary" (click)="onFechar()">Cancelar</button>
-          <button type="submit" class="btn btn-success">Confirmar Alta</button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
 }

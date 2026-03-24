@@ -12,29 +12,28 @@
     }
   </div>
 
-  <ul class="nav flex-column">
+  <ul class="nav flex-column top-menu">
     @for (iten of itens; track iten) {
-    <li class="nav-item">
+    <li class="nav-item" [class.nav-item-wide]="!!iten.children">
       @if (iten.children) {
       <a
         class="nav-link text-white d-flex align-items-center"
-        data-bs-toggle="collapse"
-        [routerLink]="iten.routerLink"
-        [attr.data-bs-target]="'#collapse-' + iten.label"
+        [routerLink]="iten.routerLink ?? null"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="onParentItemClick($event, iten)"
         role="button"
-        aria-expanded="false"
-        [attr.aria-controls]="'collapse-' + iten.label"
+        [attr.aria-expanded]="isItemExpanded(iten.label)"
         [title]="iten.label"
       >
         <i [class]="iten.icon + ' side-icon'"></i>
         @if (!isCollapsed) {
         <span class="ms-2">{{ iten.label }}</span>
-        <i class="fa-solid fa-chevron-down ms-auto"></i>
+        <i class="fa-solid fa-chevron-down ms-auto" [class.rotate-180]="isItemExpanded(iten.label)"></i>
         }
       </a>
 
-      <div class="collapse" [attr.id]="'collapse-' + iten.label">
-        @if (iten.children && !isCollapsed) {
+      @if (iten.children && !isCollapsed && isItemExpanded(iten.label)) {
         <ul class="nav flex-column ms-3">
           @for (child of iten.children; track child) {
           <li class="nav-item">
@@ -42,6 +41,7 @@
               <a
                 class="nav-link text-white d-flex align-items-center flex-grow-1"
                 [routerLink]="child.routerLink"
+                routerLinkActive="active"
                 [title]="child.label"
               >
                 <i [class]="child.icon + ' side-icon'"></i>
@@ -52,25 +52,23 @@
               <button
                 type="button"
                 class="btn btn-sm btn-link text-white ms-auto p-0 submenu-toggle"
-                data-bs-toggle="collapse"
-                [attr.data-bs-target]="'#collapse-' + iten.label + '-' + child.label"
-                aria-expanded="false"
-                [attr.aria-controls]="'collapse-' + iten.label + '-' + child.label"
+                (click)="toggleChild(iten.label, child.label)"
+                [attr.aria-expanded]="isChildExpanded(iten.label, child.label)"
                 [title]="child.label"
               >
-                <i class="fa-solid fa-chevron-down"></i>
+                <i class="fa-solid fa-chevron-down" [class.rotate-180]="isChildExpanded(iten.label, child.label)"></i>
               </button>
               }
             </div>
 
-            @if (child.children) {
-            <div class="collapse" [attr.id]="'collapse-' + iten.label + '-' + child.label">
+            @if (child.children && isChildExpanded(iten.label, child.label)) {
               <ul class="nav flex-column ms-4">
                 @for (grandchild of child.children; track grandchild) {
                 <li class="nav-item">
                   <a
                     class="nav-link text-white d-flex align-items-center"
                     [routerLink]="grandchild.routerLink"
+                    routerLinkActive="active"
                     [title]="grandchild.label"
                   >
                     <i [class]="grandchild.icon + ' side-icon'"></i>
@@ -79,13 +77,11 @@
                 </li>
                 }
               </ul>
-            </div>
             }
           </li>
           }
         </ul>
-        }
-      </div>
+      }
       } @else {
       <a
         class="nav-link text-white d-flex align-items-center"

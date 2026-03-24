@@ -169,8 +169,7 @@ export class Internacao {
       nome: '',
       petId: null,
       veterinarioId: null,
-      origemTipo: 'CONSULTA',
-      origemId: null,
+      origemTipo: 'OUTRO',
       dataHoraAdmissao: this.getNowLocalDateTime(),
       motivoInternacao: '',
       internamento: true,
@@ -187,6 +186,7 @@ export class Internacao {
   salvarNovaInternacao(): void {
     if (this.admissaoForm.invalid) {
       this.admissaoForm.markAllAsTouched();
+      this.alertService.warning('Preencha os campos obrigatórios para admitir o paciente');
       return;
     }
 
@@ -196,7 +196,7 @@ export class Internacao {
       petId: Number(value.petId),
       veterinarioId: Number(value.veterinarioId),
       origemTipo: value.origemTipo!,
-      origemId: value.origemId ? Number(value.origemId) : null,
+      origemId: null,
       dataHoraAdmissao: value.dataHoraAdmissao!,
       motivoInternacao: value.motivoInternacao!,
       internamento: true as const,
@@ -206,12 +206,59 @@ export class Internacao {
 
     this.internacaoService.admitir(payload).subscribe({
       next: (res) => {
-        this.alertService.success('Paciente admitido com sucesso');
-        this.modalNovaInternacao.set(false);
-        this.carregarInternacoes(0);
-        this.carregarDetalhe(res.id);
+        if (!res || !Number.isFinite(res.id) || res.id <= 0) {
+          this.alertService.error('A API respondeu sem confirmar a internação (id inválido).');
+          return;
+        }
+
+        this.internacaoService.detalhar(res.id).subscribe({
+          next: () => {
+            this.internacaoService.listar(0, 20, 'dataHoraAdmissao,desc').subscribe({
+              next: (page) => {
+                const createdInList = (page.content ?? []).some((item) => item.id === res.id);
+                if (!createdInList) {
+                  this.alertService.warning(
+                    'Internação criada, mas não apareceu na listagem atual. Verifique filtros/escopo da clínica.'
+                  );
+                } else {
+                  this.alertService.success('Paciente admitido com sucesso');
+                }
+
+                this.modalNovaInternacao.set(false);
+                this.carregarInternacoes(0);
+                this.carregarDetalhe(res.id);
+              },
+              error: () => {
+                this.alertService.warning(
+                  'Internação confirmada no detalhe, mas não foi possível validar a listagem.'
+                );
+                this.modalNovaInternacao.set(false);
+                this.carregarInternacoes(0);
+                this.carregarDetalhe(res.id);
+              },
+            });
+          },
+          error: () => {
+            this.alertService.error(
+              'A API retornou sucesso, mas não foi possível confirmar a persistência da internação no backend.'
+            );
+          },
+        });
       },
       error: (error) => {
+        const backendMessage = String(error?.error?.message ?? '').toLowerCase();
+        const isInternacaoAtiva =
+          backendMessage.includes('interna') &&
+          (backendMessage.includes('ativa') ||
+            backendMessage.includes('internado') ||
+            backendMessage.includes('tratamento') ||
+            backendMessage.includes('já possui'));
+
+        if (error?.status === 400 && isInternacaoAtiva) {
+          this.alertService.warning('Este animal já encontra-se em tratamento na internação.');
+          return;
+        }
+
         this.alertService.error(error?.error?.message || 'Erro ao admitir paciente');
       },
     });
@@ -223,10 +270,39 @@ export class Internacao {
       return;
     }
 
+    const petSelecionado = this.pets().find((pet) => pet.id === this.selected()?.petId);
+
     this.evolucaoForm.reset({
       veterinarioId: this.selected()?.veterinarioId ?? null,
       dataHora: this.getNowLocalDateTime(),
-      descricao: '',
+      nomePaciente: this.selected()?.petNome ?? '',
+      especie: petSelecionado?.especie ?? '',
+      suspeitaClinica: '',
+      tipoAlimentacao: '',
+      quantidadeAlimentacao: '',
+      formaAlimentacao: '',
+      estadoGeral: '',
+      exameSangue: false,
+      exameFezesParasitologico: false,
+      exameUrina: false,
+      exameImagem: false,
+      exameCardiologicos: false,
+      trCelsius: '',
+      fcBpm: '',
+      frMpm: '',
+      paMmhg: '',
+      mucosa: '',
+      urina: '',
+      aspectoUrina: '',
+      fezes: '',
+      aspectoFezes: '',
+      houveVisita: '',
+      conversadoResponsavel: '',
+      prognostico: '',
+      indicacaoAlta: '',
+      pcr: '',
+      testesRapidos: '',
+      qualPcrRealizado: '',
       conduta: '',
       proximaReavaliacao: '',
     });
@@ -248,18 +324,74 @@ export class Internacao {
 
     const value = this.evolucaoForm.getRawValue();
 
-    if (
-      value.proximaReavaliacao &&
-      new Date(value.proximaReavaliacao).getTime() <= new Date(value.dataHora!).getTime()
-    ) {
-      this.alertService.warning('A próxima reavaliação deve ser posterior ao registro da evolução');
+    if (value.proximaReavaliacao) {
+      const proximaReavaliacao = new Date(value.proximaReavaliacao).getTime();
+      if (proximaReavaliacao <= Date.now()) {
+        this.alertService.warning('A próxima reavaliação deve ser uma data futura');
+        return;
+      }
+
+      if (proximaReavaliacao <= new Date(value.dataHora!).getTime()) {
+        this.alertService.warning('A próxima reavaliação deve ser posterior ao registro da evolução');
+        return;
+      }
+    }
+
+    const examesSolicitados: string[] = [];
+    if (value.exameSangue) examesSolicitados.push('SANGUE');
+    if (value.exameFezesParasitologico) examesSolicitados.push('FEZES_PARASITOLOGICO');
+    if (value.exameUrina) examesSolicitados.push('URINA');
+    if (value.exameImagem) examesSolicitados.push('IMAGEM');
+    if (value.exameCardiologicos) examesSolicitados.push('CARDIOLOGICOS');
+
+    const camposFicha: Array<[string, unknown]> = [
+      ['nomePaciente', value.nomePaciente?.trim()],
+      ['especie', value.especie?.trim()],
+      ['suspeitaClinica', value.suspeitaClinica?.trim()],
+      ['tipoAlimentacao', value.tipoAlimentacao?.trim()],
+      ['quantidadeGramas', value.quantidadeAlimentacao?.trim()],
+      ['forma', value.formaAlimentacao?.trim()],
+      ['estadoGeral', value.estadoGeral?.trim()],
+      ['solicitacaoExames', examesSolicitados.length > 0],
+      ['examesSolicitados', examesSolicitados],
+      ['trCelsius', value.trCelsius?.trim()],
+      ['fcBpm', value.fcBpm?.trim()],
+      ['frMpm', value.frMpm?.trim()],
+      ['paMmhg', value.paMmhg?.trim()],
+      ['mucosa', value.mucosa?.trim()],
+      ['urina', value.urina?.trim()],
+      ['aspectoUrina', value.aspectoUrina?.trim()],
+      ['fezes', value.fezes?.trim()],
+      ['aspectoFezes', value.aspectoFezes?.trim()],
+      ['houveVisita', value.houveVisita?.trim()],
+      ['conversadoResponsavel', value.conversadoResponsavel?.trim()],
+      ['prognostico', value.prognostico?.trim()],
+      ['indicacaoAlta', value.indicacaoAlta?.trim()],
+      ['pcr', value.pcr?.trim()],
+      ['testesRapidos', value.testesRapidos?.trim()],
+      ['qualPcrRealizado', value.qualPcrRealizado?.trim()],
+    ];
+
+    const fichaEvolucao = Object.fromEntries(
+      camposFicha.filter(([, campo]) => {
+        if (typeof campo === 'string') return campo.length > 0;
+        if (Array.isArray(campo)) return campo.length > 0;
+        if (typeof campo === 'boolean') return campo;
+        return campo !== null && campo !== undefined;
+      })
+    );
+
+    if (Object.keys(fichaEvolucao).length === 0) {
+      this.alertService.warning('Preencha ao menos um campo clínico para registrar a evolução');
       return;
     }
+
+    const descricaoCompilada = JSON.stringify(fichaEvolucao);
 
     const payload: InternacaoEvolucaoRequestDTO = {
       veterinarioId: Number(value.veterinarioId),
       dataHora: value.dataHora!,
-      descricao: value.descricao!,
+      descricao: descricaoCompilada,
       conduta: value.conduta || undefined,
       proximaReavaliacao: value.proximaReavaliacao || undefined,
     };

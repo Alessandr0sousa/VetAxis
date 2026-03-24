@@ -94,8 +94,8 @@ export class LoginPage {
     this.loading.set(false);
     this.form.reset();
 
-    const targetRoute = this.navState.consumeLastRoute() ?? '/dashboard';
-    this.router.navigateByUrl(targetRoute);
+    // Após login, sempre iniciar no dashboard.
+    this.router.navigateByUrl('/dashboard');
   }
 
   private handleLoginError(): void {

@@ -31,8 +31,7 @@ export class App {
 
       // Verifica autenticação após o token ser carregado
       if (this.isAuthenticated() && this.router.url === '/login') {
-        const target = this.navState.getLastRoute() ?? '/dashboard';
-        this.router.navigateByUrl(target);
+        this.router.navigateByUrl('/dashboard');
       }
     });
 

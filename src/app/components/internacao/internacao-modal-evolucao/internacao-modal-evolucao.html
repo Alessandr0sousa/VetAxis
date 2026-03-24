@@ -1,48 +1,198 @@
 @if (aberto()) {
-  <div class="modal-backdrop">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h3>Nova Evolução</h3>
-        <button type="button" class="btn-close" (click)="onFechar()"></button>
+  <div class="internacao-dialog-overlay">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Nova Evolução</h5>
+          <button type="button" class="btn-close" (click)="onFechar()"></button>
+        </div>
+
+        <form [formGroup]="form()" (ngSubmit)="onSalvar()">
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Veterinário</label>
+                <select class="form-select" formControlName="veterinarioId">
+                  <option [ngValue]="null">Selecione</option>
+                  @for (vet of veterinarios(); track vet.id) {
+                    <option [ngValue]="vet.id">{{ vet.nome }}</option>
+                  }
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Data/Hora</label>
+                <input type="datetime-local" class="formControl bg-light" formControlName="dataHora" readonly />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Nome Paciente</label>
+                <input type="text" class="formControl bg-light" formControlName="nomePaciente" readonly />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Espécie</label>
+                <input type="text" class="formControl bg-light" formControlName="especie" readonly />
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Suspeita Clínica</label>
+                <textarea rows="2" class="formControl" formControlName="suspeitaClinica"></textarea>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Tipo de Alimentação</label>
+                <input type="text" class="formControl" formControlName="tipoAlimentacao" />
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Quantidade (g)</label>
+                <input type="text" class="formControl" formControlName="quantidadeAlimentacao" />
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Forma</label>
+                <input type="text" class="formControl" formControlName="formaAlimentacao" />
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Estado Geral</label>
+                <textarea rows="2" class="formControl" formControlName="estadoGeral"></textarea>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label d-block">Solicitação de Exames</label>
+                <div class="d-flex flex-wrap gap-3">
+                  <div class="form-check">
+                    <input id="exameSangue" class="form-check-input" type="checkbox" formControlName="exameSangue" />
+                    <label class="form-check-label" for="exameSangue">[SANGUE]</label>
+                  </div>
+                  <div class="form-check">
+                    <input
+                      id="exameFezesParasitologico"
+                      class="form-check-input"
+                      type="checkbox"
+                      formControlName="exameFezesParasitologico"
+                    />
+                    <label class="form-check-label" for="exameFezesParasitologico">FEZES [PARASITOLÓGICO]</label>
+                  </div>
+                  <div class="form-check">
+                    <input id="exameUrina" class="form-check-input" type="checkbox" formControlName="exameUrina" />
+                    <label class="form-check-label" for="exameUrina">[URINA]</label>
+                  </div>
+                  <div class="form-check">
+                    <input id="exameImagem" class="form-check-input" type="checkbox" formControlName="exameImagem" />
+                    <label class="form-check-label" for="exameImagem">[IMAGEM]</label>
+                  </div>
+                  <div class="form-check">
+                    <input
+                      id="exameCardiologicos"
+                      class="form-check-input"
+                      type="checkbox"
+                      formControlName="exameCardiologicos"
+                    />
+                    <label class="form-check-label" for="exameCardiologicos">[CARDIOLÓGICOS]</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">TR (ºC)</label>
+                <input type="text" class="formControl" formControlName="trCelsius" />
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">FC (bpm)</label>
+                <input type="text" class="formControl" formControlName="fcBpm" />
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">FR (mpm)</label>
+                <input type="text" class="formControl" formControlName="frMpm" />
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">PA (mmHg)</label>
+                <input type="text" class="formControl" formControlName="paMmhg" />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Mucosa</label>
+                <input type="text" class="formControl" formControlName="mucosa" />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Urina</label>
+                <input type="text" class="formControl" formControlName="urina" />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Aspecto da Urina</label>
+                <input type="text" class="formControl" formControlName="aspectoUrina" />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Fezes</label>
+                <input type="text" class="formControl" formControlName="fezes" />
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Aspecto das Fezes</label>
+                <input type="text" class="formControl" formControlName="aspectoFezes" />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Houve Visita</label>
+                <input type="text" class="formControl" formControlName="houveVisita" />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">PCR</label>
+                <input type="text" class="formControl" formControlName="pcr" />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Testes rápidos</label>
+                <input type="text" class="formControl" formControlName="testesRapidos" />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Qual o PCR realizado</label>
+                <input type="text" class="formControl" formControlName="qualPcrRealizado" />
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">O que foi conversado com o responsável</label>
+                <textarea rows="2" class="formControl" formControlName="conversadoResponsavel"></textarea>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Prognóstico</label>
+                <textarea rows="2" class="formControl" formControlName="prognostico"></textarea>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Indicação de Alta</label>
+                <textarea rows="2" class="formControl" formControlName="indicacaoAlta"></textarea>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Conduta (opcional)</label>
+                <textarea rows="2" class="formControl" formControlName="conduta"></textarea>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Próxima reavaliação (opcional)</label>
+                <input type="datetime-local" class="formControl" formControlName="proximaReavaliacao" />
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" (click)="onFechar()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar Evolução</button>
+          </div>
+        </form>
       </div>
-
-      <form [formGroup]="form()" (ngSubmit)="onSalvar()" class="modal-body">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">Veterinário</label>
-            <select class="form-select" formControlName="veterinarioId">
-              <option [ngValue]="null">Selecione</option>
-              @for (vet of veterinarios(); track vet.id) {
-                <option [ngValue]="vet.id">{{ vet.nome }}</option>
-              }
-            </select>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Data/Hora</label>
-            <input type="datetime-local" class="form-control" formControlName="dataHora" />
-          </div>
-
-          <div class="col-12">
-            <label class="form-label">Descrição</label>
-            <textarea rows="3" class="form-control" formControlName="descricao"></textarea>
-          </div>
-
-          <div class="col-12">
-            <label class="form-label">Conduta (opcional)</label>
-            <textarea rows="2" class="form-control" formControlName="conduta"></textarea>
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Próxima reavaliação (opcional)</label>
-            <input type="datetime-local" class="form-control" formControlName="proximaReavaliacao" />
-          </div>
-        </div>
-
-        <div class="modal-actions mt-4">
-          <button type="button" class="btn btn-outline-secondary" (click)="onFechar()">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Salvar Evolução</button>
-        </div>
-      </form>
     </div>
   </div>
 }
