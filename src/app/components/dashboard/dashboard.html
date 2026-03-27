@@ -1,1 +1,78 @@
-<p>dashboard works!</p>
+<section class="dashboard-shell">
+	<header class="dashboard-header page-header">
+		<div class="page-header-main">
+			<h4 class="screen-title">Dashboard</h4>
+			<p class="page-subtitle">Visao consolidada da clinica para {{ dataHojeLabel() }}</p>
+		</div>
+	</header>
+
+	<section class="kpi-grid" aria-label="Resumo numerico do sistema">
+		<article class="kpi-card">
+			<span class="kpi-label">Clientes cadastrados</span>
+			<strong class="kpi-value">{{ totalClientes() }}</strong>
+		</article>
+
+		<article class="kpi-card">
+			<span class="kpi-label">Pets cadastrados</span>
+			<strong class="kpi-value">{{ totalPets() }}</strong>
+		</article>
+
+		<article class="kpi-card">
+			<span class="kpi-label">Pets internados</span>
+			<strong class="kpi-value">{{ totalInternados() }}</strong>
+		</article>
+
+		<article class="kpi-card">
+			<span class="kpi-label">Agendamentos de hoje</span>
+			<strong class="kpi-value">{{ totalAgendamentosHoje() }}</strong>
+		</article>
+
+		<article class="kpi-card kpi-card-highlight">
+			<span class="kpi-label">Confirmados para hoje</span>
+			<strong class="kpi-value">{{ totalConfirmadosHoje() }}</strong>
+		</article>
+	</section>
+
+	<section class="dashboard-grid">
+		<article class="panel">
+			<header class="panel-header">
+				<h2>Agendamentos do dia</h2>
+				<span>{{ agendamentosHojeLista().length }} item(ns)</span>
+			</header>
+
+			@if (agendamentosHojeLista().length === 0) {
+				<p class="empty-state">Nenhum agendamento para hoje.</p>
+			} @else {
+				<ul class="list-unstyled info-list">
+					@for (agendamento of agendamentosHojeLista(); track agendamento.id) {
+						<li class="agendamento-card" [class]="obterClasseCardStatus(agendamento)">
+							<span class="title">{{ agendamento.nome || 'Atendimento' }} · {{ agendamento.horario }}</span>
+							<span class="detail">{{ agendamento.pet.nome || 'Pet nao informado' }}</span>
+						</li>
+					}
+				</ul>
+			}
+		</article>
+
+		<article class="panel">
+			<header class="panel-header">
+				<h2>Veterinarios disponiveis hoje</h2>
+				<span>{{ veterinariosDisponiveisHoje().length }} profissional(is)</span>
+			</header>
+
+			@if (veterinariosDisponiveisHoje().length === 0) {
+				<p class="empty-state">Nao ha escala cadastrada para hoje.</p>
+			} @else {
+				<ul class="list-unstyled info-list">
+					@for (vet of veterinariosDisponiveisHoje(); track vet.id) {
+						<li>
+							<span class="title">{{ vet.nome }}</span>
+							<span class="detail">{{ vet.especialidade }}</span>
+							<span class="detail">{{ vet.horarios.join(' | ') }}</span>
+						</li>
+					}
+				</ul>
+			}
+		</article>
+	</section>
+</section>

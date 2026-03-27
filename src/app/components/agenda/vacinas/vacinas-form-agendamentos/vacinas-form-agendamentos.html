@@ -1,0 +1,78 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-body">
+      <!-- Tipo de vacina -->
+      <div class="mb-4 form-field">
+        <label for="tipo" class="form-label">Tipo de Vacina</label>
+        <input type="text" class="formControl" id="tipo" [ngModel]="tipo()" (ngModelChange)="tipo.set($event)" placeholder="Ex: Raiva, V10, V8..." />
+      </div>
+
+      <!-- Nome da vacina -->
+      <div class="mb-4 form-field">
+        <label for="nome" class="form-label">Nome da Vacina</label>
+        <input type="text" class="formControl" id="nome" [ngModel]="nome()" (ngModelChange)="nome.set($event)" placeholder="Ex: Rabivax, Vanguard PLUS..." />
+      </div>
+
+      <!-- Lote -->
+      <div class="mb-4 form-field">
+        <label for="lote" class="form-label">Lote</label>
+        <input type="text" class="formControl" id="lote" [ngModel]="lote()" (ngModelChange)="lote.set($event)" placeholder="Ex: L12345" />
+      </div>
+
+      <!-- Fabricante -->
+      <div class="mb-4 form-field">
+        <label for="fabricante" class="form-label">Fabricante</label>
+        <input type="text" class="formControl" id="fabricante" [ngModel]="fabricante()" (ngModelChange)="fabricante.set($event)" placeholder="Ex: Zoetis" />
+      </div>
+
+      <!-- Data de validade -->
+      <div class="mb-4 form-field">
+        <label for="dataValidade" class="form-label">Data de Validade</label>
+        <input type="date" class="formControl" id="dataValidade" [ngModel]="dataValidade()" (ngModelChange)="dataValidade.set($event)" />
+      </div>
+
+      <!-- Dose -->
+      <div class="mb-4 form-field">
+        <label for="dose" class="form-label">Dose</label>
+        <input type="text" class="formControl" id="dose" [ngModel]="dose()" (ngModelChange)="dose.set($event)" placeholder="Ex: 1.0 mL, 2.0 mL..." />
+      </div>
+
+      <!-- Horários disponíveis -->
+      <div class="mb-4">
+        <label class="form-label d-block mb-3">
+          <i class="fa-solid fa-clock"></i> Escolha um Horário
+        </label>
+        <div class="horario-selector">
+          @for (horario of horariosDisponiveis(); track horario) {
+            <div class="horario-option">
+              <input
+                type="radio"
+                [id]="'horario-' + horario"
+                name="horario"
+                [value]="horario"
+                (change)="selectedHorario.set(horario)"
+                [checked]="selectedHorario() === horario"
+              />
+              <label [for]="'horario-' + horario" class="badge badge-lg">
+                {{ horario }}
+              </label>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Botões -->
+      <div class="d-flex gap-2">
+        <button class="btn btn-warning btn-lg flex-grow-1" (click)="onSalvar()" [disabled]="!selectedHorario() || !tipo()">
+          <i class="fa-solid fa-check"></i> Agendar
+        </button>
+        <button class="btn btn-outline-secondary btn-lg flex-grow-1" (click)="resetForm()">
+          <i class="fa-solid fa-redo"></i> Limpar
+        </button>
+        <button class="btn btn-secondary btn-lg" (click)="onCancelar()">
+          <i class="fa-solid fa-times"></i> Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

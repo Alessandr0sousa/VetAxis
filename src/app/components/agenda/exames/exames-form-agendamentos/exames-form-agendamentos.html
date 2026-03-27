@@ -1,24 +1,41 @@
 <div class="container mt-4">
   <div class="card">
-    <div class="card-header">
-      <h5 class="mb-0">Agendar Exame</h5>
-    </div>
     <div class="card-body">
       <!-- Tipo de exame -->
-      <div class="mb-3">
+      <div class="mb-4 form-field">
         <label for="tipo" class="form-label">Tipo de Exame</label>
-        <input type="text" class="form-control" id="tipo" [ngModel]="tipo()" (ngModelChange)="tipo.set($event)" />
+        <input type="text" class="formControl" id="tipo" [ngModel]="tipo()" (ngModelChange)="tipo.set($event)" placeholder="Ex: Hemograma, Ultrassom..." />
       </div>
 
       <!-- Descrição -->
-      <div class="mb-3">
+      <div class="mb-4 form-field">
         <label for="descricao" class="form-label">Descrição</label>
-        <textarea class="form-control" id="descricao" [ngModel]="descricaoExame()" (ngModelChange)="descricaoExame.set($event)" rows="3"></textarea>
+        <textarea class="formControl" id="descricao" [ngModel]="descricaoExame()" (ngModelChange)="descricaoExame.set($event)" rows="3" placeholder="Descreva os detalhes do exame..."></textarea>
+      </div>
+
+      <!-- Material Coletado -->
+      <div class="mb-4 form-field">
+        <label for="materialColetado" class="form-label">Material Coletado</label>
+        <input type="text" class="formControl" id="materialColetado" [ngModel]="materialColetado()" (ngModelChange)="materialColetado.set($event)" placeholder="Ex: Sangue" />
+      </div>
+
+      <!-- Achados -->
+      <div class="mb-4 form-field">
+        <label for="achados" class="form-label">Achados</label>
+        <textarea class="formControl" id="achados" [ngModel]="achados()" (ngModelChange)="achados.set($event)" rows="2" placeholder="Ex: Sem alterações relevantes"></textarea>
+      </div>
+
+      <!-- Laudo -->
+      <div class="mb-4 form-field">
+        <label for="laudo" class="form-label">Laudo</label>
+        <textarea class="formControl" id="laudo" [ngModel]="laudo()" (ngModelChange)="laudo.set($event)" rows="2" placeholder="Ex: Dentro da normalidade"></textarea>
       </div>
 
       <!-- Horários disponíveis -->
-      <div class="mb-3">
-        <label class="form-label">Horário</label>
+      <div class="mb-4">
+        <label class="form-label d-block mb-3">
+          <i class="fa-solid fa-clock"></i> Escolha um Horário
+        </label>
         <div class="horario-selector">
           @for (horario of horariosDisponiveis(); track horario) {
             <div class="horario-option">
@@ -30,7 +47,7 @@
                 (change)="selectedHorario.set(horario)"
                 [checked]="selectedHorario() === horario"
               />
-              <label [for]="'horario-' + horario">
+              <label [for]="'horario-' + horario" class="badge badge-lg">
                 {{ horario }}
               </label>
             </div>
@@ -40,11 +57,14 @@
 
       <!-- Botões -->
       <div class="d-flex gap-2">
-        <button class="btn btn-primary" (click)="onSalvar()" [disabled]="!selectedHorario() || !tipo()">
-          Agendar
+        <button class="btn btn-primary btn-lg flex-grow-1" (click)="onSalvar()" [disabled]="!selectedHorario() || !tipo()">
+          <i class="fa-solid fa-check"></i> Agendar
         </button>
-        <button class="btn btn-secondary" (click)="resetForm()">
-          Limpar
+        <button class="btn btn-outline-secondary btn-lg flex-grow-1" (click)="resetForm()">
+          <i class="fa-solid fa-redo"></i> Limpar
+        </button>
+        <button class="btn btn-secondary btn-lg" (click)="onCancelar()">
+          <i class="fa-solid fa-times"></i> Cancelar
         </button>
       </div>
     </div>

@@ -1,5 +1,5 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FuncionarioModel } from '../../models/funcionario-model';
 import { ViaCepService } from '@shared/services';
 import { Customservice } from '@shared/services';

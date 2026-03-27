@@ -30,10 +30,10 @@ export const StatusAgendamentoLabels: { [key in StatusAgendamento]: string } = {
 
 export const STATUS_BADGE_CLASS: Record<StatusAgendamento, string> = {
   [StatusAgendamento.AGENDADO]: 'text-white bg-secondary',
-  [StatusAgendamento.CONFIRMADO]: 'text-white bg-primary',
+  [StatusAgendamento.CONFIRMADO]: 'text-white bg-success',
   [StatusAgendamento.CANCELADO]: 'text-white bg-danger',
-  [StatusAgendamento.INICIADO]: 'text-white bg-warning',
-  [StatusAgendamento.REALIZADO]: 'text-white bg-success',
+  [StatusAgendamento.INICIADO]: 'text-dark bg-warning',
+  [StatusAgendamento.REALIZADO]: 'text-white bg-primary',
 };
 
 export const STATUS_ICON_CLASS: Record<StatusAgendamento, string> = {

@@ -8,22 +8,24 @@ import { AlertService } from '@shared/services';
 import { UserProfileService } from '@infrastructure/storage';
 
 @Component({
-  selector: 'app-exames-form-agendamentos',
+  selector: 'app-cirurgias-form-agendamentos',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
-  templateUrl: './exames-form-agendamentos.html',
-  styleUrl: './exames-form-agendamentos.scss',
+  templateUrl: './cirurgias-form-agendamentos.html',
+  styleUrl: './cirurgias-form-agendamentos.scss',
 })
-export class ExamesFormAgendamentos implements OnInit {
-  @Input() tipoAgendamento: TipoAgendamento = TipoAgendamento.EXAME;
+export class CirurgiasFormAgendamentos implements OnInit {
+  @Input() tipoAgendamento: TipoAgendamento = TipoAgendamento.CIRURGIA;
 
   @Output() cancelar = new EventEmitter<void>();
   selectedVeterinario = signal<any | null>(null);
-  descricaoExame = signal<string>('');
+  descricao = signal<string>('');
   tipo = signal<string>('');
-  materialColetado = signal<string>('');
-  achados = signal<string>('');
-  laudo = signal<string>('');
+  anestesia = signal<string>('');
+  anestesista = signal<string>('');
+  protocoloAnestesia = signal<string>('');
+  relaProcedimento = signal<string>('');
+  internamento = signal<boolean>(false);
   selectedHorario = signal<string | null>(null);
   diaSelecionado = signal<string>('');
 
@@ -48,7 +50,7 @@ export class ExamesFormAgendamentos implements OnInit {
 
   onSalvar(): void {
     if (!this.selectedHorario() || !this.tipo()) {
-      this.alertService.warning('Selecione horário e tipo de exame');
+      this.alertService.warning('Selecione horário e tipo de cirurgia');
       return;
     }
 
@@ -64,31 +66,33 @@ export class ExamesFormAgendamentos implements OnInit {
 
     const agendamento: ConsultasFormAgendamentosModel = {
       id: 0,
-      nome: 'Exame',
+      nome: 'Cirurgia',
       veterinario: this.selectedVeterinario(),
       dia: this.diaSelecionado(),
       horario: this.selectedHorario()!,
       pet: {} as any,  // Será preenchido pelo componente pai
-      tipoAgendamento: TipoAgendamento.EXAME,
+      tipoAgendamento: TipoAgendamento.CIRURGIA,
       peso: 0,
       clinicaId: clinicaId,
-      // Campos de exame (flattened)
+      // Campos de cirurgia (flattened)
       tipo: this.tipo(),
-      descricao: this.descricaoExame(),
-      materialColetado: this.materialColetado(),
-      achados: this.achados(),
-      laudo: this.laudo(),
-      statusExame: 'SOLICITADO',
+      descricao: this.descricao(),
+      anestesia: this.anestesia(),
+      anestesista: this.anestesista(),
+      protocoloAnestesia: this.protocoloAnestesia(),
+      relaProcedimento: this.relaProcedimento(),
+      internamento: this.internamento(),
+      statusCirurgia: 'AGENDADA',
     } as ConsultasFormAgendamentosModel;
 
-    this.agendamentosService.salvarExame(agendamento).subscribe({
+    this.agendamentosService.salvarCirurgia(agendamento).subscribe({
       next: () => {
-        this.alertService.success('Exame agendado com sucesso!');
+        this.alertService.success('Cirurgia agendada com sucesso!');
         this.resetForm();
       },
       error: (err: any) => {
-        console.error('Erro ao agendar exame', err);
-        this.alertService.error('Erro ao agendar exame');
+        console.error('Erro ao agendar cirurgia', err);
+        this.alertService.error('Erro ao agendar cirurgia');
       },
     });
   }
@@ -96,10 +100,12 @@ export class ExamesFormAgendamentos implements OnInit {
   resetForm(): void {
     this.selectedHorario.set(null);
     this.tipo.set('');
-    this.descricaoExame.set('');
-    this.materialColetado.set('');
-    this.achados.set('');
-    this.laudo.set('');
+    this.descricao.set('');
+    this.anestesia.set('');
+    this.anestesista.set('');
+    this.protocoloAnestesia.set('');
+    this.relaProcedimento.set('');
+    this.internamento.set(false);
     this.selectedVeterinario.set(null);
   }
 

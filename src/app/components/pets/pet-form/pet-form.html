@@ -1,13 +1,15 @@
 <div class="mt-3">
   <div class="card-header mb-3">
-    <h5 class="mb-0">{{ dto ? 'Editar' : 'Cadastrar' }} Pet</h5>
+    <div class="mb-3 col-12 page-header-main">
+      <h4 class="mb-0 screen-title">{{ dto ? 'Editar' : 'Cadastrar' }} Pet</h4>
+    </div>
   </div>
   <div class="card-body">
-    <form [formGroup]="petForm" (ngSubmit)="salvarPet()">
+    <form [formGroup]="petForm" (ngSubmit)="salvarPet()" novalidate>
       <div class="container-fluid">
         <div class="g-2 row">
           <!-- Nome -->
-          <div class="mb-3 col-6 col-md-4">
+          <div class="mb-3 col-6 col-md-4 form-field">
             <label class="form-label">Nome do Animal</label>
             <input
               type="text"
@@ -15,10 +17,13 @@
               formControlName="nome"
               placeholder="Digite o nome"
             />
+            @if (petForm.get('nome')?.invalid && petForm.get('nome')?.touched) {
+              <div class="text-danger">Nome é obrigatório.</div>
+            }
           </div>
 
           <!-- Sexo -->
-          <div class="mb-3 col-3 col-md-2">
+          <div class="mb-3 col-3 col-md-2 form-field">
             <label class="form-label">Sexo</label>
             <input
               class="formControl"
@@ -30,6 +35,9 @@
               <option value="Macho"></option>
               <option value="Fêmea"></option>
             </datalist>
+            @if (petForm.get('sexo')?.invalid && petForm.get('sexo')?.touched) {
+              <div class="text-danger">Sexo é obrigatório.</div>
+            }
           </div>
 
           <!-- Esterilização -->
@@ -45,13 +53,16 @@
           </div>
 
           <!-- Nascimento -->
-          <div class="mb-3 col-4 col-md-3">
+          <div class="mb-3 col-4 col-md-3 form-field">
             <label class="form-label">Nascimento</label>
             <input type="date" class="formControl" formControlName="nascimento" />
+            @if (petForm.get('nascimento')?.invalid && petForm.get('nascimento')?.touched) {
+              <div class="text-danger">Nascimento é obrigatório.</div>
+            }
           </div>
 
           <!-- Espécie -->
-          <div class="mb-3 col-4 col-md-3">
+          <div class="mb-3 col-4 col-md-3 form-field">
             <label class="form-label">Espécie</label>
             <input
               class="formControl"
@@ -65,10 +76,13 @@
               <option value="{{ especie }}"></option>
               }
             </datalist>
+            @if (petForm.get('especie')?.invalid && petForm.get('especie')?.touched) {
+              <div class="text-danger">Espécie é obrigatória.</div>
+            }
           </div>
 
           <!-- Raça -->
-          <div class="mb-3 col-4 col-md-3">
+          <div class="mb-3 col-4 col-md-3 form-field">
             <label class="form-label">Raça</label>
             <input
               class="formControl"
@@ -84,7 +98,7 @@
           </div>
 
           <!-- Pelagem -->
-          <div class="mb-3 col-6 col-sm-3 col-md-3">
+          <div class="mb-3 col-6 col-sm-3 col-md-3 form-field">
             <label class="form-label">Pelagem (Cor)</label>
             <input
               class="formControl"
@@ -100,7 +114,7 @@
           </div>
 
           <!-- Temperamento -->
-          <div class="mb-3 col-6 col-sm-3 col-md-3">
+          <div class="mb-3 col-6 col-sm-3 col-md-3 form-field">
             <label class="form-label">Temperamento</label>
             <input
               class="formControl"
@@ -116,7 +130,7 @@
           </div>
 
           <!-- Microchip -->
-          <div class="form-check mb-3 col-4 col-sm-3 col-md-2 checkbox">
+          <div class="form-check mb-3 col-4 col-sm-3 col-md-2 checkbox form-field">
             <input
               type="checkbox"
               class="form-check-input"
@@ -127,8 +141,8 @@
           </div>
 
           @if (petForm.get('microchip')?.value) {
-          <div class="col-4 col-sm-3 col-md-2 mb-3">
-            <label for="chip">Chip</label>
+          <div class="col-4 col-sm-3 col-md-2 mb-3 form-field">
+            <label for="chip" class="form-label">Chip</label>
             <input
               type="text"
               class="formControl"
@@ -139,12 +153,12 @@
           </div>
           }
           <!-- Status -->
-          <div class="form-check mb-3 col-4 col-sm-3 col-md-2 checkbox">
+          <div class="form-check mb-3 col-4 col-sm-3 col-md-2 checkbox form-field">
             <input type="checkbox" class="form-check-input" formControlName="status" id="status" />
             <label class="form-check-label" for="status">Ativo</label>
           </div>
           <!-- Cliente Responsável -->
-          <div class="mb-3 col-6 col-md-4">
+          <div class="mb-3 col-6 col-md-4 form-field">
             <label class="form-label" for="responsavel">Responsável</label>
             <input
               id="responsavel"
@@ -160,9 +174,12 @@
               <option [value]="c.nome"></option>
               }
             </datalist>
+            @if (petForm.get('clienteNome')?.invalid && petForm.get('clienteNome')?.touched) {
+              <div class="text-danger">Responsável é obrigatório.</div>
+            }
           </div>
           <!-- Botões -->
-          <div class="d-flex justify-content-end">
+          <div class="col-12 d-flex justify-content-end">
             <button type="button" class="btn btn-secondary me-2" (click)="cancelarPet()">
               Descartar
             </button>

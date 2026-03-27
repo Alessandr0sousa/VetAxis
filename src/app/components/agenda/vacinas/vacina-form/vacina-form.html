@@ -1,0 +1,45 @@
+<div class="card-body">
+  <form [formGroup]="form" (ngSubmit)="salvar()" class="container mt-3" novalidate>
+    <div class="row">
+      <div class="mb-3 col-md-6 form-field">
+        <label class="form-label">Veterinário</label>
+        <input class="formControl readonly" [value]="agendamento?.veterinario?.nome || ''" readonly />
+      </div>
+
+      <div class="mb-3 col-md-6 form-field">
+        <label class="form-label">Pet</label>
+        <input class="formControl readonly" [value]="agendamento?.pet?.nome || ''" readonly />
+      </div>
+
+      <div class="mb-3 col-md-6 form-field">
+        <label for="tipo" class="form-label">Tipo de Vacina</label>
+        <input id="tipo" class="formControl" formControlName="tipo" />
+      </div>
+
+      <div class="mb-3 col-md-6 form-field">
+        <label for="dose" class="form-label">Dose</label>
+        <input id="dose" class="formControl" formControlName="dose" />
+      </div>
+
+      <div class="mb-3 col-md-4 form-field">
+        <label for="lote" class="form-label">Lote</label>
+        <input id="lote" class="formControl" formControlName="lote" />
+      </div>
+
+      <div class="mb-3 col-md-4 form-field">
+        <label for="fabricante" class="form-label">Fabricante</label>
+        <input id="fabricante" class="formControl" formControlName="fabricante" />
+      </div>
+
+      <div class="mb-3 col-md-4 form-field">
+        <label for="dataValidade" class="form-label">Data de Validade</label>
+        <input id="dataValidade" type="date" class="formControl" formControlName="dataValidade" />
+      </div>
+
+      <div class="col-12 d-flex justify-content-end">
+        <button type="button" class="btn btn-secondary me-2" (click)="onCancelar()">Cancelar</button>
+        <button type="submit" class="btn btn-success" [disabled]="form.invalid">Salvar</button>
+      </div>
+    </div>
+  </form>
+</div>

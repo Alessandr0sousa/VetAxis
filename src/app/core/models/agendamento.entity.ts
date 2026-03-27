@@ -61,6 +61,7 @@ export interface Anexo {
  * Interface base para Agendamento
  */
 export interface Agendamento extends BaseEntity {
+  nomeAgendamento?: string;
   veterinario: Veterinario;
   clinica?: Clinica;
   clinicaId: number;
@@ -98,6 +99,7 @@ export interface CirurgiaData {
   tipo?: string;
   descricao?: string;
   anestesia?: string;
+  anestesista?: string;
   protocoloAnestesia?: string;
   relaProcedimento?: string;
   internamento?: boolean;

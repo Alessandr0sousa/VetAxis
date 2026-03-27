@@ -1,0 +1,84 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-body">
+      <!-- Tipo de cirurgia -->
+      <div class="mb-4 form-field">
+        <label for="tipo" class="form-label">Tipo de Cirurgia</label>
+        <input type="text" class="formControl" id="tipo" [ngModel]="tipo()" (ngModelChange)="tipo.set($event)" placeholder="Ex: Castração, Ovário-Histerectomia..." />
+      </div>
+
+      <!-- Descrição -->
+      <div class="mb-4 form-field">
+        <label for="descricao" class="form-label">Descrição</label>
+        <textarea class="formControl" id="descricao" [ngModel]="descricao()" (ngModelChange)="descricao.set($event)" rows="3" placeholder="Descreva os detalhes da cirurgia..."></textarea>
+      </div>
+
+      <!-- Anestesia -->
+      <div class="mb-4 form-field">
+        <label for="anestesia" class="form-label">Anestesia</label>
+        <input type="text" class="formControl" id="anestesia" [ngModel]="anestesia()" (ngModelChange)="anestesia.set($event)" placeholder="Ex: GERAL" />
+      </div>
+
+      <!-- Anestesista -->
+      <div class="mb-4 form-field">
+        <label for="anestesista" class="form-label">Anestesista</label>
+        <input type="text" class="formControl" id="anestesista" [ngModel]="anestesista()" (ngModelChange)="anestesista.set($event)" placeholder="Ex: Dr. Carlos" />
+      </div>
+
+      <!-- Protocolo de Anestesia -->
+      <div class="mb-4 form-field">
+        <label for="protocolo" class="form-label">Protocolo de Anestesia</label>
+        <input type="text" class="formControl" id="protocolo" [ngModel]="protocoloAnestesia()" (ngModelChange)="protocoloAnestesia.set($event)" placeholder="Ex: Indução com propofol, manutenção com isoflurano..." />
+      </div>
+
+      <!-- Relatório do Procedimento -->
+      <div class="mb-4 form-field">
+        <label for="relaProcedimento" class="form-label">Procedimento</label>
+        <textarea class="formControl" id="relaProcedimento" [ngModel]="relaProcedimento()" (ngModelChange)="relaProcedimento.set($event)" rows="3" placeholder="Ex: Procedimento sem intercorrências"></textarea>
+      </div>
+
+      <!-- Internamento -->
+      <div class="mb-4 form-check form-field">
+        <input type="checkbox" class="form-check-input" id="internamento" [ngModel]="internamento()" (ngModelChange)="internamento.set($event)" />
+        <label class="form-check-label" for="internamento">Requer Internamento</label>
+      </div>
+
+      <!-- Horários disponíveis -->
+      <div class="mb-4">
+        <label class="form-label d-block mb-3">
+          <i class="fa-solid fa-clock"></i> Escolha um Horário
+        </label>
+        <div class="horario-selector">
+          @for (horario of horariosDisponiveis(); track horario) {
+            <div class="horario-option">
+              <input
+                type="radio"
+                [id]="'horario-' + horario"
+                name="horario"
+                [value]="horario"
+                (change)="selectedHorario.set(horario)"
+                [checked]="selectedHorario() === horario"
+              />
+              <label [for]="'horario-' + horario" class="badge badge-lg">
+                {{ horario }}
+              </label>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Botões -->
+      <div class="d-flex gap-2">
+        <button class="btn btn-danger btn-lg flex-grow-1" (click)="onSalvar()" [disabled]="!selectedHorario() || !tipo()">
+          <i class="fa-solid fa-check"></i> Agendar
+        </button>
+        <button class="btn btn-outline-secondary btn-lg flex-grow-1" (click)="resetForm()">
+          <i class="fa-solid fa-redo"></i> Limpar
+        </button>
+        <button class="btn btn-secondary btn-lg" (click)="onCancelar()">
+          <i class="fa-solid fa-times"></i> Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,21 +1,21 @@
 <div class="mt-3">
   <div class="card-header row">
-    <div class="mb-3 col-9">
-      <h5 class="mb-0">{{ dto ? 'Editar' : 'Cadastrar' }} Cliente</h5>
+    <div class="mb-3 col-12 page-header-main">
+      <h4 class="mb-0 screen-title">{{ dto ? 'Editar' : 'Cadastrar' }} Cliente</h4>
     </div>
   </div>
 
   <div class="card-body">
-    <form [formGroup]="form" (ngSubmit)="salvarForm()">
+    <form [formGroup]="form" (ngSubmit)="salvarForm()" novalidate>
       <div class="container-fluid">
         <div class="row g-1">
           <!-- Nome -->
-          <div class="mb-3 col-6">
+          <div class="mb-3 col-6 form-field">
             <label for="nome" class="form-label">Nome</label>
             <input
               id="nome"
               type="text"
-              class="fomControl"
+              class="formControl"
               formControlName="nome"
               placeholder="Digite o nome"
             />
@@ -25,12 +25,12 @@
           </div>
 
           <!-- CPF -->
-          <div class="mb-3 col-3">
+          <div class="mb-3 col-3 form-field">
             <label for="cpf" class="form-label">CPF</label>
             <input
               id="cpf"
               type="text"
-              class="fomControl"
+              class="formControl"
               formControlName="cpf"
               placeholder="Digite o CPF"
               (keyup)="formatarCampo($event)"
@@ -42,12 +42,12 @@
           </div>
 
           <!-- Telefone -->
-          <div class="mb-3 col-3">
+          <div class="mb-3 col-3 form-field">
             <label for="telefone" class="form-label">Telefone</label>
             <input
               id="telefone"
               type="tel"
-              class="fomControl"
+              class="formControl"
               formControlName="telefone"
               placeholder="Digite o telefone"
               (keyup)="formatarCampo($event)"
@@ -59,12 +59,12 @@
           </div>
 
           <!-- Email -->
-          <div class="mb-3 col-6">
+          <div class="mb-3 col-6 form-field">
             <label for="email" class="form-label">Email</label>
             <input
               id="email"
               type="email"
-              class="fomControl"
+              class="formControl"
               formControlName="email"
               placeholder="Digite o email"
             />
@@ -74,12 +74,12 @@
           </div>
 
           <!-- Endereço -->
-          <div class="mb-3 col-2" formGroupName="endereco">
+          <div class="mb-3 col-2 form-field" formGroupName="endereco">
             <label for="cep" class="form-label">CEP</label>
             <input
               id="cep"
               type="text"
-              class="fomControl"
+              class="formControl"
               formControlName="cep"
               placeholder="Digite o cep"
               (keyup)="formatarCampo($event)"
@@ -92,13 +92,13 @@
             }
           </div>
 
-          <div class="mb-3 col-1" formGroupName="endereco">
+          <div class="mb-3 col-1 form-field" formGroupName="endereco">
             <label for="uf" class="form-label">UF</label>
             <input
               formControlName="uf"
               id="uf"
               list="listaEstados"
-              class="fomControl"
+              class="formControl"
               placeholder="UF"
               (change)="buscarMunicipiosPorEstado($event.target.value)"
             />
@@ -108,15 +108,18 @@
               <option [value]="estado.sigla">{{ estado.nome }}</option>
               }
             </datalist>
+            @if (form.get('endereco.uf')?.invalid && form.get('endereco.uf')?.touched) {
+            <div class="text-danger">UF é obrigatória.</div>
+            }
           </div>
 
-          <div class="mb-3 col-3" formGroupName="endereco">
+          <div class="mb-3 col-3 form-field" formGroupName="endereco">
             <label for="cidade" class="form-label">Município</label>
             <input
               formControlName="cidade"
               id="cidade"
               list="listaMunicipios"
-              class="fomControl"
+              class="formControl"
               placeholder="Digite a cidade"
             />
             <datalist id="listaMunicipios">
@@ -124,40 +127,49 @@
               <option [value]="municipio.nome">{{ municipio.nome }}</option>
               }
             </datalist>
+            @if (form.get('endereco.cidade')?.invalid && form.get('endereco.cidade')?.touched) {
+            <div class="text-danger">Município é obrigatório.</div>
+            }
           </div>
 
-          <div class="mb-3 col-6" formGroupName="endereco">
+          <div class="mb-3 col-6 form-field" formGroupName="endereco">
             <label for="logradouro" class="form-label">Logradouro</label>
             <input
               id="logradouro"
               type="text"
-              class="fomControl"
+              class="formControl"
               formControlName="logradouro"
               placeholder="Digite o logradouro"
             />
+            @if (form.get('endereco.logradouro')?.invalid && form.get('endereco.logradouro')?.touched) {
+            <div class="text-danger">Logradouro é obrigatório.</div>
+            }
           </div>
 
-          <div class="mb-3 col-4" formGroupName="endereco">
+          <div class="mb-3 col-4 form-field" formGroupName="endereco">
             <label for="bairro" class="form-label">Bairro</label>
             <input
               id="bairro"
               type="text"
-              class="fomControl"
+              class="formControl"
               formControlName="bairro"
               placeholder="Digite o bairro"
             />
+            @if (form.get('endereco.bairro')?.invalid && form.get('endereco.bairro')?.touched) {
+            <div class="text-danger">Bairro é obrigatório.</div>
+            }
           </div>
 
-          <div class="mb-3 col-2" formGroupName="endereco">
+          <div class="mb-3 col-2 form-field" formGroupName="endereco">
             <label for="numero" class="form-label">Nº</label>
             <input
               id="numero"
               type="text"
-              class="fomControl"
+              class="formControl"
               formControlName="numero"
               placeholder="Digite o numero"
             />
-            @if (form.get('numero')?.touched) {
+            @if (form.get('endereco.numero')?.invalid && form.get('endereco.numero')?.touched) {
             <div class="text-danger">Número é obrigatório.</div>
             }
           </div>

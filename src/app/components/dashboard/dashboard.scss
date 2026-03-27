@@ -1,0 +1,170 @@
+:host {
+	--surface: #f9fafb;
+	--surface-card: #ffffff;
+	--border: #d9e2ec;
+	--text-main: #1f2933;
+	--text-muted: #52606d;
+	--accent: #0b7285;
+	--accent-soft: #e3fafc;
+	--shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+
+	display: block;
+	min-height: 100%;
+	background:
+		radial-gradient(circle at 0% 0%, #e3fafc 0%, transparent 30%),
+		radial-gradient(circle at 100% 100%, #fff4e6 0%, transparent 35%),
+		var(--surface);
+}
+
+.dashboard-shell {
+	padding: 1.5rem;
+	color: var(--text-main);
+}
+
+.kpi-grid {
+	display: grid;
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	gap: 1rem;
+	margin-bottom: 1.2rem;
+}
+
+.kpi-card {
+	background: var(--surface-card);
+	border: 1px solid var(--border);
+	border-radius: 0.95rem;
+	box-shadow: var(--shadow);
+	padding: 1rem;
+
+	.kpi-label {
+		display: block;
+		color: var(--text-muted);
+		font-size: 0.85rem;
+		margin-bottom: 0.35rem;
+	}
+
+	.kpi-value {
+		font-size: 1.8rem;
+		line-height: 1;
+	}
+}
+
+.kpi-card-highlight {
+	background: linear-gradient(135deg, var(--accent-soft), #ffffff);
+	border-color: #9adbe3;
+}
+
+.dashboard-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1rem;
+}
+
+.panel {
+	background: var(--surface-card);
+	border: 1px solid var(--border);
+	border-radius: 0.95rem;
+	box-shadow: var(--shadow);
+	padding: 1rem;
+}
+
+.panel-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 0.75rem;
+
+	h2 {
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 700;
+	}
+
+	span {
+		font-size: 0.8rem;
+		color: var(--text-muted);
+	}
+}
+
+.info-list {
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+
+	li {
+		border: 1px solid var(--border);
+		border-radius: 0.6rem;
+		background: #ffffff;
+		padding: 0.55rem 0.65rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.12rem;
+		box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+	}
+}
+
+.agendamento-card {
+	border-left-width: 0.25rem !important;
+	background: #ffffff;
+}
+
+.status-agendado {
+	border-left-color: #60a5fa;
+}
+
+.status-confirmado {
+	border-left-color: #2dd4bf;
+}
+
+.status-iniciado {
+	border-left-color: #f59e0b;
+}
+
+.status-realizado {
+	border-left-color: #34d399;
+}
+
+.status-cancelado {
+	border-left-color: #f87171;
+}
+
+.title {
+	font-weight: 600;
+	font-size: 0.92rem;
+}
+
+.detail {
+	color: var(--text-muted);
+	font-size: 0.82rem;
+}
+
+.empty-state {
+	color: var(--text-muted);
+	margin: 0.3rem 0 0;
+}
+
+@media (max-width: 1200px) {
+	.kpi-grid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 860px) {
+	.dashboard-shell {
+		padding: 1rem;
+	}
+
+	.kpi-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.dashboard-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 520px) {
+	.kpi-grid {
+		grid-template-columns: 1fr;
+	}
+}

@@ -1,0 +1,45 @@
+<div class="card-body">
+  <form [formGroup]="form" (ngSubmit)="salvar()" class="container mt-3" novalidate>
+    <div class="row">
+      <div class="mb-3 col-md-6 form-field">
+        <label class="form-label">Veterinário</label>
+        <input class="formControl readonly" [value]="agendamento?.veterinario?.nome || ''" readonly />
+      </div>
+
+      <div class="mb-3 col-md-6 form-field">
+        <label class="form-label">Pet</label>
+        <input class="formControl readonly" [value]="agendamento?.pet?.nome || ''" readonly />
+      </div>
+
+      <div class="mb-3 col-md-6 form-field">
+        <label for="tipo" class="form-label">Tipo de Exame</label>
+        <input id="tipo" class="formControl" formControlName="tipo" />
+      </div>
+
+      <div class="mb-3 col-md-6 form-field">
+        <label for="materialColetado" class="form-label">Material Coletado</label>
+        <input id="materialColetado" class="formControl" formControlName="materialColetado" />
+      </div>
+
+      <div class="mb-3 col-md-12 form-field">
+        <label for="descricao" class="form-label">Descrição</label>
+        <textarea id="descricao" class="formControl" formControlName="descricao" rows="3"></textarea>
+      </div>
+
+      <div class="mb-3 col-md-6 form-field">
+        <label for="achados" class="form-label">Achados</label>
+        <textarea id="achados" class="formControl" formControlName="achados" rows="3"></textarea>
+      </div>
+
+      <div class="mb-3 col-md-6 form-field">
+        <label for="laudo" class="form-label">Laudo</label>
+        <textarea id="laudo" class="formControl" formControlName="laudo" rows="3"></textarea>
+      </div>
+
+      <div class="col-12 d-flex justify-content-end">
+        <button type="button" class="btn btn-secondary me-2" (click)="onCancelar()">Cancelar</button>
+        <button type="submit" class="btn btn-success" [disabled]="form.invalid">Salvar</button>
+      </div>
+    </div>
+  </form>
+</div>

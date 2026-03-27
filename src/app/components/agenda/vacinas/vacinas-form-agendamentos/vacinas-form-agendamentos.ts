@@ -8,22 +8,23 @@ import { AlertService } from '@shared/services';
 import { UserProfileService } from '@infrastructure/storage';
 
 @Component({
-  selector: 'app-exames-form-agendamentos',
+  selector: 'app-vacinas-form-agendamentos',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
-  templateUrl: './exames-form-agendamentos.html',
-  styleUrl: './exames-form-agendamentos.scss',
+  templateUrl: './vacinas-form-agendamentos.html',
+  styleUrl: './vacinas-form-agendamentos.scss',
 })
-export class ExamesFormAgendamentos implements OnInit {
-  @Input() tipoAgendamento: TipoAgendamento = TipoAgendamento.EXAME;
+export class VacinasFormAgendamentos implements OnInit {
+  @Input() tipoAgendamento: TipoAgendamento = TipoAgendamento.VACINA;
 
   @Output() cancelar = new EventEmitter<void>();
   selectedVeterinario = signal<any | null>(null);
-  descricaoExame = signal<string>('');
   tipo = signal<string>('');
-  materialColetado = signal<string>('');
-  achados = signal<string>('');
-  laudo = signal<string>('');
+  nome = signal<string>('');
+  lote = signal<string>('');
+  fabricante = signal<string>('');
+  dataValidade = signal<string>('');
+  dose = signal<string>('');
   selectedHorario = signal<string | null>(null);
   diaSelecionado = signal<string>('');
 
@@ -48,7 +49,7 @@ export class ExamesFormAgendamentos implements OnInit {
 
   onSalvar(): void {
     if (!this.selectedHorario() || !this.tipo()) {
-      this.alertService.warning('Selecione horário e tipo de exame');
+      this.alertService.warning('Selecione horário e tipo de vacina');
       return;
     }
 
@@ -64,31 +65,32 @@ export class ExamesFormAgendamentos implements OnInit {
 
     const agendamento: ConsultasFormAgendamentosModel = {
       id: 0,
-      nome: 'Exame',
+      nomeAgendamento: this.nome() ? `Vacina ${this.nome()}` : 'Vacina',
       veterinario: this.selectedVeterinario(),
       dia: this.diaSelecionado(),
       horario: this.selectedHorario()!,
       pet: {} as any,  // Será preenchido pelo componente pai
-      tipoAgendamento: TipoAgendamento.EXAME,
+      tipoAgendamento: TipoAgendamento.VACINA,
       peso: 0,
       clinicaId: clinicaId,
-      // Campos de exame (flattened)
+      // Campos de vacina (flattened)
       tipo: this.tipo(),
-      descricao: this.descricaoExame(),
-      materialColetado: this.materialColetado(),
-      achados: this.achados(),
-      laudo: this.laudo(),
-      statusExame: 'SOLICITADO',
+      nome: this.nome(),
+      lote: this.lote(),
+      fabricante: this.fabricante(),
+      dataValidade: this.dataValidade(),
+      dose: this.dose(),
+      statusVacina: 'APLICADA',
     } as ConsultasFormAgendamentosModel;
 
-    this.agendamentosService.salvarExame(agendamento).subscribe({
+    this.agendamentosService.salvarVacina(agendamento).subscribe({
       next: () => {
-        this.alertService.success('Exame agendado com sucesso!');
+        this.alertService.success('Vacina agendada com sucesso!');
         this.resetForm();
       },
       error: (err: any) => {
-        console.error('Erro ao agendar exame', err);
-        this.alertService.error('Erro ao agendar exame');
+        console.error('Erro ao agendar vacina', err);
+        this.alertService.error('Erro ao agendar vacina');
       },
     });
   }
@@ -96,10 +98,11 @@ export class ExamesFormAgendamentos implements OnInit {
   resetForm(): void {
     this.selectedHorario.set(null);
     this.tipo.set('');
-    this.descricaoExame.set('');
-    this.materialColetado.set('');
-    this.achados.set('');
-    this.laudo.set('');
+    this.nome.set('');
+    this.lote.set('');
+    this.fabricante.set('');
+    this.dataValidade.set('');
+    this.dose.set('');
     this.selectedVeterinario.set(null);
   }
 

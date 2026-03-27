@@ -265,10 +265,14 @@ export class ConsultasFormAgendamentos implements OnInit {
   }
 
   montarNomeAgendamento(val: any) {
-    const petnome = val.petNome || '';
-    const dia = val.dia || '';
-    const hora = val.horario || '';
-    return [petnome, dia, hora].filter(Boolean).join('-');
+    const petNome = String(val.petNome || '').trim();
+    const tipo = this.tipoAgendamentoLabels[this.tipoAgendamento] || 'Agendamento';
+
+    if (!petNome) {
+      return tipo;
+    }
+
+    return `${tipo} ${petNome}`;
   }
 
   get horarios(): FormArray {

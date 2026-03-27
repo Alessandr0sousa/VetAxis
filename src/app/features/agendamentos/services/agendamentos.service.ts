@@ -319,12 +319,15 @@ export class AgendamentosService extends ApiService {
         peso: (cirurgia as any)?.peso,
         isRetorno: (cirurgia as any)?.isRetorno ?? false,
         consultaOrigemId: (cirurgia as any)?.consultaOrigemId ?? null,
-        // Campos específicos da cirurgia (do subgrupo form.cirurgia)
-        tipo: (cirurgia as any)?.cirurgia?.tipo ?? '',
-        anestesia: (cirurgia as any)?.cirurgia?.anestesia ?? '',
-        protocoloAnestesia: (cirurgia as any)?.cirurgia?.protocoloAnestesia ?? '',
-        procedimento: (cirurgia as any)?.cirurgia?.procedimento ?? '',
-        status: (cirurgia as any)?.cirurgia?.status ?? 'AGENDADA',
+        // Campos específicos da cirurgia (payload flat)
+        tipo: (cirurgia as any)?.tipo ?? '',
+        descricao: (cirurgia as any)?.descricao ?? '',
+        anestesia: (cirurgia as any)?.anestesia ?? '',
+        anestesista: (cirurgia as any)?.anestesista ?? '',
+        protocoloAnestesia: (cirurgia as any)?.protocoloAnestesia ?? '',
+        relaProcedimento: (cirurgia as any)?.relaProcedimento ?? '',
+        internamento: (cirurgia as any)?.internamento ?? false,
+        statusCirurgia: (cirurgia as any)?.statusCirurgia ?? 'AGENDADA',
       };
 
       console.log('AgendamentosService.salvarCirurgia - Payload para POST /agendamentos/cirurgias:', tipoPayload);
@@ -410,12 +413,13 @@ export class AgendamentosService extends ApiService {
         peso: (exame as any)?.peso,
         isRetorno: (exame as any)?.isRetorno ?? false,
         consultaOrigemId: (exame as any)?.consultaOrigemId ?? null,
-        // Campos específicos do exame (do subgrupo form.exame)
-        tipo: (exame as any)?.exame?.tipo ?? '',
-        descricao: (exame as any)?.exame?.descricao ?? '',
-        materialColetado: (exame as any)?.exame?.materialColetado ?? '',
-        resultadoEsperado: (exame as any)?.exame?.resultadoEsperado ?? '',
-        status: (exame as any)?.exame?.status ?? 'AGENDADA',
+        // Campos específicos do exame (payload flat)
+        tipo: (exame as any)?.tipo ?? '',
+        descricao: (exame as any)?.descricao ?? '',
+        materialColetado: (exame as any)?.materialColetado ?? '',
+        achados: (exame as any)?.achados ?? '',
+        laudo: (exame as any)?.laudo ?? '',
+        statusExame: (exame as any)?.statusExame ?? 'SOLICITADO',
       };
 
       console.log('AgendamentosService.salvarExame - Payload para POST /agendamentos/exames:', tipoPayload);
@@ -492,8 +496,13 @@ export class AgendamentosService extends ApiService {
 
       // Extrair dados completos conforme esperado pelo backend
       // Campos básicos + campos específicos da vacina
+      const nomePet = (vacina as any)?.pet?.nome ?? (vacina as any)?.petNome;
+      const nomeAgendamento = nomePet
+        ? `Vacina ${nomePet}`
+        : ((vacina as any)?.nomeAgendamento ?? ((vacina as any)?.nome ? `Vacina ${(vacina as any)?.nome}` : 'Vacina'));
+
       const tipoPayload = {
-        nome: (vacina as any)?.nome,
+        nomeAgendamento,
         veterinarioId: veterinarioId,
         petId: petId,
         dia: (vacina as any)?.dia,
@@ -501,12 +510,14 @@ export class AgendamentosService extends ApiService {
         peso: (vacina as any)?.peso,
         isRetorno: (vacina as any)?.isRetorno ?? false,
         consultaOrigemId: (vacina as any)?.consultaOrigemId ?? null,
-        // Campos específicos da vacina (do subgrupo form.vacina)
-        tipo: (vacina as any)?.vacina?.tipo ?? '',
-        fabricante: (vacina as any)?.vacina?.fabricante ?? '',
-        lote: (vacina as any)?.vacina?.lote ?? '',
-        dataValidade: (vacina as any)?.vacina?.dataValidade ?? null,
-        status: (vacina as any)?.vacina?.status ?? 'AGENDADA',
+        // Campos específicos da vacina (payload flat)
+        tipo: (vacina as any)?.tipo ?? '',
+        nome: (vacina as any)?.nome ?? '',
+        lote: (vacina as any)?.lote ?? '',
+        fabricante: (vacina as any)?.fabricante ?? '',
+        dataValidade: (vacina as any)?.dataValidade ?? null,
+        dose: (vacina as any)?.dose ?? '',
+        statusVacina: (vacina as any)?.statusVacina ?? 'APLICADA',
       };
 
       console.log('AgendamentosService.salvarVacina - Payload para POST /agendamentos/vacinas:', tipoPayload);

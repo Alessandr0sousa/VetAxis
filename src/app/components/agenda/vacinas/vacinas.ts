@@ -1,18 +1,18 @@
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ConsultasFormAgendamentos } from '../../consultas/consultas-form-agendamentos/consultas-form-agendamentos';
+import { VacinaForm } from './vacina-form/vacina-form';
 import { ConsultasFormAgendamentosModel } from '../../models/consultas-form-agendametos-model';
 import { AgendamentosService } from '@features/agendamentos';
 import { TipoAgendamento } from '../../models/agendamentos-model';
 import { STATUS_BADGE_CLASS, StatusAgendamento } from '../../models/consulta-model';
 import { AlertService } from '@shared/services';
-import { firstValueFrom } from 'rxjs';
+import { ConsultasFormAgendamentos } from '../../consultas/consultas-form-agendamentos/consultas-form-agendamentos';
 
 @Component({
   selector: 'app-vacinas',
   standalone: true,
-  imports: [FormsModule, CommonModule, ConsultasFormAgendamentos],
+  imports: [FormsModule, CommonModule, ConsultasFormAgendamentos, VacinaForm],
   templateUrl: './vacinas.html',
   styleUrl: './vacinas.scss',
 })
@@ -20,6 +20,7 @@ export class Vacinas implements OnInit {
   @Input() selectedAgendamento?: ConsultasFormAgendamentosModel;
   @Input() abrirFormularioDireto = false;
   isAgedamento: boolean = false;
+  isAtendimento = false;
   selectedAgendamentoDto?: ConsultasFormAgendamentosModel;
   tipoAgendamento = TipoAgendamento.VACINA;
   agendamentosFiltrados: ConsultasFormAgendamentosModel[] = [];
@@ -94,18 +95,58 @@ export class Vacinas implements OnInit {
 
   onClickEmitter() {
     this.isAgedamento = true;
+    this.isAtendimento = false;
     this.selectedAgendamentoDto = undefined;
   }
 
   onCancelar(): void {
     this.isAgedamento = false;
+    this.isAtendimento = false;
     this.selectedAgendamentoDto = undefined;
     this.listarAgendamentos();
+  }
+
+  iniciarVacina(item: ConsultasFormAgendamentosModel): void {
+    const atualizado = {
+      ...item,
+      status: StatusAgendamento.INICIADO,
+      statusVacina: StatusAgendamento.INICIADO,
+      vacina: {
+        ...(item as any).vacina,
+        status: StatusAgendamento.INICIADO,
+        statusVacina: StatusAgendamento.INICIADO,
+      },
+    } as ConsultasFormAgendamentosModel;
+
+    // Abre o atendimento imediatamente para evitar necessidade de duplo clique.
+    this.selectedAgendamentoDto = atualizado;
+    this.isAgedamento = true;
+    this.isAtendimento = true;
+    this.cdr.detectChanges();
+
+    this.agendamentoService.atualizarAgendamento(atualizado).subscribe({
+      next: () => {},
+      error: () => {
+        this.alertService.error('Erro ao iniciar vacina');
+        this.onCancelar();
+      },
+    });
+  }
+
+  onAtendimentoConcluido(item: ConsultasFormAgendamentosModel): void {
+    this.agendamentoService.atualizarAgendamento(item).subscribe({
+      next: () => {
+        this.alertService.success('Vacina finalizada com sucesso!');
+        this.onCancelar();
+      },
+      error: () => this.alertService.error('Erro ao finalizar vacina'),
+    });
   }
 
   editarAgendamento(item: ConsultasFormAgendamentosModel) {
     this.selectedAgendamentoDto = item;
     this.isAgedamento = true;
+    this.isAtendimento = false;
   }
 
   getStatusClass(status: string | null | undefined): string {
