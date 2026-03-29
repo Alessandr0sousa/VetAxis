@@ -1,0 +1,222 @@
+<div class="mt-2">
+  <div class="row">
+    <div class="col-sm-8">
+      <div class="container">
+        <div class="card-header agendamento-header">
+          <h4 class="mb-0">Agendamento de {{ tipoAgendamentoLabels[tipoAgendamento] }}</h4>
+        </div>
+        <div class="card-body">
+          <!-- Formulário -->
+          <form [formGroup]="form" (ngSubmit)="salvarAgendamento()">
+            <!-- Nome -->
+            <div class="row">
+              <!-- Veterinário -->
+              <div class="mb-3 col-sm-6 col-md-5">
+                <label for="veterinario" class="form-label">Veterinário</label>
+                <input
+                  id="veterinario"
+                  class="formControl"
+                  list="vetOptions"
+                  formControlName="veterinarioNome"
+                  placeholder="Selecione o Veterinário"
+                  (change)="onChangeSelecionado($event, 'vet')"
+                />
+                @if (form.get('veterinario')?.invalid && form.get('veterinario')?.touched) {
+                <div class="text-danger mt-1">Selecione um veterinário válido da lista.</div>
+                }
+                <datalist id="vetOptions">
+                  @for (v of vets(); track v.id) {
+                  <option [value]="v.nome"></option>
+                  }
+                </datalist>
+              </div>
+
+              <!-- Dia -->
+              <div class="mb-3 col-sm-6 col-md-3">
+                <label for="dia" class="form-label">Dia</label>
+                <input id="dia" type="text" class="formControl" formControlName="dia" readonly />
+                @if (form.get('dia')?.invalid && form.get('dia')?.touched ) {
+                <div class="text-danger mt-1">Selecione um dia no calendário.</div>
+                }
+              </div>
+
+              <!-- Horários -->
+              <div class="mb-3 col-sm-6 col-md-4">
+                <label class="form-label">Horário</label>
+                <div class="option">
+                  @if (horariosDisponiveis().length > 0) {
+                    @for (h of horariosDisponiveis(); track h.horario) {
+                      <div
+                        class="horario-selector"
+                        [class.horario-agendado]="h.agendado"
+                        [attr.title]="h.agendado ? 'Ocupado' : null"
+                      >
+                        <input
+                          type="radio"
+                          [value]="h.horario"
+                          formControlName="horario"
+                          id="horario-{{ h.horario }}"
+                          [attr.aria-disabled]="h.agendado ? 'true' : null"
+                          (click)="onHorarioClick($event, h)"
+                          (keydown.enter)="onHorarioClick($event, h)"
+                          (keydown.space)="onHorarioClick($event, h)"
+                        />
+                        <label
+                          class="form-check-label"
+                          for="horario-{{ h.horario }}"
+                        >
+                          {{ h.horario }}
+                        </label>
+                      </div>
+                    }
+                  } @else {
+                    <p class="text-muted">Selecione um veterinário e um dia para ver os horários disponíveis</p>
+                  }
+                </div>
+              </div>
+
+              <!-- Pet -->
+              <div class="mb-3 col-sm-6 col-md-5">
+                <label for="petNome" class="form-label">Pet</label>
+                <input
+                  id="petNome"
+                  class="formControl"
+                  list="petOptions"
+                  formControlName="petNome"
+                  placeholder="Selecione o Pet"
+                  (change)="onChangeSelecionado($event, 'pet')"
+                />
+                @if (form.get('pet')?.invalid && form.get('pet')?.touched) {
+                <div class="text-danger mt-1">Selecione um pet válido da lista.</div>
+                }
+                <datalist id="petOptions">
+                  @for (p of pets(); track p.id) {
+                  <option [value]="p.nome"></option>
+                  }
+                </datalist>
+              </div>
+
+              <!-- Consulta de retorno -->
+              <div class="form-check mb-3 col-sm-6 col-md-3">
+                <input
+                  id="isRetorno"
+                  type="checkbox"
+                  class="form-check-input"
+                  formControlName="isRetorno"
+                />
+                <label for="isRetorno" class="form-check-label">Retorno</label>
+              </div>
+
+              <!-- Peso -->
+              <div class="mb-3 col-sm-6 col-md-3">
+                <label for="peso" class="form-label">Peso (kg)</label>
+                <input
+                  id="peso"
+                  type="number"
+                  class="formControl"
+                  formControlName="peso"
+                  min="0"
+                  step="0.1"
+                />
+                @if (form.get('peso')?.invalid && form.get('peso')?.touched) {
+                <div class="text-danger mt-1">Peso deve ser um valor positivo.</div>
+                }
+              </div>
+
+              @if (tipoAgendamento === tipoAgendamentoEnum.CONSULTA) {
+                <!-- Anamnese -->
+                <div class="mb-3" formGroupName="consulta">
+                  <label for="anamnese" class="form-label">Anamnese</label>
+                  <textarea
+                    id="anamnese"
+                    rows="2"
+                    class="formControl"
+                    formControlName="anamnese"
+                  ></textarea>
+                  @if (form.get('consulta.anamnese')?.invalid && form.get('consulta.anamnese')?.touched) {
+                  <div class="text-danger mt-1">Anamnese deve conter pelo menos 10 caracteres.</div>
+                  }
+                </div>
+              }
+
+              @if (tipoAgendamento === tipoAgendamentoEnum.EXAME) {
+                <div class="mb-3" formGroupName="exame">
+                  <label for="exame-tipo" class="form-label">Tipo de Exame</label>
+                  <input id="exame-tipo" class="formControl" formControlName="tipo" />
+                </div>
+                <div class="mb-3" formGroupName="exame">
+                  <label for="exame-descricao" class="form-label">Descrição</label>
+                  <textarea id="exame-descricao" rows="2" class="formControl" formControlName="descricao"></textarea>
+                </div>
+                <div class="mb-3" formGroupName="exame">
+                  <label for="exame-material" class="form-label">Material Coletado</label>
+                  <input id="exame-material" class="formControl" formControlName="materialColetado" />
+                </div>
+              }
+
+              @if (tipoAgendamento === tipoAgendamentoEnum.CIRURGIA) {
+                <div class="mb-3" formGroupName="cirurgia">
+                  <label for="cirurgia-tipo" class="form-label">Tipo de Cirurgia</label>
+                  <input id="cirurgia-tipo" class="formControl" formControlName="tipo" />
+                </div>
+                <div class="mb-3" formGroupName="cirurgia">
+                  <label for="cirurgia-descricao" class="form-label">Descrição</label>
+                  <textarea id="cirurgia-descricao" rows="2" class="formControl" formControlName="descricao"></textarea>
+                </div>
+                <div class="mb-3" formGroupName="cirurgia">
+                  <label for="cirurgia-protocolo" class="form-label">Protocolo Anestesia</label>
+                  <input id="cirurgia-protocolo" class="formControl" formControlName="protocoloAnestesia" />
+                </div>
+                <div class="form-check mb-3" formGroupName="cirurgia">
+                  <input id="cirurgia-internamento" type="checkbox" class="form-check-input" formControlName="internamento" />
+                  <label for="cirurgia-internamento" class="form-check-label">Internamento</label>
+                </div>
+              }
+
+              @if (tipoAgendamento === tipoAgendamentoEnum.VACINA) {
+                <div class="mb-3 col-4" formGroupName="vacina">
+                  <label for="vacina-tipo" class="form-label">Tipo de Vacina</label>
+                  <input id="vacina-tipo" class="formControl" formControlName="tipo" />
+                </div>
+                <div class="mb-3 col-4" formGroupName="vacina">
+                  <label for="vacina-nome" class="form-label">Nome</label>
+                  <input id="vacina-nome" class="formControl" formControlName="nome" />
+                </div>
+                <div class="mb-3 col-4" formGroupName="vacina">
+                  <label for="vacina-dose" class="form-label">Dose</label>
+                  <input id="vacina-dose" class="formControl" formControlName="dose" />
+                </div>
+              }
+
+              <!-- Anexos -->
+              <div class="col-12">
+                <app-anexos-upload [agendamentoId]="dto?.id" formControlName="anexos"></app-anexos-upload>
+              </div>
+
+              <!-- Botões -->
+              <div class="d-flex justify-content-end">
+                <button
+                  type="button"
+                  class="btn btn-secondary cancel"
+                  (click)="cancelarAgendamento()"
+                >
+                  Descartar
+                </button>
+                <button type="submit" class="btn btn-success" [disabled]="form.invalid">
+                  Agendar
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <app-agenda-calendario
+        [diasHabilitados]="diasHabilitados()"
+        (diaSelecionado)="form.get('dia')?.setValue(atualizarDiaSelecionado($event))"
+      ></app-agenda-calendario>
+      <app-consultas-list [diaSelected]="diaSelected"></app-consultas-list>
+    </div>
+  </div>
+</div>

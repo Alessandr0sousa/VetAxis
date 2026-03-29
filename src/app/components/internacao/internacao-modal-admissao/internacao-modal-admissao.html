@@ -1,0 +1,71 @@
+@if (aberto()) {
+  <div class="internacao-dialog-overlay">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Nova Internação</h5>
+          <button type="button" class="btn-close" (click)="onFechar()"></button>
+        </div>
+
+        <form [formGroup]="form()" (ngSubmit)="onSalvar()">
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Pet</label>
+                <select class="form-select" formControlName="petId">
+                  <option [ngValue]="null">Selecione</option>
+                  @for (pet of pets(); track pet.id) {
+                    <option [ngValue]="pet.id">{{ pet.nome }}</option>
+                  }
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Veterinário</label>
+                <select class="form-select" formControlName="veterinarioId">
+                  <option [ngValue]="null">Selecione</option>
+                  @for (vet of veterinarios(); track vet.id) {
+                    <option [ngValue]="vet.id">{{ vet.nome }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Origem</label>
+                <select class="form-select" formControlName="origemTipo">
+                  @for (origem of origemTipos(); track origem) {
+                    <option [ngValue]="origem">{{ origem }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Data/Hora Admissão</label>
+                <input type="datetime-local" class="form-control" formControlName="dataHoraAdmissao" />
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Peso Entrada (kg)</label>
+                <input type="number" step="0.1" class="form-control" formControlName="pesoEntrada" />
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Peso Atual (kg)</label>
+                <input type="number" step="0.1" class="form-control" formControlName="pesoAtual" />
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Motivo da Internação</label>
+                <textarea rows="3" class="form-control" formControlName="motivoInternacao"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" (click)="onFechar()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Admitir</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}

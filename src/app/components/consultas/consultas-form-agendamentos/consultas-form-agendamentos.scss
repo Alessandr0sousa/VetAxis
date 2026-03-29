@@ -1,0 +1,87 @@
+.readonly {
+  border: none;
+}
+
+.agendamento-header {
+    padding-bottom: 1rem;
+}
+
+.option {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    column-gap: 0.2rem;
+    row-gap: 0.12rem;
+}
+
+.cancel{
+  margin-right: 0.2rem;
+}
+
+.horario-selector {
+    display: block;
+    margin-top: 0.3rem;
+}
+
+.horario-selector label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 26px;
+        padding: 0.1rem 0.2rem;
+        margin: 0;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 0.78rem;
+        line-height: 1.1;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.horario-selector input[type="radio"] {
+    display: none;
+}
+
+/* Estilo para o label quando o rádio input está marcado */
+.horario-selector input[type="radio"]:checked + label {
+    background-color: #007bff; /* Cor de destaque para seleção */
+    color: white;
+    border-color: #007bff;
+}
+
+/* Estilo de hover para melhor UX */
+.horario-selector label:hover {
+    background-color: #f0f0f0e0;
+}
+
+/* Estilo para horários agendados */
+.horario-selector.horario-agendado label {
+    background-color: #ef4848;
+    border-color: #ef4848;
+    color: #ffffff;
+    cursor: not-allowed;
+}
+
+.horario-selector input[type="radio"]:disabled + label {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.horario-selector.horario-agendado:hover label {
+    background-color: #ef4848;
+}
+
+@media (max-width: 576px) {
+    .option {
+        grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+        column-gap: 0.15rem;
+        row-gap: 0.1rem;
+    }
+
+    .horario-selector label {
+        min-height: 24px;
+        padding: 0.08rem 0.25rem;
+        font-size: 0.74rem;
+    }
+}
+

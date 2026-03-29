@@ -1,0 +1,168 @@
+.calendario-container {
+  width: 100%;
+}
+
+.calendario-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.dia-semana-header {
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #495057;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.calendario-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.dia-card {
+  min-height: 120px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dia-vazio {
+  background: transparent;
+  border: none;
+  cursor: default;
+}
+
+.dia-card:not(.dia-vazio):hover {
+  border-color: #0d6efd;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dia-selecionado {
+  border-color: #0d6efd;
+  background: #eef4ff;
+}
+
+.dia-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.25rem;
+  flex-shrink: 0;
+}
+
+.dia-numero {
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
+  color: #212529;
+}
+
+.dia-status {
+  font-size: 0.875rem;
+}
+
+.escala-existente {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.7rem;
+}
+
+.escala-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.25rem;
+  padding: 0.15rem 0.25rem;
+  background: linear-gradient(135deg, #e7f3ff 0%, #cfe8ff 100%);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.15);
+}
+
+.escala-nome {
+  font-weight: 600;
+  color: #343a40;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.escala-hora {
+  color: #495057;
+  white-space: nowrap;
+}
+
+.horarios-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+  overflow-y: auto;
+  flex: 1;
+  max-height: 200px;
+  scrollbar-width: thin;
+  scrollbar-color: #6c757d #f8f9fa;
+}
+
+.horarios-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.horarios-container::-webkit-scrollbar-track {
+  background: #f8f9fa;
+}
+
+.horarios-container::-webkit-scrollbar-thumb {
+  background: #6c757d;
+  border-radius: 2px;
+}
+
+.horario-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: #ffffff;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+  font-size: 0.75rem;
+}
+
+.horario-input {
+  flex: 1;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid #ced4da;
+  border-radius: 3px;
+  min-width: 0;
+}
+
+.horario-item .btn {
+  padding: 0.2rem 0.4rem;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  line-height: 1;
+  background: transparent;
+  border: none;
+  color: #6c757d;
+}
+
+.horario-item .btn:hover {
+  color: #dc3545;
+  background: transparent;
+}
+

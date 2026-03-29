@@ -1,0 +1,166 @@
+<div class="container mt-4">
+  <div class="page-header">
+    <div class="page-header-main">
+      <h4 class="screen-title">Escala de Veterinarios</h4>
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="salvarEscala()">
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <label for="vet" class="form-label">Veterinario</label>
+        <input
+          id="vet"
+          type="text"
+          class="formControl"
+          list="vet-list"
+          formControlName="veterinarioNome"
+          placeholder="Selecione o veterinario"
+          (input)="onVeterinarioInput($event.target.value)"
+        />
+        <datalist id="vet-list">
+          @for (vet of veterinarios(); track vet.id) {
+          <option [value]="vet.nome"></option>
+          }
+        </datalist>
+      </div>
+
+      <div class="col-md-2">
+        <label for="ano" class="form-label">Ano</label>
+        <input
+          id="ano"
+          type="text"
+          class="formControl"
+          list="ano-list"
+          formControlName="ano"
+          placeholder="Selecione o ano"
+          (input)="onAnoInput($event.target.value)"
+        />
+        <datalist id="ano-list">
+          @for (ano of anosDisponiveis(); track ano) {
+          <option [value]="ano"></option>
+          }
+        </datalist>
+      </div>
+
+      <div class="col-md-2">
+        <label for="mes" class="form-label">Mes</label>
+        <input
+          id="mes"
+          type="text"
+          class="formControl"
+          list="mes-list"
+          formControlName="mesNome"
+          placeholder="Selecione o mes"
+          (input)="onMesInput($event.target.value)"
+        />
+        <datalist id="mes-list">
+          @for (mes of meses; track mes.value) {
+          <option [value]="mes.label"></option>
+          }
+        </datalist>
+      </div>
+    </div>
+
+    @if (diasDoMes().length === 0) {
+    <div class="alert alert-secondary">Selecione um ano e um mes para ver a escala.</div>
+    } @else {
+    @if (mostrarEscalasCarregadas()) {
+    <div class="alert alert-info mb-3">
+      <strong>Escalas de {{ form.get('veterinarioNome')?.value }}</strong> - {{ form.get('mesNome')?.value }} de {{ form.get('ano')?.value }}
+    </div>
+    }
+    <div class="calendario-container">
+      <div class="calendario-header">
+        @for (diaSemana of diasSemana; track diaSemana) {
+        <div class="dia-semana-header">{{ diaSemana }}</div>
+        }
+      </div>
+      <div class="calendario-grid">
+      @for (celula of celulasCalendario(); track $index) {
+        @if (celula === null) {
+        <div class="dia-card dia-vazio"></div>
+        } @else {
+        @let dia = celula;
+        <div
+          class="dia-card"
+          [class.dia-selecionado]="isDiaSelecionado(dia.diaNumero)"
+          (click)="toggleDia(dia.diaNumero)"
+          [title]="dia.data"
+        >
+          <div class="dia-header">
+            <div class="dia-numero">{{ dia.diaNumero }}</div>
+            <div class="dia-status">
+              @if (isDiaSelecionado(dia.diaNumero)) {
+              <i class="fa-solid fa-check text-success"></i>
+              }
+            </div>
+          </div>
+
+          @if (getEscalasDoDia(dia.diaNumero).length > 0) {
+          <div class="escala-existente" (click)="$event.stopPropagation()">
+            @for (escala of getEscalasDoDia(dia.diaNumero); track escala.id) {
+            <div class="escala-item">
+              <span class="escala-nome">{{ getNomeVeterinario(escala.veterinarioId) }}</span>
+              <span class="escala-hora">{{ escala.horaInicio }}-{{ escala.horaFim }}</span>
+            </div>
+            }
+          </div>
+          }
+
+          @if (isDiaSelecionado(dia.diaNumero)) {
+          @for (diaControl of diasForm.controls; track diaControl.get('dia')?.value) {
+            @if (diaControl.get('dia')?.value === dia.diaNumero) {
+            <div class="horarios-container" (click)="$event.stopPropagation()">
+              @for (horario of getHorarios(asDiaFormGroup(diaControl)).controls; track $index) {
+              <div class="horario-item" [formGroup]="$any(horario)">
+                <input
+                  type="text"
+                  class="formControl horario-input"
+                  placeholder="Inicio (HH:mm)"
+                  formControlName="horaInicio"
+                  maxlength="5"
+                  (input)="formatarHoraInput($event, horario, 'horaInicio')"
+                />
+                <input
+                  type="text"
+                  class="formControl horario-input"
+                  placeholder="Fim (HH:mm)"
+                  formControlName="horaFim"
+                  maxlength="5"
+                  (input)="formatarHoraInput($event, horario, 'horaFim')"
+                />
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-secondary"
+                  (click)="removerHorario(asDiaFormGroup(diaControl), $index)"
+                >
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+              }
+              @if (canAdicionarHorario(dia.diaNumero)) {
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary w-100 mt-2"
+                (click)="adicionarHorario(asDiaFormGroup(diaControl))"
+              >
+                + Horario
+              </button>
+              }
+            </div>
+            }
+          }
+          }
+        </div>
+        }
+      }
+      </div>
+    </div>
+    }
+
+    <div class="mt-4 d-flex justify-content-end">
+      <button type="submit" class="btn btn-primary">Salvar escala</button>
+    </div>
+  </form>
+</div>

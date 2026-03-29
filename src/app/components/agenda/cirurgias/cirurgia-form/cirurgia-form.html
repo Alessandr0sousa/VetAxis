@@ -1,0 +1,55 @@
+<div class="card-body">
+  <form [formGroup]="form" (ngSubmit)="salvar()" class="container mt-3" novalidate>
+    <div class="row">
+      <div class="mb-3 col-md-6 form-field">
+        <label class="form-label">Veterinário</label>
+        <input class="formControl readonly" [value]="agendamento?.veterinario?.nome || ''" readonly />
+      </div>
+
+      <div class="mb-3 col-md-6 form-field">
+        <label class="form-label">Pet</label>
+        <input class="formControl readonly" [value]="agendamento?.pet?.nome || ''" readonly />
+      </div>
+
+      <div class="mb-3 col-md-6 form-field">
+        <label for="tipo" class="form-label">Tipo de Cirurgia</label>
+        <input id="tipo" class="formControl" formControlName="tipo" />
+      </div>
+
+      <div class="mb-3 col-md-6 form-field">
+        <label for="protocoloAnestesia" class="form-label">Protocolo Anestesia</label>
+        <input id="protocoloAnestesia" class="formControl" formControlName="protocoloAnestesia" />
+      </div>
+
+      <div class="mb-3 col-md-6 form-field">
+        <label for="anestesia" class="form-label">Anestesia</label>
+        <input id="anestesia" class="formControl" formControlName="anestesia" />
+      </div>
+
+      <div class="mb-3 col-md-6 form-field">
+        <label for="anestesista" class="form-label">Anestesista</label>
+        <input id="anestesista" class="formControl" formControlName="anestesista" />
+      </div>
+
+      <div class="mb-3 col-md-6 form-field">
+        <label for="descricao" class="form-label">Descrição</label>
+        <textarea id="descricao" class="formControl" formControlName="descricao"></textarea>
+      </div>
+
+      <div class="mb-3 col-md-6 form-field">
+        <label for="relaProcedimento" class="form-label">Procedimento</label>
+        <textarea id="relaProcedimento" class="formControl" formControlName="relaProcedimento"></textarea>
+      </div>
+
+      <div class="form-check mb-3 col-md-3 form-field">
+        <input type="checkbox" id="internamento" class="form-check-input" formControlName="internamento" />
+        <label for="internamento" class="form-check-label">Internamento</label>
+      </div>
+
+      <div class="col-12 d-flex justify-content-end">
+        <button type="button" class="btn btn-secondary me-2" (click)="onCancelar()">Cancelar</button>
+        <button type="submit" class="btn btn-success" [disabled]="form.invalid">Salvar</button>
+      </div>
+    </div>
+  </form>
+</div>

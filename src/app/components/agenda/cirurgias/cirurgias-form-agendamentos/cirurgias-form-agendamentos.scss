@@ -1,0 +1,42 @@
+.horario-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 10px;
+}
+
+.horario-option {
+  position: relative;
+}
+
+.horario-selector input[type="radio"] {
+  display: none;
+}
+
+.horario-selector label {
+  display: block;
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #f8f9fa;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.horario-selector input[type="radio"]:checked + label {
+  background-color: #dc2626;
+  color: white;
+  border-color: #dc2626;
+}
+
+.horario-agendado label {
+  background-color: #ef4848;
+  color: white;
+  cursor: not-allowed;
+  border-color: #ef4848;
+}
+
+.horario-agendado input[type="radio"] {
+  cursor: not-allowed;
+}

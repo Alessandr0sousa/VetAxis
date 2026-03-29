@@ -1,0 +1,52 @@
+<section class="login-shell">
+  <div class="login-card">
+    <header class="login-header">
+      <h1>VetAxis</h1>
+      <p>Acessar o sistema</p>
+    </header>
+
+    @if (errorMessage()) {
+      <div class="login-alert" role="alert">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <form [formGroup]="form()" (ngSubmit)="submit.emit()" novalidate>
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          class="formControl"
+          formControlName="email"
+          autocomplete="username"
+          placeholder="voce@exemplo.com"
+        />
+        @if (form().get('email')?.invalid && form().get('email')?.touched) {
+          <span class="field-error">Email invalido.</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">Senha</label>
+        <input
+          id="password"
+          type="password"
+          class="formControl"
+          formControlName="password"
+          autocomplete="current-password"
+          placeholder="Digite sua senha"
+        />
+        @if (form().get('password')?.invalid && form().get('password')?.touched) {
+          <span class="field-error">Senha obrigatoria.</span>
+        }
+      </div>
+      <div class="btn-login">
+        <button class="btn btn-primary" type="submit" [disabled]="form().invalid || loading()">
+            <span>{{ loading() ? 'Entrando...' : 'Entrar' }}</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</section>

@@ -1,0 +1,85 @@
+<div class="card-body">
+  <form [formGroup]="form" (ngSubmit)="salvarConsulta()" class="container mt-4" novalidate>
+    <div class="row">
+      <div class="mb-3 col-md-6 form-field">
+        <label for="veterinario" class="form-label">Veterinário</label>
+        <input
+          id="veterinario"
+          type="text"
+          readonly
+          class="formControl readonly"
+          formControlName="veterinarioNome"
+        />
+      </div>
+
+      <div class="mb-3 col-md-3 form-field">
+        <label for="peso" class="form-label">Peso (kg)</label>
+        <input type="number" id="peso" formControlName="peso" class="formControl" />
+        @if (form.get('peso')?.invalid && form.get('peso')?.touched) {
+          <div class="text-danger">Peso é obrigatório.</div>
+        }
+      </div>
+
+      <div class="mb-3 col-md-6 form-field" formGroupName="consulta">
+        <label for="anamnese" class="form-label">Anamnese</label>
+        <textarea id="anamnese" formControlName="anamnese" class="formControl"></textarea>
+        @if (form.get('consulta.anamnese')?.invalid && form.get('consulta.anamnese')?.touched) {
+          <div class="text-danger">Anamnese é obrigatória.</div>
+        }
+      </div>
+
+      <div class="mb-3 col-md-6 form-field" formGroupName="consulta">
+        <label for="exameFisico" class="form-label">Exame Físico</label>
+        <textarea id="exameFisico" formControlName="exameFisico" class="formControl"></textarea>
+        @if (form.get('consulta.exameFisico')?.invalid && form.get('consulta.exameFisico')?.touched) {
+          <div class="text-danger">Exame Físico é obrigatório.</div>
+        }
+      </div>
+
+      <div class="mb-3 col-md-6 form-field" formGroupName="consulta">
+        <label for="tratamento" class="form-label">Tratamento</label>
+        <textarea id="tratamento" formControlName="tratamento" class="formControl"></textarea>
+        @if (form.get('consulta.tratamento')?.invalid && form.get('consulta.tratamento')?.touched) {
+          <div class="text-danger">Tratamento é obrigatório.</div>
+        }
+      </div>
+
+      <div class="mb-3 col-md-6 form-field" formGroupName="consulta">
+        <label for="prescricao" class="form-label">Prescrição</label>
+        <textarea id="prescricao" formControlName="prescricao" class="formControl"></textarea>
+        @if (form.get('consulta.prescricao')?.invalid && form.get('consulta.prescricao')?.touched) {
+          <div class="text-danger">Prescrição é obrigatória.</div>
+        }
+      </div>
+
+      <div class="mb-3 col-md-3 form-field" formGroupName="consulta">
+        <label for="diagnostico" class="form-label">Diagnóstico</label>
+        <input id="diagnostico" formControlName="diagnostico" class="formControl" />
+        @if (form.get('consulta.diagnostico')?.invalid && form.get('consulta.diagnostico')?.touched) {
+          <div class="text-danger">Diagnóstico é obrigatório.</div>
+        }
+      </div>
+      <div class="form-check mb-3 col-md-2 form-field" formGroupName="consulta">
+        <input
+          type="checkbox"
+          id="internamento"
+          formControlName="internamento"
+          class="form-check-input"
+        />
+        <label for="internamento" class="form-check-label">Internamento</label>
+      </div>
+
+      <!-- Anexos -->
+      <div class="col-12">
+        <app-anexos-upload [agendamentoId]="agendamento?.id" formControlName="anexos"></app-anexos-upload>
+      </div>
+
+      <div class="col-12 d-flex justify-content-end">
+        <button type="button" (click)="cancelarForm()" class="btn btn-secondary me-2">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-success" [disabled]="form.invalid">Salvar</button>
+      </div>
+    </div>
+  </form>
+</div>

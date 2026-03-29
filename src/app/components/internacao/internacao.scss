@@ -1,0 +1,46 @@
+// ── Page Shell ──────────────────────────────────────────────────
+.internacoes-page {
+	display: flex;
+	flex-direction: column;
+	min-height: 100%;
+	background: #f1f5f9;
+	padding: 1.5rem 2rem;
+	gap: 1.25rem;
+	box-sizing: border-box;
+}
+
+// ── Two-column layout ────────────────────────────────────────────
+.layout-grid {
+	display: grid;
+	grid-template-columns: 310px 1fr;
+	gap: 1.25rem;
+	align-items: start;
+	flex: 1;
+}
+
+.internacoes-sidebar {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	position: sticky;
+	top: 0;
+}
+
+.internacoes-detail {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	min-width: 0;
+}
+
+// ── Responsive ───────────────────────────────────────────────────
+@media (max-width: 900px) {
+	.internacoes-page {
+		padding: 1rem;
+	}
+
+	.layout-grid {
+		grid-template-columns: 1fr;
+	}
+}
+

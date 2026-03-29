@@ -1,0 +1,227 @@
+<div class="mt-4">
+  <!-- Tabs por tipo de agendamento -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link active"
+        id="consultas-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#consultas"
+        type="button"
+        role="tab"
+      >
+        Consultas ({{ agendamentosAgrupados.totalConsultas }})
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        id="cirurgias-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#cirurgias"
+        type="button"
+        role="tab"
+      >
+        Cirurgias ({{ agendamentosAgrupados.totalCirurgias }})
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        id="exames-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#exames"
+        type="button"
+        role="tab"
+      >
+        Exames ({{ agendamentosAgrupados.totalExames }})
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        id="vacinas-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#vacinas"
+        type="button"
+        role="tab"
+      >
+        Vacinas ({{ agendamentosAgrupados.totalVacinas }})
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <!-- Consultas -->
+    <div class="tab-pane fade show active" id="consultas" role="tabpanel">
+      <div class="card mt-3">
+        <ul class="list-group list-group-flush">
+          @if (agendamentosAgrupados.consultas.length > 0) {
+            @for (item of agendamentosAgrupados.consultas; track item.id) {
+              <li
+                class="list-group-item inline-flex"
+                [title]="
+                getTipoAgendamentoFrase(item.tipoAgendamento) +
+                  ' ' +
+                  item.dia +
+                  ' às ' +
+                  item.horario +
+                  ' com ' +
+                  item.veterinario.nome +
+                  ' - ' +
+                  getStatusLabel(item.status)
+                "
+              >
+                <strong>{{ item.pet.nome }}</strong>
+                <div>
+                  <span>{{ item.dia }}</span>
+                  &nbsp;
+                  <span>{{ item.horario }}</span>
+                  &nbsp;
+                  @if (item.status) {
+                    <i
+                      [class]="getStatusIcon(item.status) + ' ' + getStatusFontColor(item.status)"
+                    ></i>
+                  } @else {
+                    <i class="fa-solid fa-calendar"></i>
+                  }
+                </div>
+              </li>
+            }
+          } @else {
+            <li class="list-group-item text-center text-muted">Nenhuma consulta agendada</li>
+          }
+        </ul>
+      </div>
+    </div>
+
+    <!-- Cirurgias -->
+    <div class="tab-pane fade" id="cirurgias" role="tabpanel">
+      <div class="card mt-3">
+        <ul class="list-group list-group-flush">
+          @if (agendamentosAgrupados.cirurgias.length > 0) {
+            @for (item of agendamentosAgrupados.cirurgias; track item.id) {
+              <li
+                class="list-group-item inline-flex"
+                [title]="
+                getTipoAgendamentoFrase(item.tipoAgendamento) +
+                  ' ' +
+                  item.dia +
+                  ' às ' +
+                  item.horario +
+                  ' com ' +
+                  item.veterinario.nome +
+                  ' - ' +
+                  getStatusLabel(item.status)
+                "
+              >
+                <strong>{{ item.pet.nome }}</strong>
+                <div>
+                  <span>{{ item.dia }}</span>
+                  &nbsp;
+                  <span>{{ item.horario }}</span>
+                  &nbsp;
+                  @if (item.status) {
+                    <i
+                      [class]="getStatusIcon(item.status) + ' ' + getStatusFontColor(item.status)"
+                    ></i>
+                  } @else {
+                    <i class="fa-solid fa-calendar"></i>
+                  }
+                </div>
+              </li>
+            }
+          } @else {
+            <li class="list-group-item text-center text-muted">Nenhuma cirurgia agendada</li>
+          }
+        </ul>
+      </div>
+    </div>
+
+    <!-- Exames -->
+    <div class="tab-pane fade" id="exames" role="tabpanel">
+      <div class="card mt-3">
+        <ul class="list-group list-group-flush">
+          @if (agendamentosAgrupados.exames.length > 0) {
+            @for (item of agendamentosAgrupados.exames; track item.id) {
+              <li
+                class="list-group-item inline-flex"
+                [title]="
+                getTipoAgendamentoFrase(item.tipoAgendamento) +
+                  ' ' +
+                  item.dia +
+                  ' às ' +
+                  item.horario +
+                  ' com ' +
+                  item.veterinario.nome +
+                  ' - ' +
+                  getStatusLabel(item.status)
+                "
+              >
+                <strong>{{ item.pet.nome }}</strong>
+                <div>
+                  <span>{{ item.dia }}</span>
+                  &nbsp;
+                  <span>{{ item.horario }}</span>
+                  &nbsp;
+                  @if (item.status) {
+                    <i
+                      [class]="getStatusIcon(item.status) + ' ' + getStatusFontColor(item.status)"
+                    ></i>
+                  } @else {
+                    <i class="fa-solid fa-calendar"></i>
+                  }
+                </div>
+              </li>
+            }
+          } @else {
+            <li class="list-group-item text-center text-muted">Nenhum exame agendado</li>
+          }
+        </ul>
+      </div>
+    </div>
+
+    <!-- Vacinas -->
+    <div class="tab-pane fade" id="vacinas" role="tabpanel">
+      <div class="card mt-3">
+        <ul class="list-group list-group-flush">
+          @if (agendamentosAgrupados.vacinas.length > 0) {
+            @for (item of agendamentosAgrupados.vacinas; track item.id) {
+              <li
+                class="list-group-item inline-flex"
+                [title]="
+                getTipoAgendamentoFrase(item.tipoAgendamento) +
+                  ' ' +
+                  item.dia +
+                  ' às ' +
+                  item.horario +
+                  ' com ' +
+                  item.veterinario.nome +
+                  ' - ' +
+                  getStatusLabel(item.status)
+                "
+              >
+                <strong>{{ item.pet.nome }}</strong>
+                <div>
+                  <span>{{ item.dia }}</span>
+                  &nbsp;
+                  <span>{{ item.horario }}</span>
+                  &nbsp;
+                  @if (item.status) {
+                    <i
+                      [class]="getStatusIcon(item.status) + ' ' + getStatusFontColor(item.status)"
+                    ></i>
+                  } @else {
+                    <i class="fa-solid fa-calendar"></i>
+                  }
+                </div>
+              </li>
+            }
+          } @else {
+            <li class="list-group-item text-center text-muted">Nenhuma vacina agendada</li>
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

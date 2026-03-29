@@ -1,0 +1,127 @@
+<div class="anexos-container card mt-3">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">
+      <i class="fa-solid fa-paperclip me-2"></i>
+      Anexos ({{ getTotalAnexos() }})
+    </h5>
+
+    <label class="btn btn-primary btn-sm mb-0" [class.disabled]="uploading()">
+      <i class="fa-solid fa-upload me-1"></i>
+      @if (uploading()) {
+        <span>Enviando...</span>
+      } @else {
+        <span>Adicionar</span>
+      }
+      <input
+        type="file"
+        class="d-none"
+        accept=".pdf,.png,.jpg,.jpeg"
+        (change)="onFileSelected($event)"
+        [disabled]="uploading()"
+      />
+    </label>
+  </div>
+
+  <div class="card-body">
+    @if (getTotalAnexos() === 0) {
+      <div class="text-center text-muted py-4">
+        <i class="fa-solid fa-folder-open fa-3x mb-3"></i>
+        <p class="mb-0">Nenhum anexo adicionado</p>
+      </div>
+    } @else {
+      <div class="list-group list-group-flush">
+        <!-- Anexos Salvos -->
+        @for (anexo of anexos(); track anexo.id) {
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center flex-grow-1">
+              @if (isImagem(anexo.tipo) && getPreviewUrl(anexo)) {
+                <img
+                  [src]="getPreviewUrl(anexo)!"
+                  [alt]="anexo.nome"
+                  class="preview-thumbnail me-3"
+                />
+              } @else {
+                <i class="fa-solid {{ getIconeAnexo(anexo.tipo) }} fa-2x text-primary me-3"></i>
+              }
+              <div>
+                <div class="fw-bold">{{ anexo.nome }}</div>
+              </div>
+            </div>
+
+            <div class="btn-group btn-group-sm">
+              <button
+                type="button"
+                class="btn btn-outline-info"
+                (click)="visualizarAnexo(anexo)"
+                title="Visualizar"
+              >
+                <i class="fa-solid fa-eye"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-primary"
+                (click)="downloadAnexo(anexo)"
+                title="Baixar"
+              >
+                <i class="fa-solid fa-download"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-danger"
+                (click)="deletarAnexo(anexo)"
+                title="Excluir"
+              >
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Anexos Temporários -->
+        @for (anexo of anexosTemp(); track $index) {
+          <div class="list-group-item d-flex justify-content-between align-items-center bg-light">
+            <div class="d-flex align-items-center flex-grow-1">
+              @if (isImagem(anexo.tipo)) {
+                <img
+                  [src]="'data:' + anexo.tipo + ';base64,' + anexo.arquivo"
+                  [alt]="anexo.nome"
+                  class="preview-thumbnail me-3"
+                />
+              } @else {
+                <i class="fa-solid {{ getIconeAnexo(anexo.tipo) }} fa-2x text-warning me-3"></i>
+              }
+              <div>
+                <div class="fw-bold">
+                  {{ anexo.nome }}
+                  <span class="badge bg-warning text-dark ms-2">Pendente</span>
+                </div>
+                <small class="text-muted">
+                  Será salvo ao criar o agendamento
+                </small>
+              </div>
+            </div>
+
+            <div class="btn-group btn-group-sm">
+              <button
+                type="button"
+                class="btn btn-outline-info"
+                (click)="visualizarAnexoTemporario(anexo)"
+                title="Visualizar"
+              >
+                <i class="fa-solid fa-eye"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-danger"
+                (click)="deletarAnexoTemporario($index)"
+                title="Excluir"
+              >
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,102 @@
+<div
+  class="sidebar bg-dark text-white p-3"
+  [ngClass]="{ 'sidebar-collapsed': isCollapsed, 'sidebar-expanded': !isCollapsed }"
+>
+  <div class="d-flex justify-content-center align-items-center mb-3 overlay">
+    @if (!isCollapsed) {
+    <app-card-company (click)="toggle.emit()"></app-card-company>
+    } @else {
+    <button class="btn btn-sm btn-dark side-icon" (click)="toggle.emit()">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+    }
+  </div>
+
+  <ul class="nav flex-column top-menu">
+    @for (iten of itens; track iten) {
+    <li class="nav-item" [class.nav-item-wide]="!!iten.children">
+      @if (iten.children) {
+      <a
+        class="nav-link text-white d-flex align-items-center"
+        [routerLink]="iten.routerLink ?? null"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="onParentItemClick($event, iten)"
+        role="button"
+        [attr.aria-expanded]="isItemExpanded(iten.label)"
+        [title]="iten.label"
+      >
+        <i [class]="iten.icon + ' side-icon'"></i>
+        @if (!isCollapsed) {
+        <span class="ms-2">{{ iten.label }}</span>
+        <i class="fa-solid fa-chevron-down ms-auto" [class.rotate-180]="isItemExpanded(iten.label)"></i>
+        }
+      </a>
+
+      @if (iten.children && !isCollapsed && isItemExpanded(iten.label)) {
+        <ul class="nav flex-column ms-3">
+          @for (child of iten.children; track child) {
+          <li class="nav-item">
+            <div class="d-flex align-items-center">
+              <a
+                class="nav-link text-white d-flex align-items-center flex-grow-1"
+                [routerLink]="child.routerLink"
+                routerLinkActive="active"
+                [title]="child.label"
+              >
+                <i [class]="child.icon + ' side-icon'"></i>
+                <span class="ms-2">{{ child.label }}</span>
+              </a>
+
+              @if (child.children) {
+              <button
+                type="button"
+                class="btn btn-sm btn-link text-white ms-auto p-0 submenu-toggle"
+                (click)="toggleChild(iten.label, child.label)"
+                [attr.aria-expanded]="isChildExpanded(iten.label, child.label)"
+                [title]="child.label"
+              >
+                <i class="fa-solid fa-chevron-down" [class.rotate-180]="isChildExpanded(iten.label, child.label)"></i>
+              </button>
+              }
+            </div>
+
+            @if (child.children && isChildExpanded(iten.label, child.label)) {
+              <ul class="nav flex-column ms-4">
+                @for (grandchild of child.children; track grandchild) {
+                <li class="nav-item">
+                  <a
+                    class="nav-link text-white d-flex align-items-center"
+                    [routerLink]="grandchild.routerLink"
+                    routerLinkActive="active"
+                    [title]="grandchild.label"
+                  >
+                    <i [class]="grandchild.icon + ' side-icon'"></i>
+                    <span class="ms-2">{{ grandchild.label }}</span>
+                  </a>
+                </li>
+                }
+              </ul>
+            }
+          </li>
+          }
+        </ul>
+      }
+      } @else {
+      <a
+        class="nav-link text-white d-flex align-items-center"
+        [routerLink]="iten.routerLink"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        [title]="iten.label"
+      >
+        <i [class]="iten.icon + ' side-icon'"></i>
+        @if (!isCollapsed) {
+        <span class="ms-2">{{ iten.label }}</span>
+        }
+      </a>
+      }
+    </li>
+    }
+  </ul>
+</div>

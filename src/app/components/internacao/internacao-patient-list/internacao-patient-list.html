@@ -1,0 +1,23 @@
+<div class="internacao-list">
+  @if (!listLoading() && internacoes().length === 0) {
+    <div class="empty-state">Nenhuma internação encontrada.</div>
+  }
+
+  @for (item of internacoes(); track item.id) {
+    <button
+      type="button"
+      [class]="'internacao-card ' + (selectedId() === item.id ? 'selected' : '')"
+      (click)="onSelecionar(item.id)"
+    >
+      <div class="card-top">
+        <strong>{{ item.petNome }}</strong>
+        <span [class]="getStatusClass(item.statusInternacao)">{{ getStatusLabel(item.statusInternacao) }}</span>
+      </div>
+      <div class="card-mid">{{ item.nome }}</div>
+      <div class="card-meta">
+        <span>{{ item.veterinarioNome }}</span>
+        <span>{{ formatarData(item.dataHoraAdmissao) }}</span>
+      </div>
+    </button>
+  }
+</div>

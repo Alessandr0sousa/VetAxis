@@ -1,0 +1,22 @@
+.div-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+a, i{
+  padding: 0;
+}
+
+.btn-secondary {
+  border-radius: 50%;
+  // color: #fff;
+}
+
+.qtd{
+  font-size: 4rem;
+}
+
+.card-body{
+  padding: .3rem;
+}

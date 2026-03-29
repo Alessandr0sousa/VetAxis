@@ -1,1 +1,86 @@
-<p>consultas works!</p>
+<div class="mt-3">
+  @if (agendamentoConsulta) {
+    <div class="mt-3 page-header">
+      <div class="page-header-main">
+        <h4 class="screen-title">
+          Atendimento de Consulta {{ agendamentoConsulta.pet.sexo === 'Fêmea' ? 'da' : 'do' }}
+          {{ agendamentoConsulta.pet.nome }} ({{ agendamentoConsulta.pet.especie }})
+        </h4>
+      </div>
+    </div>
+    <div class="dadospet-resumo">
+      <span><strong>Status:</strong> {{ agendamentoConsulta.pet.status ? 'Ativo' : 'Inativo' }}</span>
+      <span><strong>Raça:</strong> {{ agendamentoConsulta.pet.raca }}</span>
+      <span><strong>Esterilização:</strong> {{ agendamentoConsulta.pet.esterilizacao ? 'Sim' : 'Não' }}</span>
+      <span><strong>Pelagem:</strong> {{ agendamentoConsulta.pet.pelagem }}</span>
+      <span><strong>Temperamento:</strong> {{ agendamentoConsulta.pet.temperamento }}</span>
+      <span><strong>Sexo:</strong> {{ agendamentoConsulta.pet.sexo }}</span>
+      @if (agendamentoConsulta.pet.microchip) {
+        <span><strong>Chip:</strong> {{ agendamentoConsulta.pet.chip }}</span>
+      }
+      @if (agendamentoConsulta.pet.cliente) {
+        <span><strong>Responsável:</strong> {{ agendamentoConsulta.pet.cliente.nome }}</span>
+        <span><strong>Cpf:</strong> {{ agendamentoConsulta.pet.cliente.cpf }}</span>
+        @if (agendamentoConsulta.pet.cliente.endereco) {
+          <span>
+            <strong>Endereço:</strong> {{ agendamentoConsulta.pet.cliente.endereco.logradouro }},
+            {{ agendamentoConsulta.pet.cliente.endereco.bairro }},
+            {{ agendamentoConsulta.pet.cliente.endereco.numero }},
+            {{ agendamentoConsulta.pet.cliente.endereco.cidade }} -
+            {{ agendamentoConsulta.pet.cliente.endereco.uf }}
+          </span>
+        }
+      }
+    </div>
+  }
+  @if (agendamentoConsulta) {
+    <app-consulta-form
+      [agendamento]="agendamentoConsulta"
+      (consultaConcluida)="onConsultaConcluida($event)"
+      (cancelar)="onCancelar()"
+    ></app-consulta-form>
+  } @else if (!isAgedamento && !agendamentoConsulta) {
+    <div class="mt-3 page-header">
+      <div class="page-header-main">
+        <h4 class="screen-title">Consultas do Dia</h4>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-sm btn-secondary" (click)="onClickEmitter()">Agendar</button>
+      </div>
+    </div>
+    <hr />
+    @if (agendamentosFiltrados.length === 0) {
+      <div class="alert alert-warning" role="alert">
+        Não há consultas agendadas para hoje.
+      </div>
+    }
+    <div class="row mt-2 g-1">
+      @for (item of agendamentosFiltrados; track item.id) {
+        <div class="card mb-1 col-sm-5 col-md-4 col-lg-3 p-0">
+          <div
+            class="card-header p-0 ps-2"
+            [class]="getStatusClass(item.status)"
+          >
+            {{ item.pet.nome }}
+          </div>
+          <div class="card-body p-2">
+            <h6 class="card-title mb-1">{{ item.veterinario.nome }}</h6>
+            <p class="card-text mb-1">{{ item.dia }} - {{ item.horario }}</p>
+            <div class="text-end">
+              @if (item.status && (item.status != 'CANCELADO' && item.status != 'REALIZADO')) {
+                <button class="btn btn-sm btn-secondary" (click)="iniciarConsulta(item)">
+                  Iniciar
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <app-consultas-form-agendamentos
+    (cancelar)="onCancelar()"
+    [dto]="retorno"
+    ></app-consultas-form-agendamentos>
+  }
+</div>

@@ -16,56 +16,41 @@
       "routerLink": ["/pets"]
     },
     {
-      "label": "Consultas",
-      "icon": "fa-solid fa-stethoscope",
-      "routerLink": ["/consultas"]
-    },
-    {
-      "label": "Internação",
-      "icon": "fa-solid fa-procedures",
-      "routerLink": ["/internacao"]
-    },
-    {
       "label": "Cadastro",
       "icon": "fa-solid fa-user-plus",
-      "children": [
-        {
-          "label": "Clientes",
-          "icon": "fa-solid fa-user",
-          "routerLink": ["/cadastro/cliente-form"]
-        },
-        {
-          "label": "Pets",
-          "icon": "fa-solid fa-paw",
-          "routerLink": ["/cadastro/pet-form"]
-        },
-        {
-          "label": "Veterinários",
-          "icon": "fa-solid fa-user-md",
-          "routerLink": ["/cadastro/veterinarios"]
-        },
-        {
-          "label": "Funcionários",
-          "icon": "fa-solid fa-users",
-          "routerLink": ["/cadastro/funcionarios"]
-        }
-      ]
+      "routerLink": ["/cadastro"]
     },
     {
       "label": "Agenda",
       "icon": "fa-solid fa-calendar-days",
+      "routerLink": ["/agenda"],
       "children": [
         {
+          "label": "Consultas",
+          "icon": "fa-solid fa-stethoscope",
+          "routerLink": ["/consultas"]
+        },
+        {
           "label": "Cirurgias",
-          "icon": "fa-solid fa-syringe",
+          "icon": "fa-solid fa-scissors",
           "routerLink": ["/agenda/cirurgias"]
         },
         {
           "label": "Exames",
           "icon": "fa-solid fa-vials",
           "routerLink": ["/agenda/exames"]
+        },
+        {
+          "label": "Vacinas",
+          "icon": "fa-solid fa-syringe",
+          "routerLink": ["/agenda/vacinas"]
         }
       ]
+    },
+    {
+      "label": "Internações",
+      "icon": "fa-solid fa-procedures",
+      "routerLink": ["/internacoes"]
     },
     {
       "label": "Financeiro",
@@ -122,6 +107,18 @@
           "label": "Perfis de Acesso",
           "icon": "fa-solid fa-lock",
           "routerLink": ["/configuracoes/perfis"]
+        },
+        {
+          "label": "Escala",
+          "icon": "fa-solid fa-calendar-check",
+          "routerLink": ["/configuracoes/escala"],
+          "children": [
+            {
+              "label": "Veterinários",
+              "icon": "fa-solid fa-user-doctor",
+              "routerLink": ["/configuracoes/escala/veterinarios"]
+            }
+          ]
         }
       ]
     }
